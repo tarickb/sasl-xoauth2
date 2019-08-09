@@ -1,0 +1,4 @@
+BasedOnStyle: Google
+FixNamespaceComments: true
+DerivePointerAlignment: false
+PointerAlignment: Right
