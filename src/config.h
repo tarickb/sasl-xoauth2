@@ -25,7 +25,7 @@ class Config {
 
   std::string client_id_;
   std::string client_secret_;
-  bool log_to_syslog_on_failure_ = false;
+  bool log_to_syslog_on_failure_ = true;
   bool log_full_trace_on_failure_ = false;
 };
 
