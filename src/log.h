@@ -14,11 +14,12 @@ class Log {
   ~Log();
 
   void Write(const char *fmt, ...);
-  void FlushToDisk();
+  void Flush();
   void SetFlushOnDestroy();
 
  private:
   bool flush_on_destroy_ = false;
+  std::string summary_;
   std::vector<std::string> lines_;
 };
 

@@ -1,38 +1,24 @@
 #include "log.h"
 
-#include <errno.h>
-#include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/time.h>
-#include <sys/types.h>
+#include <syslog.h>
 #include <time.h>
-#include <unistd.h>
+
+#include "config.h"
 
 namespace sasl_xoauth2 {
 
 namespace {
-
-std::string GenerateFileName() {
-  timeval t = {};
-  gettimeofday(&t, nullptr);
-  const uint64_t time_ms = t.tv_sec * 1000 + t.tv_usec / 1000;
-
-  char buf[128];
-  snprintf(buf, sizeof(buf), "%d.%" PRIu64, getpid(), time_ms);
-
-  return "/tmp/sasl_xoauth2." + std::string(buf) + ".log";
-}
-
 bool s_test_mode = false;
-
 }  // namespace
 
 void EnableLoggingForTesting() { s_test_mode = true; }
 
 Log::~Log() {
-  if (flush_on_destroy_) FlushToDisk();
+  if (flush_on_destroy_ && !lines_.empty()) Flush();
 }
 
 void Log::Write(const char *fmt, ...) {
@@ -57,24 +43,34 @@ void Log::Write(const char *fmt, ...) {
   }
 }
 
-void Log::FlushToDisk() {
-  const std::string path = GenerateFileName();
-
+void Log::Flush() {
   if (s_test_mode) {
-    fprintf(stderr, "LOGGING: skipping write to %s\n", path.c_str());
+    fprintf(stderr, "LOGGING: skipping write of %lu line(s).\n", lines_.size());
     return;
   }
 
-  FILE *f = fopen(path.c_str(), "w");
-  if (!f) return;
+  if (!Config::Get()->log_to_syslog_on_failure()) return;
 
-  for (const auto &line : lines_) {
-    fprintf(f, "%s\n", line.c_str());
+  openlog("sasl-xoauth2", 0, 0);
+  if (Config::Get()->log_full_trace_on_failure()) {
+    syslog(LOG_WARNING, "auth failed:\n");
+    for (const auto &line : lines_) syslog(LOG_WARNING, "  %s\n", line.c_str());
+  } else {
+    if (summary_.empty()) summary_ = lines_.back();
+    syslog(LOG_WARNING, "auth failed: %s\n", summary_.c_str());
+    if (lines_.size() > 1) {
+      syslog(LOG_WARNING,
+             "set log_full_trace_on_failure to see full %lu "
+             "line(s) of tracing.\n",
+             lines_.size());
+    }
   }
-
-  fclose(f);
+  closelog();
 }
 
-void Log::SetFlushOnDestroy() { flush_on_destroy_ = true; }
+void Log::SetFlushOnDestroy() {
+  flush_on_destroy_ = true;
+  if (!lines_.empty()) summary_ = lines_.back();
+}
 
 }  // namespace sasl_xoauth2
