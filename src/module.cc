@@ -4,6 +4,7 @@
 #include <sasl/saslplug.h>
 
 #include "client.h"
+#include "config.h"
 
 namespace {
 
@@ -61,6 +62,11 @@ extern "C" int sasl_client_plug_init(const sasl_utils_t *utils, int max_version,
                     SASL_CLIENT_PLUG_VERSION, max_version);
     return SASL_BADVERS;
   }
+
+  // Do this here because subsequent calls are chroot-ed (for Postfix, at
+  // least).
+  int err = sasl_xoauth2::Config::Init();
+  if (err != SASL_OK) return err;
 
   *out_version = SASL_CLIENT_PLUG_VERSION;
   *plug_list = s_plugins;

@@ -6,9 +6,11 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <json/json.h>
 #include <string>
 #include <vector>
 
+#include "config.h"
 #include "http.h"
 #include "log.h"
 #include "module.h"
@@ -499,6 +501,11 @@ bool TestFailedPreemptiveTokenRefresh(sasl_client_plug_t plug) {
 
 int main(int argc, char **argv) {
   sasl_xoauth2::EnableLoggingForTesting();
+
+  Json::Value config;
+  config["client_id"] = "dummy client id";
+  config["client_secret"] = "dummy client secret";
+  TEST_ASSERT_OK(sasl_xoauth2::Config::InitForTesting(config));
 
   int version = 0;
   sasl_client_plug_t *plug_list = nullptr;

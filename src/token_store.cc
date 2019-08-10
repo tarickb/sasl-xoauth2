@@ -13,6 +13,7 @@
 #include <fstream>
 #include <sstream>
 
+#include "config.h"
 #include "http.h"
 #include "log.h"
 
@@ -24,9 +25,6 @@ constexpr int kMaxRefreshAttempts = 2;
 constexpr int kExpiryMarginSec = 10;
 
 constexpr char kTokenEndpoint[] = "https://accounts.google.com/o/oauth2/token";
-constexpr char kClientId[] =
-    "57941343807-i9phq61o2f21ujuo75b8rtpbmpb3l4lr.apps.googleusercontent.com";
-constexpr char kClientSecret[] = "cfBdcaqmjOJq5F2xK7qFxTEe";
 
 std::string GetTempSuffix() {
   timeval t = {};
@@ -68,8 +66,8 @@ int TokenStore::Refresh() {
   log_->Write("TokenStore::Refresh: attempt %d", refresh_attempts_);
 
   const std::string request =
-      std::string("client_id=") + kClientId +
-      "&client_secret=" + kClientSecret +
+      std::string("client_id=") + Config::Get()->client_id() +
+      "&client_secret=" + Config::Get()->client_secret() +
       "&grant_type=refresh_token&refresh_token=" + refresh_;
   std::string response;
   int response_code = 0;
