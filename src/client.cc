@@ -150,9 +150,9 @@ int Client::DoStep(sasl_client_params_t *params, const char *from_server,
       log_->Write("Client::DoStep: invalid state");
   }
 
+  if (err != SASL_OK && err != SASL_INTERACT) log_->SetFlushOnDestroy();
   log_->Write("Client::DoStep: new state %d and err %d",
               static_cast<int>(state_), err);
-  if (err != SASL_OK && err != SASL_INTERACT) log_->SetFlushOnDestroy();
   return err;
 }
 
