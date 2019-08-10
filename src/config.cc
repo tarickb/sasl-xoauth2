@@ -1,7 +1,9 @@
 #include "config.h"
 
 #include <sasl/sasl.h>
+#include <stdarg.h>
 #include <stdio.h>
+#include <syslog.h>
 
 #include <algorithm>
 #include <fstream>
@@ -12,11 +14,25 @@ namespace sasl_xoauth2 {
 namespace {
 
 constexpr char kConfigFilePath[] = "/etc/sasl/xoauth2.conf";
+
+bool s_test_mode = false;
 Config *s_config = nullptr;
+
+void Log(const char *fmt, ...) {
+  va_list args;
+  va_start(args, fmt);
+
+  if (s_test_mode)
+    vfprintf(stderr, fmt, args);
+  else
+    vsyslog(LOG_WARNING, fmt, args);
+
+  va_end(args);
+}
 
 template <typename T>
 int Transform(std::string in, T *out) {
-  fprintf(stderr, "CONFIG: Unknown value type.\n");
+  Log("sasl-xoauth2: Unknown value type.\n");
   return SASL_FAIL;
 }
 
@@ -31,10 +47,9 @@ int Transform(std::string in, bool *out) {
     *out = false;
     return SASL_OK;
   }
-  fprintf(stderr,
-          "CONFIG: Invalid value '%s'. Need either 'yes'/'true' or "
-          "'no'/'false'.\n",
-          in.c_str());
+  Log("sasl-xoauth2: Invalid value '%s'. Need either 'yes'/'true' or "
+      "'no'/'false'.\n",
+      in.c_str());
   return SASL_FAIL;
 }
 
@@ -49,7 +64,7 @@ int Fetch(const Json::Value &root, const std::string &name, bool optional,
           T *out) {
   if (!root.isMember(name)) {
     if (optional) return SASL_OK;
-    fprintf(stderr, "CONFIG: Missing required value: %s\n", name.c_str());
+    Log("sasl-xoauth2: Missing required value: %s\n", name.c_str());
     return SASL_FAIL;
   }
   return Transform(root[name].asString(), out);
@@ -63,30 +78,36 @@ int Config::Init() {
 
   try {
     std::ifstream f(kConfigFilePath);
+    if (!f.good()) {
+      Log("sasl-xoauth2: Unable to open config file %s\n", kConfigFilePath);
+      return SASL_FAIL;
+    }
+
     Json::Value root;
     f >> root;
     s_config = new Config();
     return s_config->Init(root);
 
   } catch (const std::exception &e) {
-    fprintf(stderr, "CONFIG: Exception during init: %s\n", e.what());
+    Log("sasl-xoauth2: Exception during init: %s\n", e.what());
     return SASL_FAIL;
   }
 }
 
 int Config::InitForTesting(const Json::Value &root) {
   if (s_config) {
-    fprintf(stderr, "CONFIG: Already initialized!\n");
+    Log("sasl-xoauth2: Already initialized!\n");
     exit(1);
   }
 
+  s_test_mode = true;
   s_config = new Config();
   return s_config->Init(root);
 }
 
 Config *Config::Get() {
   if (!s_config) {
-    fprintf(stderr, "CONFIG: Attempt to fetch before calling Init()!\n");
+    Log("sasl-xoauth2: Attempt to fetch before calling Init()!\n");
     exit(1);
   }
   return s_config;
@@ -113,7 +134,7 @@ int Config::Init(const Json::Value &root) {
     return 0;
 
   } catch (const std::exception &e) {
-    fprintf(stderr, "CONFIG: Exception during init: %s\n", e.what());
+    Log("sasl-xoauth2: Exception during init: %s\n", e.what());
     return SASL_FAIL;
   }
 }
