@@ -16,7 +16,7 @@ Config *s_config = nullptr;
 
 template <typename T>
 int Transform(std::string in, T *out) {
-  fprintf(stderr, "Unknown configuration value type.\n");
+  fprintf(stderr, "CONFIG: Unknown value type.\n");
   return SASL_FAIL;
 }
 
@@ -32,7 +32,7 @@ int Transform(std::string in, bool *out) {
     return SASL_OK;
   }
   fprintf(stderr,
-          "Invalid value '%s'. Need either 'yes'/'true' or "
+          "CONFIG: Invalid value '%s'. Need either 'yes'/'true' or "
           "'no'/'false'.\n",
           in.c_str());
   return SASL_FAIL;
@@ -49,7 +49,7 @@ int Fetch(const Json::Value &root, const std::string &name, bool optional,
           T *out) {
   if (!root.isMember(name)) {
     if (optional) return SASL_OK;
-    fprintf(stderr, "Missing required configuration value: %s\n", name.c_str());
+    fprintf(stderr, "CONFIG: Missing required value: %s\n", name.c_str());
     return SASL_FAIL;
   }
   return Transform(root[name].asString(), out);
@@ -69,14 +69,14 @@ int Config::Init() {
     return s_config->Init(root);
 
   } catch (const std::exception &e) {
-    fprintf(stderr, "Exception during config init: %s\n", e.what());
+    fprintf(stderr, "CONFIG: Exception during init: %s\n", e.what());
     return SASL_FAIL;
   }
 }
 
 int Config::InitForTesting(const Json::Value &root) {
   if (s_config) {
-    fprintf(stderr, "Config already initialized!\n");
+    fprintf(stderr, "CONFIG: Already initialized!\n");
     exit(1);
   }
 
@@ -86,7 +86,7 @@ int Config::InitForTesting(const Json::Value &root) {
 
 Config *Config::Get() {
   if (!s_config) {
-    fprintf(stderr, "Attempt to fetch configuration before calling Init()!\n");
+    fprintf(stderr, "CONFIG: Attempt to fetch before calling Init()!\n");
     exit(1);
   }
   return s_config;
@@ -113,7 +113,7 @@ int Config::Init(const Json::Value &root) {
     return 0;
 
   } catch (const std::exception &e) {
-    fprintf(stderr, "Exception during config init: %s\n", e.what());
+    fprintf(stderr, "CONFIG: Exception during init: %s\n", e.what());
     return SASL_FAIL;
   }
 }
