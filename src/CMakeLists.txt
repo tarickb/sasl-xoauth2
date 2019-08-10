@@ -15,6 +15,8 @@ include_directories(
 set(SOURCES
   client.cc
   client.h
+  config.cc
+  config.h
   http.cc
   http.h
   log.cc
