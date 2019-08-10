@@ -57,7 +57,7 @@ extern "C" int sasl_client_plug_init(const sasl_utils_t *utils, int max_version,
                                      sasl_client_plug_t **plug_list,
                                      int *plug_count) {
   if (max_version < SASL_CLIENT_PLUG_VERSION) {
-    utils->seterror(utils->conn, 0, "sasl_xoauth2: need version %d, got %d",
+    utils->seterror(utils->conn, 0, "sasl-xoauth2: need version %d, got %d",
                     SASL_CLIENT_PLUG_VERSION, max_version);
     return SASL_BADVERS;
   }

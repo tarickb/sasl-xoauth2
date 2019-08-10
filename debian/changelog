@@ -1,0 +1,23 @@
+sasl-xoauth2 (0.3-1ubuntu1~bionic1~ppa1) bionic; urgency=low
+
+  * Initial package for 0.3.
+
+ -- Tarick Bedeir (Ubuntu Development) <tarick@bedeir.com>  Fri, 09 Aug 2019 17:28:00 -0700
+
+sasl-xoauth2 (0.2-1ubuntu1~bionic1~ppa2) bionic; urgency=low
+
+  * Fix symlinks.
+
+ -- Tarick Bedeir (Ubuntu Development) <tarick@bedeir.com>  Fri, 09 Aug 2019 17:13:00 -0700
+
+sasl-xoauth2 (0.2-1ubuntu1~bionic1~ppa1) bionic; urgency=low
+
+  * Initial package for 0.2.
+
+ -- Tarick Bedeir (Ubuntu Development) <tarick@bedeir.com>  Fri, 09 Aug 2019 17:08:00 -0700
+
+sasl-xoauth2 (0.1-1ubuntu1~bionic1~ppa1) bionic; urgency=low
+
+  * Initial package for 0.1.
+
+ -- Tarick Bedeir (Ubuntu Development) <tarick@bedeir.com>  Fri, 09 Aug 2019 16:48:00 -0700

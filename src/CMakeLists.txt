@@ -32,12 +32,6 @@ install(
   TARGETS ${PROJECT_NAME}
   LIBRARY DESTINATION lib)
 
-set(lib_name "${CMAKE_INSTALL_FULL_LIBDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}${PROJECT_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX}")
-install(
-  CODE "execute_process( \
-  COMMAND ln -f -s ${lib_name} /usr/lib/sasl2/${PROJECT_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX} \
-  )")
-
 add_executable(${PROJECT_NAME}_test xoauth2_test.cc)
 target_link_libraries(${PROJECT_NAME}_test ${PROJECT_NAME})
 
