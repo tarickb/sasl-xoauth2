@@ -8,9 +8,7 @@ find_package(CURL REQUIRED)
 
 pkg_check_modules(SASL REQUIRED "libsasl2")
 
-include_directories(
-  ${CMAKE_SOURCE_DIR}/src
-  ${CMAKE_BINARY_DIR}/src)
+include_directories(${CMAKE_SOURCE_DIR}/src)
 
 set(SOURCES
   client.cc
