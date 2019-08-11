@@ -13,7 +13,7 @@ namespace sasl_xoauth2 {
 
 namespace {
 
-constexpr char kConfigFilePath[] = "/etc/sasl/xoauth2.conf";
+constexpr char kConfigFilePath[] = "/etc/sasl-xoauth2.conf";
 
 bool s_test_mode = false;
 Config *s_config = nullptr;
