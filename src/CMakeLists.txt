@@ -34,7 +34,7 @@ target_link_libraries(${PROJECT_NAME} ${CURL_LIBRARIES} jsoncpp_lib)
 
 install(
   TARGETS ${PROJECT_NAME}
-  LIBRARY DESTINATION lib)
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 install(
   FILES ${CONFIG_FILE}
