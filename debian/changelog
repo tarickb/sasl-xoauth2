@@ -1,3 +1,9 @@
+sasl-xoauth2 (0.6-1ubuntu1~bionic1~ppa1) bionic; urgency=low
+
+  * Actually (?) fix broken 32-bit build.
+
+ -- Tarick Bedeir (Ubuntu Development) <tarick@bedeir.com>  Sat, 10 Aug 2019 19:22:00 -0700
+
 sasl-xoauth2 (0.5-1ubuntu1~bionic1~ppa1) bionic; urgency=low
 
   * Fix broken 32-bit build.
