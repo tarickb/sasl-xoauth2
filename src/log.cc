@@ -45,7 +45,7 @@ void Log::Write(const char *fmt, ...) {
 
 void Log::Flush() {
   if (s_test_mode) {
-    fprintf(stderr, "LOGGING: skipping write of %lu line(s).\n", lines_.size());
+    fprintf(stderr, "LOGGING: skipping write of %zu line(s).\n", lines_.size());
     return;
   }
 
