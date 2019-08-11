@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.10.0)
 cmake_policy(VERSION 3.0)
 
-include(GNUInstallDirs)
-
 project(sasl-xoauth2 VERSION 0.3 LANGUAGES CXX)
+
+include(GNUInstallDirs)
 
 option(EnableTests "Enable tests." ON)
 
