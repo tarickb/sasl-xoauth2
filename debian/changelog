@@ -1,3 +1,12 @@
+sasl-xoauth2 (0.4-1ubuntu1~bionic1~ppa1) bionic; urgency=low
+
+  * Add config file in /etc/sasl-xoauth2.conf.
+  * Store client secret in config file.
+  * Write failure logs to syslog instead of /tmp.
+  * Install library directly into SASL plugin directory.
+
+ -- Tarick Bedeir (Ubuntu Development) <tarick@bedeir.com>  Sat, 10 Aug 2019 10:43:00 -0700
+
 sasl-xoauth2 (0.3-1ubuntu1~bionic1~ppa1) bionic; urgency=low
 
   * Initial package for 0.3.
