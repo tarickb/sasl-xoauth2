@@ -1,9 +1,0 @@
-cmake_minimum_required(VERSION 3.10.0)
-cmake_policy(VERSION 3.0)
-
-set(dest_dir "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/@CMAKE_INSTALL_LIBDIR@/sasl2")
-set(lib_name "@CMAKE_SHARED_LIBRARY_PREFIX@@PROJECT_NAME@@CMAKE_SHARED_LIBRARY_SUFFIX@")
-set(lib_path "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/@CMAKE_INSTALL_LIBDIR@/${lib_name}")
-
-file(MAKE_DIRECTORY "${dest_dir}")
-execute_process(COMMAND sh -c "ln -sfr ${lib_path} ${dest_dir}/${lib_name}")

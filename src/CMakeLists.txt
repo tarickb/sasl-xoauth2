@@ -32,17 +32,12 @@ target_link_libraries(${PROJECT_NAME} ${CURL_LIBRARIES} jsoncpp_lib)
 
 install(
   TARGETS ${PROJECT_NAME}
-  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/sasl2)
 
 install(
   FILES ${CONFIG_FILE}
   DESTINATION ${CMAKE_INSTALL_SYSCONFDIR}
   COMPONENT config)
-
-set(symlink_script "${CMAKE_CURRENT_BINARY_DIR}/install-lib-symlink.cmake")
-configure_file(install-lib-symlink.cmake.in "${symlink_script}" @ONLY)
-install(
-  SCRIPT "${symlink_script}")
 
 add_executable(${PROJECT_NAME}_test xoauth2_test.cc)
 target_link_libraries(${PROJECT_NAME}_test ${PROJECT_NAME})
