@@ -60,7 +60,7 @@ void Log::Flush() {
     syslog(LOG_WARNING, "auth failed: %s\n", summary_.c_str());
     if (lines_.size() > 1) {
       syslog(LOG_WARNING,
-             "set log_full_trace_on_failure to see full %lu "
+             "set log_full_trace_on_failure to see full %zu "
              "line(s) of tracing.\n",
              lines_.size());
     }
