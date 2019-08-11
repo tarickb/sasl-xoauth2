@@ -26,13 +26,20 @@ set(SOURCES
   token_store.cc
   token_store.h)
 
-add_library(${PROJECT_NAME} SHARED ${SOURCES})
+set(CONFIG_FILE ${PROJECT_NAME}.conf)
+
+add_library(${PROJECT_NAME} SHARED ${SOURCES} ${CONFIG_FILE})
 target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE ${CURL_INCLUDE_DIRS} jsoncpp_lib ${SASL_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} ${CURL_LIBRARIES} jsoncpp_lib)
 
 install(
   TARGETS ${PROJECT_NAME}
   LIBRARY DESTINATION lib)
+
+install(
+  FILES ${CONFIG_FILE}
+  DESTINATION ${CMAKE_INSTALL_SYSCONFDIR}
+  COMPONENT config)
 
 add_executable(${PROJECT_NAME}_test xoauth2_test.cc)
 target_link_libraries(${PROJECT_NAME}_test ${PROJECT_NAME})
