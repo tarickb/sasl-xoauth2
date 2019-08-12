@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10.0)
 cmake_policy(VERSION 3.0)
 
-project(sasl-xoauth2 VERSION 0.6 LANGUAGES CXX)
+project(sasl-xoauth2 VERSION 0.7 LANGUAGES CXX)
 
 include(GNUInstallDirs)
 
