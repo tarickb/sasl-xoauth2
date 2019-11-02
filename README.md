@@ -107,9 +107,12 @@ Save the resulting tokens in the file specified in `/etc/postfix/sasl_passwd`:
 {
   "access_token" : "access token goes here",
   "expiry" : "0",
-  "refresh_token" : "refresh token goes here",
+  "refresh_token" : "refresh token goes here"
 }
 ```
+
+It may be necessary to adjust permissions on the token file so that Postfix (or,
+more accurately, sasl-xoauth2 running as the Postfix user) can update it.
 
 ### Restart Postfix
 
@@ -132,3 +135,8 @@ disable this, set `log_to_syslog_on_failure` to `no` in `/etc/sasl-xoauth2.conf`
 
 Conversely, to get more verbose logging when authentication fails, set
 `log_full_trace_on_failure` to `yes`.
+
+If Postfix complains about not finding a SASL mechanism (along the lines of
+`warning: SASL authentication failure: No worthy mechs found`), it's possible
+that either `make install` or the pre-built package put libsasl-xoauth2.so in
+the wrong directory.
