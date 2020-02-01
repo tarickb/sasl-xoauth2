@@ -101,7 +101,9 @@ to obtain an OAuth token by following the [Creating and Authorizing an OAuth
 Token](https://github.com/google/gmail-oauth2-tools/wiki/OAuth2DotPyRunThrough#creating-and-authorizing-an-oauth-token)
 instructions.
 
-Save the resulting tokens in the file specified in `/etc/postfix/sasl_passwd`:
+Save the resulting tokens in the file specified in `/etc/postfix/sasl_passwd`.
+In our example that file will be either `/etc/tokens/username@domain.com` or
+`/var/spool/postfix/etc/tokens/username@domain.com`:
 
 ```json
 {
@@ -112,7 +114,17 @@ Save the resulting tokens in the file specified in `/etc/postfix/sasl_passwd`:
 ```
 
 It may be necessary to adjust permissions on the token file so that Postfix (or,
-more accurately, sasl-xoauth2 running as the Postfix user) can update it.
+more accurately, sasl-xoauth2 running as the Postfix user) can update it:
+
+```
+$ sudo chown -R postfix:postfix /etc/tokens
+```
+
+or:
+
+```
+$ sudo chown -R postfix:postfix /var/spool/postfix/etc/tokens
+```
 
 ### Restart Postfix
 
