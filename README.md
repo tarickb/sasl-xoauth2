@@ -1,5 +1,9 @@
 # sasl-xoauth2
 
+## Disclaimer
+
+This is not an officially supported Google product.
+
 ## Background
 
 sasl-xoauth2 is a SASL plugin that enables client-side use of OAuth 2.0.
