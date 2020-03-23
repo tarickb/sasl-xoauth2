@@ -1,0 +1,5 @@
+sasl-xoauth2 (0.8-1debian1~buster1) buster; urgency=low
+
+  * Package for Debian 10.
+
+ -- Tarick Bedeir (Debian Development) <tarick@bedeir.com>  Mon, 23 Mar 2020 09:49:00 -0700
