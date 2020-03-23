@@ -19,7 +19,7 @@ project(sasl-xoauth2 VERSION 0.7 LANGUAGES CXX)
 
 include(GNUInstallDirs)
 
-option(EnableTests "Enable tests." ON)
+option(EnableTests "Enable tests." OFF)
 
 if(EnableTests)
   enable_testing()
