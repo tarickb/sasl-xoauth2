@@ -63,7 +63,7 @@ class RequestContext {
   size_t to_server_size() const { return to_server_.size(); }
 
   std::string from_server() const {
-    return std::string(from_server_.data(), from_server_.size());
+    return std::string(from_server_.begin(), from_server_.end());
   }
 
  private:
