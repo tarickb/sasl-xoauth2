@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-cmake_minimum_required(VERSION 3.10.0)
+cmake_minimum_required(VERSION 3.0.0)
 cmake_policy(VERSION 3.0)
 
 project(sasl-xoauth2 VERSION 0.7 LANGUAGES CXX)
