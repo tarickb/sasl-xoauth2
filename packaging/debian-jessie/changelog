@@ -1,0 +1,5 @@
+sasl-xoauth2 (0.8-1debian1) jessie; urgency=low
+
+  * Package for Debian 8.
+
+ -- Tarick Bedeir (Debian Development) <tarick@bedeir.com>  Sun, 22 Mar 2020 18:58:01 -0700

@@ -1,3 +1,11 @@
+sasl-xoauth2 (0.8) unstable; urgency=low
+
+  * Rework packaging.
+  * Improve CURL request error handling.
+  * Use config file path from package installation path.
+
+ -- Tarick Bedeir <tarick@bedeir.com>  Sun, 22 Mar 2020 18:58:00 -0700
+
 sasl-xoauth2 (0.7) unstable; urgency=low
 
   * Flesh out README.
