@@ -1,0 +1,5 @@
+sasl-xoauth2 (0.8-1debian1~stretch1) stretch; urgency=low
+
+  * Package for Debian 9.
+
+ -- Tarick Bedeir (Debian Development) <tarick@bedeir.com>  Sun, 22 Mar 2020 22:46:00 -0700
