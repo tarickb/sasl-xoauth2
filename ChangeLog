@@ -1,0 +1,32 @@
+sasl-xoauth2 (0.7) unstable; urgency=low
+
+  * Flesh out README.
+
+ -- Tarick Bedeir <tarick@bedeir.com>  Sun, 11 Aug 2019 21:54:00 -0700
+
+sasl-xoauth2 (0.6) unstable; urgency=low
+
+  * Actually (?) fix broken 32-bit build.
+
+ -- Tarick Bedeir <tarick@bedeir.com>  Sat, 10 Aug 2019 19:22:00 -0700
+
+sasl-xoauth2 (0.5) unstable; urgency=low
+
+  * Fix broken 32-bit build.
+
+ -- Tarick Bedeir <tarick@bedeir.com>  Sat, 10 Aug 2019 18:58:00 -0700
+
+sasl-xoauth2 (0.4) unstable; urgency=low
+
+  * Add config file in /etc/sasl-xoauth2.conf.
+  * Store client secret in config file.
+  * Write failure logs to syslog instead of /tmp.
+  * Install library directly into SASL plugin directory.
+
+ -- Tarick Bedeir <tarick@bedeir.com>  Sat, 10 Aug 2019 10:43:00 -0700
+
+sasl-xoauth2 (0.2) unstable; urgency=low
+
+  * Fix symlinks.
+
+ -- Tarick Bedeir <tarick@bedeir.com>  Fri, 09 Aug 2019 17:13:00 -0700
