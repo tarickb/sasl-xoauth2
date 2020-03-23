@@ -96,7 +96,10 @@ int HttpPost(const std::string &url, const std::string &data,
   response->clear();
 
   CURL *curl = curl_easy_init();
-  if (!curl) return SASL_BADPROT;
+  if (!curl) {
+    *error = "Unable to create CURL handle.";
+    return SASL_BADPROT;
+  }
 
   RequestContext context(data);
 
@@ -128,11 +131,15 @@ int HttpPost(const std::string &url, const std::string &data,
   curl_easy_setopt(curl, CURLOPT_SEEKFUNCTION, &RequestContext::Seek);
   curl_easy_setopt(curl, CURLOPT_SEEKDATA, &context);
 
-  int err = curl_easy_perform(curl);
+  CURLcode err = curl_easy_perform(curl);
   curl_easy_cleanup(curl);
 
   if (err != CURLE_OK) {
     *error = transport_error;
+    if (error->empty()) {
+      *error = curl_easy_strerror(err);
+      *error += " (no further error information)";
+    }
     return SASL_BADPROT;
   }
 
