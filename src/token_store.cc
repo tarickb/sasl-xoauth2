@@ -84,7 +84,7 @@ int TokenStore::Refresh() {
       "&client_secret=" + Config::Get()->client_secret() +
       "&grant_type=refresh_token&refresh_token=" + refresh_;
   std::string response;
-  int response_code = 0;
+  long response_code = 0;
   log_->Write("TokenStore::Refresh: request: %s", request.c_str());
 
   std::string http_error;

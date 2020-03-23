@@ -83,7 +83,7 @@ void Cleanup() {
 }
 
 int DefaultHttpIntercept(const std::string &url, const std::string &data,
-                         int *response_code, std::string *response,
+                         long *response_code, std::string *response,
                          std::string *error) {
   fprintf(stderr, "TEST: default http intercept for url=%s\n", url.c_str());
   return SASL_FAIL;
@@ -401,7 +401,7 @@ bool TestWithTokenExpiredError(sasl_client_plug_t plug) {
   bool intercept_called = false;
   sasl_xoauth2::SetHttpInterceptForTesting(
       [&intercept_called](const std::string &url, const std::string &data,
-                          int *response_code, std::string *response,
+                          long *response_code, std::string *response,
                           std::string *error) {
         *response = R"({"access_token": "access", "expires_in": 3600})";
         *response_code = 200;
@@ -446,7 +446,7 @@ bool TestPreemptiveTokenRefresh(sasl_client_plug_t plug) {
   bool intercept_called = false;
   sasl_xoauth2::SetHttpInterceptForTesting(
       [&intercept_called](const std::string &url, const std::string &data,
-                          int *response_code, std::string *response,
+                          long *response_code, std::string *response,
                           std::string *error) {
         *response =
             R"({"access_token": "refreshed_access", "expires_in": 3600})";
@@ -495,7 +495,7 @@ bool TestFailedPreemptiveTokenRefresh(sasl_client_plug_t plug) {
   bool intercept_called = false;
   sasl_xoauth2::SetHttpInterceptForTesting(
       [&intercept_called](const std::string &url, const std::string &data,
-                          int *response_code, std::string *response,
+                          long *response_code, std::string *response,
                           std::string *error) {
         *response = "";
         *response_code = 400;
