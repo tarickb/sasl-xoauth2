@@ -15,7 +15,14 @@
 cmake_minimum_required(VERSION 3.0.0)
 cmake_policy(VERSION 3.0)
 
-project(sasl-xoauth2 VERSION 0.7 LANGUAGES CXX)
+execute_process(
+  COMMAND head -n 1 ChangeLog
+  COMMAND sed -e "s/.*(//" -e "s/).*//"
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  OUTPUT_VARIABLE CHANGELOG_VERSION
+  OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+project(sasl-xoauth2 VERSION ${CHANGELOG_VERSION} LANGUAGES CXX)
 
 include(GNUInstallDirs)
 
