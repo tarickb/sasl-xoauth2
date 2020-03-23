@@ -1,0 +1,56 @@
+sasl-xoauth2 (0.8-1ubuntu1~eoan1~ppa1) eoan; urgency=low
+
+  * Package for Ubuntu 19.10.
+
+ -- Tarick Bedeir (Ubuntu Development) <tarick@bedeir.com>  Mon, 23 Mar 2020 11:52:00 -0700
+
+sasl-xoauth2 (0.7-1ubuntu1~bionic1~ppa1) bionic; urgency=low
+
+  * Flesh out README.
+
+ -- Tarick Bedeir (Ubuntu Development) <tarick@bedeir.com>  Sun, 11 Aug 2019 21:54:00 -0700
+
+sasl-xoauth2 (0.6-1ubuntu1~bionic1~ppa1) bionic; urgency=low
+
+  * Actually (?) fix broken 32-bit build.
+
+ -- Tarick Bedeir (Ubuntu Development) <tarick@bedeir.com>  Sat, 10 Aug 2019 19:22:00 -0700
+
+sasl-xoauth2 (0.5-1ubuntu1~bionic1~ppa1) bionic; urgency=low
+
+  * Fix broken 32-bit build.
+
+ -- Tarick Bedeir (Ubuntu Development) <tarick@bedeir.com>  Sat, 10 Aug 2019 18:58:00 -0700
+
+sasl-xoauth2 (0.4-1ubuntu1~bionic1~ppa1) bionic; urgency=low
+
+  * Add config file in /etc/sasl-xoauth2.conf.
+  * Store client secret in config file.
+  * Write failure logs to syslog instead of /tmp.
+  * Install library directly into SASL plugin directory.
+
+ -- Tarick Bedeir (Ubuntu Development) <tarick@bedeir.com>  Sat, 10 Aug 2019 10:43:00 -0700
+
+sasl-xoauth2 (0.3-1ubuntu1~bionic1~ppa1) bionic; urgency=low
+
+  * Initial package for 0.3.
+
+ -- Tarick Bedeir (Ubuntu Development) <tarick@bedeir.com>  Fri, 09 Aug 2019 17:28:00 -0700
+
+sasl-xoauth2 (0.2-1ubuntu1~bionic1~ppa2) bionic; urgency=low
+
+  * Fix symlinks.
+
+ -- Tarick Bedeir (Ubuntu Development) <tarick@bedeir.com>  Fri, 09 Aug 2019 17:13:00 -0700
+
+sasl-xoauth2 (0.2-1ubuntu1~bionic1~ppa1) bionic; urgency=low
+
+  * Initial package for 0.2.
+
+ -- Tarick Bedeir (Ubuntu Development) <tarick@bedeir.com>  Fri, 09 Aug 2019 17:08:00 -0700
+
+sasl-xoauth2 (0.1-1ubuntu1~bionic1~ppa1) bionic; urgency=low
+
+  * Initial package for 0.1.
+
+ -- Tarick Bedeir (Ubuntu Development) <tarick@bedeir.com>  Fri, 09 Aug 2019 16:48:00 -0700

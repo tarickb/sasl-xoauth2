@@ -1,0 +1,17 @@
+Source: sasl-xoauth2
+Section: utils
+Priority: extra
+Maintainer: Tarick Bedeir (Ubuntu Development) <tarick@bedeir.com>
+Build-Depends: debhelper (>= 11~),
+               cmake,
+               libcurl4-openssl-dev | libcurl4-nss-dev | libcurl4-gnutls-dev,
+               libjsoncpp-dev,
+               libsasl2-dev,
+               libstdc++6-4.6-dev | libstdc++-dev,
+               pkg-config
+Standards-Version: 4.1.3
+
+Package: sasl-xoauth2
+Architecture: any
+Depends: libsasl2-2, ${shlibs:Depends}, ${misc:Depends}
+Description: SASL extension for XOAUTH2.
