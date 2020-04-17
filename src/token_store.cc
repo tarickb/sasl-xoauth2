@@ -139,7 +139,8 @@ int TokenStore::Read() {
 
     std::ifstream file(path_);
     if (!file.good()) {
-      log_->Write("TokenStore::Read: failed to open file %s", path_.c_str());
+      log_->Write("TokenStore::Read: failed to open file %s: %s", path_.c_str(),
+                  strerror(errno));
       return SASL_FAIL;
     }
 
@@ -176,8 +177,8 @@ int TokenStore::Write() {
 
     std::ofstream file(new_path);
     if (!file.good()) {
-      log_->Write("TokenStore::Write: failed to open file %s for writing",
-                  new_path.c_str());
+      log_->Write("TokenStore::Write: failed to open file %s for writing: %s",
+                  new_path.c_str(), strerror(errno));
       return SASL_FAIL;
     }
     file << root;

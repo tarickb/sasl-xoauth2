@@ -14,9 +14,11 @@
 
 #include "config.h"
 
+#include <errno.h>
 #include <sasl/sasl.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <string.h>
 #include <syslog.h>
 
 #include <algorithm>
@@ -93,7 +95,8 @@ int Config::Init() {
   try {
     std::ifstream f(kConfigFilePath);
     if (!f.good()) {
-      Log("sasl-xoauth2: Unable to open config file %s\n", kConfigFilePath);
+      Log("sasl-xoauth2: Unable to open config file %s: %s\n", kConfigFilePath,
+          strerror(errno));
       return SASL_FAIL;
     }
 
