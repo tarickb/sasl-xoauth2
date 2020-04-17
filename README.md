@@ -69,17 +69,32 @@ Next, add client Gmail account details to the SASL password database in
 ```
 
 The path specified above tells sasl-xoauth2 where to find tokens for the account
-"username@domain.com". The path *may* become relative to the Postfix chroot
-directory, if the smtp process runs with chroot enabled.
-
-In my configuration, chroot is enabled and so the token file is actually
-`/var/spool/postfix/etc/tokens/username@domain.com`.
+"username@domain.com" (but see [A Note on chroot](#a-note-on-chroot) below).
 
 Finally, regenerate the SASL password database:
 
 ```
 $ sudo postmap /etc/postfix/sasl_passwd
 ```
+
+#### A Note on chroot
+
+Check if chroot is enabled:
+
+```
+$ grep -E '^(smtp|.*chroot)' /etc/postfix/master.cf
+# service type  private unpriv  chroot  wakeup  maxproc command + args
+smtp      inet  n       -       y       -       -       smtpd
+smtp      unix  -       -       y       -       -       smtp
+```
+
+In this example `master.cf`, chroot is in fact enabled for the Postfix smtp
+process. As a result, the token path specified above will be interpreted at
+runtime relative to the Postfix root (`/var/spool/postfix`, usually).
+
+This means that *even though the path in `/etc/postfix/sasl_passwd` is
+(and should be) `/etc/tokens/username@domain.com`*, at runtime Postfix will
+attempt to read from `/var/spool/postfix/etc/tokens/username@domain.com`.
 
 ### Client Credentials
 
@@ -107,7 +122,8 @@ instructions.
 
 Save the resulting tokens in the file specified in `/etc/postfix/sasl_passwd`.
 In our example that file will be either `/etc/tokens/username@domain.com` or
-`/var/spool/postfix/etc/tokens/username@domain.com`:
+`/var/spool/postfix/etc/tokens/username@domain.com` (see [A Note on
+chroot](#a-note-on-chroot)):
 
 ```json
 {
@@ -116,6 +132,10 @@ In our example that file will be either `/etc/tokens/username@domain.com` or
   "refresh_token" : "refresh token goes here"
 }
 ```
+
+In my configuration, chroot is enabled and so even though
+`/etc/postfix/sasl_passwd` specifies `/etc/tokens/username@domain.com`,
+my token file is `/var/spool/postfix/etc/tokens/username@domain.com`.
 
 It may be necessary to adjust permissions on the token file so that Postfix (or,
 more accurately, sasl-xoauth2 running as the Postfix user) can update it:
