@@ -1,0 +1,5 @@
+sasl-xoauth2 (0.9-1ubuntu1~focal1~ppa1) bionic; urgency=low
+
+  * Package for Ubuntu 20.04.
+
+ -- Tarick Bedeir (Ubuntu Development) <tarick@bedeir.com>  Mon, 10 Aug 2020 13:28:00 -0700
