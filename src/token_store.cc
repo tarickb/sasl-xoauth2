@@ -57,7 +57,7 @@ std::string GetTempSuffix() {
     Log *log, const std::string &path) {
   std::unique_ptr<TokenStore> store(new TokenStore(log, path));
   if (store->Read() != SASL_OK) return {};
-  return std::move(store);
+  return store;
 }
 
 int TokenStore::GetAccessToken(std::string *token) {
