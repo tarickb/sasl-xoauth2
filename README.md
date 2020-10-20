@@ -129,6 +129,7 @@ Store the client ID and secret in `/etc/sasl-xoauth2.conf`:
 {
   "client_id": "client ID goes here",
   "client_secret": "client secret goes here"
+  "token_endpoint": "token URL goes here"
 }
 ```
 
@@ -186,6 +187,7 @@ disable this, set `log_to_syslog_on_failure` to `no` in `/etc/sasl-xoauth2.conf`
 {
   "client_id": "client ID goes here",
   "client_secret": "client secret goes here",
+  "token_endpoint": "token URL goes here"
   "log_to_syslog_on_failure": "no"
 }
 ```
