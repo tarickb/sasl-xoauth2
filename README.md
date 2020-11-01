@@ -96,6 +96,21 @@ This means that *even though the path in `/etc/postfix/sasl_passwd` is
 (and should be) `/etc/tokens/username@domain.com`*, at runtime Postfix will
 attempt to read from `/var/spool/postfix/etc/tokens/username@domain.com`.
 
+Additionally, if you see an error message similar to the following, you may need
+to manually copy over root CA certificates for SSL to work within sasl-xoauth2:
+
+```
+TokenStore::Refresh: http error: error setting certificate verify locations: ...
+```
+
+To copy certificates manually, assuming the Postfix root is
+`/var/spool/postfix`:
+
+```
+$ sudo mkdir -p /var/spool/postfix/etc/ssl/certs
+$ sudo cp /etc/ssl/certs/ca-certificates.crt /var/spool/postfix/etc/ssl/certs/ca-certificates.crt
+```
+
 ### Client Credentials
 
 Visit the [Google API Console](https://console.developers.google.com/) to obtain
