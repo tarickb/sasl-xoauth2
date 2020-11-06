@@ -111,6 +111,12 @@ $ sudo mkdir -p /var/spool/postfix/etc/ssl/certs
 $ sudo cp /etc/ssl/certs/ca-certificates.crt /var/spool/postfix/etc/ssl/certs/ca-certificates.crt
 ```
 
+#### A Note on postmulti
+
+[@jamenlang](https://github.com/jamenlang) has provided a [very helpful
+tutorial](https://github.com/jamenlang/sasl-xoauth2-1/wiki/Setting-up-postmulti-with-multiple-xoauth2-relays)
+on setting up `postmulti` with sasl-xoauth2.
+
 ### Client Credentials
 
 Visit the [Google API Console](https://console.developers.google.com/) to obtain
