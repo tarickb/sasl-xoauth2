@@ -1,3 +1,9 @@
+sasl-xoauth2 (0.10) unstable; urgency=low
+
+  * Added Python script to fetch initial tokens for Outlook/Office 365.
+
+ -- Tarick Bedeir <tarick@bedeir.com>  Sat, 07 Nov 2020 00:25:00 -0800
+
 sasl-xoauth2 (0.9) unstable; urgency=low
 
   * Compile fixes for Focal.

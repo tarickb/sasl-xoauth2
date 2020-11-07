@@ -31,6 +31,7 @@ option(EnableTests "Enable tests." ON)
 if(EnableTests)
   enable_testing()
 endif()
+add_subdirectory(scripts)
 add_subdirectory(src)
 
 set(CPACK_SOURCE_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${PROJECT_VERSION}")
