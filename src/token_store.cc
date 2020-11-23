@@ -38,8 +38,6 @@ namespace {
 constexpr int kMaxRefreshAttempts = 2;
 constexpr int kExpiryMarginSec = 10;
 
-constexpr char kTokenEndpoint[] = "https://accounts.google.com/o/oauth2/token";
-
 std::string GetTempSuffix() {
   timeval t = {};
   gettimeofday(&t, nullptr);
@@ -85,11 +83,12 @@ int TokenStore::Refresh() {
       "&grant_type=refresh_token&refresh_token=" + refresh_;
   std::string response;
   long response_code = 0;
+  log_->Write("TokenStore::Refresh: token_endpoint: %s", Config::Get()->token_endpoint().c_str());
   log_->Write("TokenStore::Refresh: request: %s", request.c_str());
 
   std::string http_error;
   int err =
-      HttpPost(kTokenEndpoint, request, &response_code, &response, &http_error);
+      HttpPost(Config::Get()->token_endpoint(), request, &response_code, &response, &http_error);
   if (err != SASL_OK) {
     log_->Write("TokenStore::Refresh: http error: %s", http_error.c_str());
     return err;
