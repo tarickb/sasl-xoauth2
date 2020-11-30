@@ -1,3 +1,15 @@
+sasl-xoauth2 (0.10-1ubuntu1~focal2~ppa1) focal; urgency=low
+
+  * Try actually specifying focal this time...
+
+ -- Tarick Bedeir (Ubuntu Development) <tarick@bedeir.com>  Sun, 29 Nov 2020 23:05:00 -0800
+
+sasl-xoauth2 (0.10-1ubuntu1~focal1~ppa1) bionic; urgency=low
+
+  * Update for 0.10.
+
+ -- Tarick Bedeir (Ubuntu Development) <tarick@bedeir.com>  Sun, 29 Nov 2020 22:48:00 -0800
+
 sasl-xoauth2 (0.9-1ubuntu1~focal1~ppa1) bionic; urgency=low
 
   * Package for Ubuntu 20.04.
