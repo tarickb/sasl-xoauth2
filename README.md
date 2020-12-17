@@ -281,6 +281,24 @@ Outlook support:
 $ service postfix restart
 ```
 
+## Using Multiple Mail Providers Simultaneously
+
+One instance of sasl-xoauth2 may provide tokens for different mail providers,
+but each provider will require its own client ID, client secret, and token
+endpoint. In this case, each of these may be set in the token file rather than
+in `/etc/sasl-xoauth2.conf`. Set them when setting the initial access token:
+
+```json
+{
+  "access_token" : "access token goes here",
+  "client_id": "client ID goes here",
+  "client_secret": "client secret goes here, if required",
+  "token_endpoint": "token endpoint goes here, for non-Gmail",
+  "expiry" : "0",
+  "refresh_token" : "refresh token goes here"
+}
+```
+
 ## Debugging
 
 By default, sasl-xoauth2 will write to syslog if authentication fails. To

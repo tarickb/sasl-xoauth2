@@ -42,6 +42,11 @@ class TokenStore {
   Log *const log_ = nullptr;
   const std::string path_;
 
+  // Normally these values come from the config file, but they can be overriden.
+  std::string override_client_id_;
+  std::string override_client_secret_;
+  std::string override_token_endpoint_;
+
   std::string access_;
   std::string refresh_;
   time_t expiry_ = 0;

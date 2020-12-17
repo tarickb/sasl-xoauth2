@@ -1,3 +1,9 @@
+sasl-xoauth2 (0.11) unstable; urgency=low
+
+  * Allow client ID/secret and endpoint overrides in token files.
+
+ -- Tarick Bedeir <tarick@bedeir.com>  Wed, 16 Dec 2020 22:10:00 -0800
+
 sasl-xoauth2 (0.10) unstable; urgency=low
 
   * Added Python script to fetch initial tokens for Outlook/Office 365.

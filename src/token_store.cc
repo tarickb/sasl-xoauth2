@@ -49,6 +49,20 @@ std::string GetTempSuffix() {
   return std::string(buf);
 }
 
+void ReadOverride(const Json::Value &root, const std::string &key,
+                  std::string *output) {
+  if (root.isMember(key)) {
+    *output = root[key].asString();
+  }
+}
+
+void WriteOverride(const std::string &key, const std::string &value,
+                   Json::Value *output) {
+  if (!value.empty()) {
+    (*output)[key] = value;
+  }
+}
+
 }  // namespace
 
 /* static */ std::unique_ptr<TokenStore> TokenStore::Create(
@@ -77,18 +91,29 @@ int TokenStore::Refresh() {
   refresh_attempts_++;
   log_->Write("TokenStore::Refresh: attempt %d", refresh_attempts_);
 
+  const std::string client_id =
+      (override_client_id_.empty() ? Config::Get()->client_id()
+                                   : override_client_id_);
+  const std::string client_secret =
+      (override_client_secret_.empty() ? Config::Get()->client_secret()
+                                       : override_client_secret_);
+  const std::string token_endpoint =
+      (override_token_endpoint_.empty() ? Config::Get()->token_endpoint()
+                                        : override_token_endpoint_);
+
   const std::string request =
-      std::string("client_id=") + Config::Get()->client_id() +
-      "&client_secret=" + Config::Get()->client_secret() +
+      std::string("client_id=") + client_id +
+      "&client_secret=" + client_secret +
       "&grant_type=refresh_token&refresh_token=" + refresh_;
   std::string response;
   long response_code = 0;
-  log_->Write("TokenStore::Refresh: token_endpoint: %s", Config::Get()->token_endpoint().c_str());
+  log_->Write("TokenStore::Refresh: token_endpoint: %s",
+              token_endpoint.c_str());
   log_->Write("TokenStore::Refresh: request: %s", request.c_str());
 
   std::string http_error;
   int err =
-      HttpPost(Config::Get()->token_endpoint(), request, &response_code, &response, &http_error);
+      HttpPost(token_endpoint, request, &response_code, &response, &http_error);
   if (err != SASL_OK) {
     log_->Write("TokenStore::Refresh: http error: %s", http_error.c_str());
     return err;
@@ -150,6 +175,10 @@ int TokenStore::Read() {
       return SASL_FAIL;
     }
 
+    ReadOverride(root, "client_id", &override_client_id_);
+    ReadOverride(root, "client_secret", &override_client_secret_);
+    ReadOverride(root, "token_endpoint", &override_token_endpoint_);
+
     refresh_ = root["refresh_token"].asString();
     if (root.isMember("access_token"))
       access_ = root["access_token"].asString();
@@ -173,6 +202,10 @@ int TokenStore::Write() {
     root["refresh_token"] = refresh_;
     root["access_token"] = access_;
     root["expiry"] = std::to_string(expiry_);
+
+    WriteOverride("client_id", override_client_id_, &root);
+    WriteOverride("client_secret", override_client_secret_, &root);
+    WriteOverride("token_endpoint", override_token_endpoint_, &root);
 
     std::ofstream file(new_path);
     if (!file.good()) {
