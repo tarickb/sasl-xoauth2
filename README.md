@@ -128,8 +128,8 @@ on setting up `postmulti` with sasl-xoauth2.
 #### Client Credentials
 
 Visit the [Google API Console](https://console.developers.google.com/) to obtain
-OAuth 2 credentials (a client ID and client secret) for an "Installed
-application" application type.
+OAuth 2 credentials (a client ID and client secret) for a "Desktop app"
+application type.
 
 Store the client ID and secret in `/etc/sasl-xoauth2.conf`:
 
