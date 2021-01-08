@@ -1,8 +1,9 @@
 sasl-xoauth2 (0.11) unstable; urgency=low
 
   * Allow client ID/secret and endpoint overrides in token files.
+  * Fix HTTP request seek callback signature.
 
- -- Tarick Bedeir <tarick@bedeir.com>  Wed, 16 Dec 2020 22:10:00 -0800
+ -- Tarick Bedeir <tarick@bedeir.com>  Thu, 07 Jan 2021 21:40:00 -0800
 
 sasl-xoauth2 (0.10) unstable; urgency=low
 

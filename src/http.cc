@@ -51,7 +51,7 @@ class RequestContext {
     return size;
   }
 
-  static int Seek(off_t offset, int origin, void *context) {
+  static int Seek(void *context, curl_off_t offset, int origin) {
     auto *request = static_cast<RequestContext *>(context);
     if (origin != SEEK_SET || offset != 0) return CURL_SEEKFUNC_FAIL;
     request->Rewind();
