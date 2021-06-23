@@ -49,6 +49,32 @@ smtp_sasl_security_options =
 smtp_sasl_mechanism_filter = xoauth2
 ```
 
+Alternatively, you could specify multiple mechanisms, i.e. 
+```
+smtp_sasl_mechanism_filter = xoauth2,login
+```
+
+The above used to cause problems, because both "xoauth2" and the "login"
+plug-in (as is used for many older, not-yet-OAuth2 providers) had the
+same "SSF" setting of "0". This made SASL's automatic detection of which
+plug-in to use non-deterministic. Now, with the higher SSF of "60" for
+"xoauth2", providers offering OAUTH2 will be handled via the xoauth2 plug-in.
+
+You can check the effective value by calling "pluginviewer -c", look for
+the "SSF" value:
+```
+Plugin "sasl-xoauth2" [loaded],         API version: 4
+        SASL mechanism: XOAUTH2, best SSF: 60
+        security flags: NO_ANONYMOUS|PASS_CREDENTIALS
+        features: WANT_CLIENT_FIRST|PROXY_AUTHENTICATION
+Plugin "login" [loaded],        API version: 4
+        SASL mechanism: LOGIN, best SSF: 0
+        security flags: NO_ANONYMOUS|PASS_CREDENTIALS
+        features: SERVER_FIRST
+```
+See https://www.cyrusimap.org/sasl/sasl/authentication_mechanisms.html#authentication-mechanisms for details on the fields.
+
+
 While you're at it, enable TLS:
 
 ```
