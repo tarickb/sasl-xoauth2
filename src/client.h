@@ -57,6 +57,7 @@ class Client {
 
   State state_ = State::kInitial;
   std::string user_;
+  std::string tokenfile_;
   std::string response_;
 
   // Order of destruction matters -- token_ holds a pointer to log_.

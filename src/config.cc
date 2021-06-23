@@ -134,10 +134,7 @@ int Config::Init(const Json::Value &root) {
   try {
     int err;
 
-    err = Fetch(root, "client_id", false, &client_id_);
-    if (err != SASL_OK) return err;
-
-    err = Fetch(root, "client_secret", false, &client_secret_);
+    err = Fetch(root, "external_token_manager", false, &external_token_manager_);
     if (err != SASL_OK) return err;
 
     err = Fetch(root, "log_to_syslog_on_failure", true,
@@ -148,8 +145,18 @@ int Config::Init(const Json::Value &root) {
                 &log_full_trace_on_failure_);
     if (err != SASL_OK) return err;
 
-    err = Fetch(root, "token_endpoint", true, &token_endpoint_);
-    if (err != SASL_OK) return err;
+    // the internal token manager needs a number of configuration parameters
+    if (!external_token_manager_) {
+
+      err = Fetch(root, "client_id", false, &client_id_);
+      if (err != SASL_OK) return err;
+
+      err = Fetch(root, "client_secret", false, &client_secret_);
+      if (err != SASL_OK) return err;
+
+      err = Fetch(root, "token_endpoint", true, &token_endpoint_);
+      if (err != SASL_OK) return err;
+    }
 
     return 0;
 
