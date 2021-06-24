@@ -50,7 +50,7 @@ void mech_dispose(void *context, const sasl_utils_t *utils) {
 
 sasl_client_plug_t s_plugin = {
     /* mech_name = */ "XOAUTH2",
-    /* max_ssf = */ 0,
+    /* max_ssf = */ 60,
     /* security_flags = */ SASL_SEC_NOANONYMOUS | SASL_SEC_PASS_CREDENTIALS,
     /* features = */ SASL_FEAT_WANT_CLIENT_FIRST | SASL_FEAT_ALLOWS_PROXY,
     /* required_prompts = */ nullptr,
