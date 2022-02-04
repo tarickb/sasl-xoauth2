@@ -16,6 +16,8 @@ Fetch the sources, then:
 
 ```
 $ mkdir build && cd build && cmake ..
+# To install with a system-packaged postfix, under /usr, use:
+# cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_SYSCONFDIR=/etc
 $ make
 $ sudo make install
 ```
