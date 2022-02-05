@@ -13,5 +13,5 @@ Standards-Version: 4.1.3
 
 Package: sasl-xoauth2
 Architecture: any
-Depends: libsasl2-2, ${shlibs:Depends}, ${misc:Depends}
+Depends: libsasl2-2, ca-certificates, ${shlibs:Depends}, ${misc:Depends}
 Description: SASL extension for XOAUTH2.
