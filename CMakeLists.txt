@@ -36,6 +36,6 @@ add_subdirectory(src)
 
 set(CPACK_SOURCE_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${PROJECT_VERSION}")
 set(CPACK_SOURCE_GENERATOR "TGZ")
-set(CPACK_SOURCE_IGNORE_FILES "/build/;/packaging/;/packaging-build/;/packaging-output/;/packaging-scripts/;/.git/;.clang-format;~$;${CPACK_SOURCE_IGNORE_FILES}")
+set(CPACK_SOURCE_IGNORE_FILES "/build/;/packaging/;/packaging-build/;/packaging-output/;/packaging-scripts/;/.git/;/.gitignore;.clang-format;~$;${CPACK_SOURCE_IGNORE_FILES}")
 
 include(CPack)
