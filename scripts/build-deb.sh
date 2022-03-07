@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # Copyright 2020 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,26 +14,23 @@
 # limitations under the License.
 
 _DIST="$1"
-_RELEASE="$2"
 
 PKG_DIR=$(pwd)
 
-function die()
+die()
 {
   echo $*
   exit 1
 }
 
-[[ ! -z "$_DIST" || ! -z "$_RELEASE" ]] || die "Usage: $0 <dist-tarball> <debian-release>"
-[[ -f "$_DIST" ]] || die "Can't find dist package [$_DIST]."
-[[ -d packaging ]] || die "Run me from the top-level packaging directory."
-[[ "$_DIST" == "${_DIST%%.tar.gz}.tar.gz" ]] || die "Tarball name needs to end in .tar.gz."
+test -n "$_DIST" || die "Usage: $0 <dist-tarball>"
+test -f "$_DIST" || die "Can't find dist package [$_DIST]."
+test -d debian || die "Run me from the top-level packaging directory."
+test "$_DIST" = "${_DIST%%.tar.gz}.tar.gz" || die "Tarball name needs to end in .tar.gz."
 
-pushd $(dirname $_DIST) >/dev/null || die "Can't enter dist dir."
+cd $(dirname $_DIST) >/dev/null || die "Can't enter dist dir."
 _DIST=$(pwd)/$(basename $_DIST)
-popd >/dev/null
-
-mkdir -p packaging-output || die "Can't create output dir."
+cd -
 
 rm -rf packaging-build
 mkdir -p packaging-build || die "Can't create build dir."
@@ -46,17 +43,7 @@ TAR_NAME=${TAR_NAME%-*}
 cp $_DIST ${TAR_NAME}_${VERSION}.orig.tar.gz || die "Failed to copy tarball."
 
 tar xfz $_DIST || die "Failed to unpack tarball."
-cd $(find . -mindepth 1 -maxdepth 1 -type d) || die "Failed to enter source dir."
-
-cp -r $PKG_DIR/packaging/debian-$_RELEASE ./debian || die "Can't copy packaging files."
-
-dpkg-buildpackage || die "dpkg-buildpackage failed."
-
-cd $PKG_DIR
-
-mv packaging-build/*.tar.[gx]z packaging-output/
-mv packaging-build/*.dsc packaging-output/
-mv packaging-build/*.deb packaging-output/
-mv packaging-build/*.changes packaging-output/
-
-rm -rf packaging-build
+cd ${TAR_NAME}-${VERSION} || die "Failed to enter source dir."
+debuild -S -sa || die "debuild (source) failed."
+cd ..
+rm -rf ${TAR_NAME}-${VERSION}
