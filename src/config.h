@@ -18,6 +18,7 @@
 #define SASL_XOAUTH2_CONFIG_H
 
 #include <json/json.h>
+
 #include <string>
 
 namespace sasl_xoauth2 {

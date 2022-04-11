@@ -17,11 +17,11 @@
 #ifndef SASL_XOAUTH2_CLIENT_H
 #define SASL_XOAUTH2_CLIENT_H
 
-#include <memory>
-#include <string>
-
 #include <sasl/sasl.h>
 #include <sasl/saslplug.h>
+
+#include <memory>
+#include <string>
 
 namespace sasl_xoauth2 {
 

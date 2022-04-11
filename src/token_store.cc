@@ -16,6 +16,7 @@
 
 #include <errno.h>
 #include <inttypes.h>
+#include <json/json.h>
 #include <sasl/sasl.h>
 #include <stdio.h>
 #include <string.h>
@@ -23,7 +24,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include <json/json.h>
 #include <fstream>
 #include <sstream>
 

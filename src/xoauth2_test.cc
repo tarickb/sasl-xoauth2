@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <assert.h>
+#include <json/json.h>
 #include <sasl/sasl.h>
 #include <sasl/saslplug.h>
 #include <stdio.h>
@@ -20,7 +21,6 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <json/json.h>
 #include <string>
 #include <vector>
 
