@@ -141,6 +141,14 @@ int TokenStore::Refresh() {
       log_->Write("TokenStore::Refresh: invalid expiry");
       return SASL_BADPROT;
     }
+    if (root.isMember("refresh_token")) {
+      const std::string refresh_token = root["refresh_token"].asString();
+      if (refresh_token != refresh_) {
+        log_->Write(
+            "TokenStore::Refresh: response includes updated refresh token");
+        refresh_ = refresh_token;
+      }
+    }
     expiry_ = time(nullptr) + expiry_sec;
   } catch (const std::exception &e) {
     log_->Write("TokenStore::Refresh: exception=%s", e.what());
