@@ -178,13 +178,36 @@ We'll also need these credentials in the next step.
 
 #### Initial Access Token
 
-Use the [Gmail OAuth2 developer tools](https://github.com/google/gmail-oauth2-tools/)
-to obtain an OAuth token by following the [Creating and Authorizing an OAuth
-Token](https://github.com/google/gmail-oauth2-tools/wiki/OAuth2DotPyRunThrough#creating-and-authorizing-an-oauth-token)
-instructions.
+The sasl-xoauth2
+[repository](https://github.com/tarickb/sasl-xoauth2/blob/master/scripts/get-initial-gmail-tokens.py)
+and pre-built packages include a script to assist in the generation of Gmail
+OAuth tokens. Run the script as follows:
 
-Save the resulting tokens in the file specified in `/etc/postfix/sasl_passwd`.
-In our example that file will be either `/etc/tokens/username@domain.com` or
+```shell
+$ python3 /usr/share/sasl-xoauth2/get-initial-gmail-tokens.py \
+    --client_id=CLIENT_ID_FROM_SASL_XOAUTH2_CONF \
+    --client_secret=CLIENT_SECRET_FROM_SASL_XOAUTH2_CONF \
+    --scope="https://mail.google.com/" \
+    PATH_TO_TOKENS_FILE
+
+Please open this URL in a browser ON THIS HOST:
+
+https://accounts.google.com/o/oauth2/auth?client_id=&scope=&response_type=code&redirect_uri=http%3A%2F%2F127.0.0.1%3A12345%2Foauth2_result
+```
+
+(This script must run on the same host that is opening the URL -- it's not
+possible to copy the URL and paste it into a browser on another computer. This
+is because [recent
+changes](https://developers.googleblog.com/2022/02/making-oauth-flows-safer.html)
+to the OAuth2 authorization flow require that the browser pass the resulting
+authorization code directly to the requesting application. If the Postfix
+installation is running on a headless host, simply run the script on a host with
+a usable browser then copy the resulting token file over to the headless host.)
+
+Opening the URL and authorizing the application should result in a new token in
+`PATH_TO_TOKENS_FILE`, which should be the file specified in
+`/etc/postfix/sasl_passwd`.  In our example that file will be either
+`/etc/tokens/username@domain.com` or
 `/var/spool/postfix/etc/tokens/username@domain.com` (see [A Note on
 chroot](#a-note-on-chroot)):
 
