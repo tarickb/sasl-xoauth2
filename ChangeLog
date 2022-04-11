@@ -1,3 +1,11 @@
+sasl-xoauth2 (0.12) unstable; urgency=low
+
+  * Prevent Office 365 tokens from expiring after 90 days.
+  * Add script to fetch initial tokens for Gmail.
+  * Install hook to update CA certificates (Ubuntu only).
+
+ -- Tarick Bedeir <tarick@bedeir.com>  Sun, 10 Apr 2022 22:34:00 -0700
+
 sasl-xoauth2 (0.11) unstable; urgency=low
 
   * Allow client ID/secret and endpoint overrides in token files.
