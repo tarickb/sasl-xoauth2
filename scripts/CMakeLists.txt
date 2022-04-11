@@ -13,6 +13,7 @@
 # limitations under the License.
 
 set(SCRIPTS
+  get-initial-gmail-tokens.py
   get-initial-outlook-tokens.py)
 
 install(
