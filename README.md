@@ -62,7 +62,7 @@ same "SSF" setting of "0". This made SASL's automatic detection of which
 plug-in to use non-deterministic. Now, with the higher SSF of "60" for
 "xoauth2", providers offering OAUTH2 will be handled via the xoauth2 plug-in.
 
-You can check the effective value by calling `pluginviewer -c` (on Debian/Ubuntu it’s called `saslpluginviewer`); look for
+You can check the effective value by calling `pluginviewer -c` (on Debian/Ubuntu it’s installed as `/usr/sbin/saslpluginviewer` in the `sasl2-bin` package); look for
 the "SSF" value:
 ```
 Plugin "sasl-xoauth2" [loaded],         API version: 4
