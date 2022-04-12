@@ -1,0 +1,114 @@
+#!/usr/bin/python3
+# PYTHON_ARGCOMPLETE_OK
+# -*- coding: utf-8 -*-
+
+import os
+import sys
+import logging
+import argparse
+
+from typing import Optional
+
+try:
+    import argcomplete #type: ignore
+except ImportError:
+    argcomplete = None
+
+##########
+
+def get_token_gmail(client_id:str,
+                    client_secret:str,
+                    scope:str,
+                    outputfile:str) -> None:
+    raise NotImplementedError()
+
+##########
+
+def get_token_outlook(client_id:str,
+                      tenant:str,
+                      outputfile:str) -> None:
+    raise NotImplementedError()
+
+##########
+
+parser = argparse.ArgumentParser()
+subparse = parser.add_subparsers(
+    #title="subcommands",
+    required=True,
+)
+
+
+def subcommand_get_token(args:argparse.Namespace) -> None:
+    if args.service == 'outlook':
+        if not args.tenant:
+            parser.error("'outlook' service requires 'tenant' argument.")
+        get_token_outlook(
+            args.client_id,
+            args.tenant,
+            args.output_file,
+        )
+    elif args.service == 'gmail':
+        if not args.client_secret:
+            parser.error("'gmail' service requires 'client-secret' argument.")
+        if not args.scope:
+            parser.error("'gmail' service requires 'scope' argument.")
+        get_token_gmail(
+            args.client_id,
+            args.client_secret,
+            args.scope,
+            args.output_file,
+        )
+
+
+sp_get_token = subparse.add_parser('get-token')
+sp_get_token.set_defaults(func=subcommand_get_token)
+sp_get_token.add_argument(
+    'service', choices=['outlook', 'gmail'],
+    help="service type",
+)
+sp_get_token.add_argument(
+    '--client-id', required=True,
+    help="required for both services",
+)
+sp_get_token.add_argument(
+    '--tenant',
+    help="required for 'outlook'",
+)
+sp_get_token.add_argument(
+    '--client-secret',
+    help="required for 'gmail'",
+)
+sp_get_token.add_argument(
+    '--scope',
+    help="required for 'gmail'",
+)
+sp_get_token.add_argument(
+    'output_file', nargs='?', type=argparse.FileType('w'), default='-',
+    help="output file, '-' for stdout",
+)
+
+
+def subcommand_test(args:argparse.Namespace) -> None:
+    raise NotImplementedError()
+
+
+sp_test = subparse.add_parser('test')
+sp_test.set_defaults(func=subcommand_test)
+
+##########
+
+
+def main() -> None:
+    if argcomplete:
+        argcomplete.autocomplete(parser)
+    elif '_ARGCOMPLETE' in os.environ:
+        logging.error('Argument completion requested but the "argcomplete" '
+                      'module is not installed. '
+                      'Maybe you want to "apt install python3-argcomplete"')
+        sys.exit(1)
+    args = parser.parse_args()
+    args.func(args)
+
+
+if __name__ == '__main__':
+    main()
