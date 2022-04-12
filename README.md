@@ -266,8 +266,7 @@ Then, add API permissions for `SMTP.Send`.
 
 Store the "application (client) ID" (which you'll find in the "Overview" page
 for the application you registered with Azure) in `/etc/sasl-xoauth2.conf`.
-Leave `client_secret` blank. Additionally, override the token endpoint (which
-points to Gmail by default):
+Leave `client_secret` blank. Additionally, explicitly set the token endpoint (`sasl-xoauth2` points to Gmail's token endpoint by default):
 
 ```json
 {
