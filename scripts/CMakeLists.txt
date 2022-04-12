@@ -14,7 +14,7 @@
 
 set(SCRIPTS
   get-initial-gmail-tokens.py
-  get-initial-outlook-tokens.py)
+  sasl-xoauth2-tool)
 
 install(
   FILES ${SCRIPTS}

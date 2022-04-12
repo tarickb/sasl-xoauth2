@@ -4,10 +4,14 @@
 
 import os
 import sys
+import json
 import logging
 import argparse
+import urllib.parse
 
-from typing import Optional
+from typing import Optional,Dict,Union,IO
+
+import httplib2 #type: ignore
 
 try:
     import argcomplete #type: ignore
@@ -24,12 +28,64 @@ def get_token_gmail(client_id:str,
 
 ##########
 
-def get_token_outlook(client_id:str,
-                      tenant:str,
-                      outputfile:str) -> None:
-    raise NotImplementedError()
+OUTLOOK_REDIRECT_URI = "https://login.microsoftonline.com/common/oauth2/nativeclient"
+OUTLOOK_SCOPE = "openid offline_access https://outlook.office.com/SMTP.Send"
+
+
+def outlook_get_authorization_code(client_id:str, tenant:str) -> str:
+    url = f"https://login.microsoftonline.com/{tenant}/oauth2/v2.0/authorize"
+    url += f"?client_id={client_id}"
+    url += "&response_type=code"
+    url += "&redirect_uri={}".format(urllib.parse.quote(OUTLOOK_REDIRECT_URI))
+    url += "&response_mode=query"
+    url += "&scope={}".format(urllib.parse.quote(OUTLOOK_SCOPE))
+
+    print(f"Please visit the following link in a web browser, then paste the resulting URL:\n\n{url}\n", file=sys.stderr)
+
+    resulting_url_input:str = input("Resulting URL: ")
+    if OUTLOOK_REDIRECT_URI not in resulting_url_input:
+        raise Exception(f"Resulting URL does not contain expected prefix: {OUTLOOK_REDIRECT_URI}")
+    resulting_url = urllib.parse.urlparse(resulting_url_input)
+    code = urllib.parse.parse_qs(resulting_url.query)
+    if "code" not in code:
+        raise Exception(f"Missing code in result: {resulting_url.query}")
+    return code["code"][0]
+
+
+def outlook_get_initial_tokens(client_id:str, tenant:str, code:str) -> Dict[str,Union[str,int]]:
+    url = f"https://login.microsoftonline.com/{tenant}/oauth2/v2.0/token"
+    token_request = f"client_id={client_id}"
+    token_request += "&scope={}".format(urllib.parse.quote(OUTLOOK_SCOPE))
+    token_request += "&code={}".format(code)
+    token_request += "&redirect_uri={}".format(urllib.parse.quote(OUTLOOK_REDIRECT_URI))
+    token_request += "&grant_type=authorization_code"
+
+    resp, content = httplib2.Http().request(
+        uri=url,
+        method="POST",
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+        body=token_request)
+    content = content.decode("utf-8")
+    if resp.status != 200:
+        raise Exception(f"Request failed: {content}")
+    try:
+        content = json.loads(content)
+        return {
+            'access_token': content["access_token"],
+            'refresh_token': content["refresh_token"],
+            'expiry': 0,
+        }
+    except:
+        raise Exception(f"Tokens not found in response: {content}")
+
+
+def get_token_outlook(client_id:str, tenant:str, output_file:IO[str]) -> None:
+    code = outlook_get_authorization_code(client_id, tenant)
+    tokens = outlook_get_initial_tokens(client_id, tenant, code)
+    json.dump(tokens, output_file, indent=4)
 
 ##########
+
 
 parser = argparse.ArgumentParser()
 subparse = parser.add_subparsers(
@@ -71,8 +127,8 @@ sp_get_token.add_argument(
     help="required for both services",
 )
 sp_get_token.add_argument(
-    '--tenant',
-    help="required for 'outlook'",
+    '--tenant', default='consumers',
+    help="wanted by 'outlook' (defaults to 'consumers')",
 )
 sp_get_token.add_argument(
     '--client-secret',
