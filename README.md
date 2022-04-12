@@ -159,12 +159,27 @@ on setting up `postmulti` with sasl-xoauth2.
 
 ### Gmail Configuration
 
+From a new account, Google requires several steps to enable access.
+Once you are logged into your Gmail account in the browser, all these steps happen at the [Google Cloud Platform console](https://console.cloud.google.com/).
+
+#### Basic Account Setup
+
+- Select an exisitng project, or add a Project if you don't have one yet (it can be any name)
+
+- Set up "OAuth Consent Screen" for the project
+
+  - If this is an "External" and "Testing" app, be sure to add add your own e-mail address to the "test users"
+
 #### Client Credentials
 
-Visit the [Google API Console](https://console.developers.google.com/) to obtain
-OAuth 2 credentials (a client ID and client secret) for a "Desktop app"
-application type.
+From the [Google Cloud Platform console](https://console.cloud.google.com/), 
 
+- Credentials: Create Credentials: OAuth client ID
+
+  - Application type: Desktop app
+  
+  - Choose a memorable name
+  
 Store the client ID and secret in `/etc/sasl-xoauth2.conf`:
 
 ```json
