@@ -131,7 +131,7 @@ This means that **even though the path in `/etc/postfix/sasl_passwd` is
 attempt to read from `/var/spool/postfix/etc/tokens/username@domain.com`.
 
 Additionally, if you see an error message similar to the following, you may need
-to copy over root CA certificates for SSL to work within sasl-xoauth2:
+to copy over root CA certificates for the TLS handshake to work within sasl-xoauth2:
 
 ```
 TokenStore::Refresh: http error: error setting certificate verify locations: ...
