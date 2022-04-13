@@ -34,13 +34,16 @@ OUTLOOK_SCOPE = "openid offline_access https://outlook.office.com/SMTP.Send"
 
 def outlook_get_authorization_code(client_id:str, tenant:str) -> str:
     url = f"https://login.microsoftonline.com/{tenant}/oauth2/v2.0/authorize"
-    url += f"?client_id={client_id}"
-    url += "&response_type=code"
-    url += "&redirect_uri={}".format(urllib.parse.quote(OUTLOOK_REDIRECT_URI))
-    url += "&response_mode=query"
-    url += "&scope={}".format(urllib.parse.quote(OUTLOOK_SCOPE))
+    query:Dict[str,str] = {}
+    query['client_id'] = client_id
+    query['response_type'] = 'code'
+    query['redirect_uri'] = OUTLOOK_REDIRECT_URI
+    query['response_mode'] = 'query'
+    query['scope'] = OUTLOOK_SCOPE
 
-    print(f"Please visit the following link in a web browser, then paste the resulting URL:\n\n{url}\n", file=sys.stderr)
+    print("Please visit the following link in a web browser, then paste the resulting URL:\n\n" +
+          f"{url}?{urllib.parse.urlencode(query)}\n",
+          file=sys.stderr)
 
     resulting_url_input:str = input("Resulting URL: ")
     if OUTLOOK_REDIRECT_URI not in resulting_url_input:
@@ -54,17 +57,18 @@ def outlook_get_authorization_code(client_id:str, tenant:str) -> str:
 
 def outlook_get_initial_tokens(client_id:str, tenant:str, code:str) -> Dict[str,Union[str,int]]:
     url = f"https://login.microsoftonline.com/{tenant}/oauth2/v2.0/token"
-    token_request = f"client_id={client_id}"
-    token_request += "&scope={}".format(urllib.parse.quote(OUTLOOK_SCOPE))
-    token_request += "&code={}".format(code)
-    token_request += "&redirect_uri={}".format(urllib.parse.quote(OUTLOOK_REDIRECT_URI))
-    token_request += "&grant_type=authorization_code"
+    token_request:Dict[str,str] = {}
+    token_request['client_id'] = client_id
+    token_request['scope'] = OUTLOOK_SCOPE
+    token_request['code'] = code
+    token_request['redirect_uri'] = OUTLOOK_REDIRECT_URI
+    token_request['grant_type'] = 'authorization_code'
 
     resp, content = httplib2.Http().request(
         uri=url,
         method="POST",
         headers={"Content-Type": "application/x-www-form-urlencoded"},
-        body=token_request)
+        body=urllib.parse.urlencode(token_request))
     content = content.decode("utf-8")
     if resp.status != 200:
         raise Exception(f"Request failed: {content}")
