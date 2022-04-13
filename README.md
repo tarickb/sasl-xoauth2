@@ -199,11 +199,11 @@ and pre-built packages include a script that can assist in the generation of Gma
 OAuth tokens. Run the script as follows:
 
 ```shell
-$ sasl-xoauth2-tool get-token \
+$ sasl-xoauth2-tool get-token gmail \
     --client_id=CLIENT_ID_FROM_SASL_XOAUTH2_CONF \
     --client_secret=CLIENT_SECRET_FROM_SASL_XOAUTH2_CONF \
     --scope="https://mail.google.com/" \
-    gmail PATH_TO_TOKENS_FILE
+    PATH_TO_TOKENS_FILE
 
 Please open this URL in a browser ON THIS HOST:
 
@@ -296,7 +296,9 @@ and pre-built packages include a script that can assist in the generation of Mic
 OAuth tokens. Run the script as follows:
 
 ```shell
-$ sasl-xoauth2-tool --client-id=CLIENT_ID_FROM_SASL_XOAUTH2_CONF outlook PATH_TO_TOKENS_FILE
+$ sasl-xoauth2-tool get-token outlook \
+    --client-id=CLIENT_ID_FROM_SASL_XOAUTH2_CONF \
+    PATH_TO_TOKENS_FILE
 Please visit the following link in a web browser, then paste the resulting URL:
 
 https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize?client_id=REDACTED&response_type=code&redirect_uri=https%3A//login.microsoftonline.com/common/oauth2/nativeclient&response_mode=query&scope=openid%20offline_access%20https%3A//outlook.office.com/SMTP.Send
