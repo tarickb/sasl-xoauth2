@@ -8,10 +8,9 @@ import json
 import logging
 import argparse
 import urllib.parse
+import urllib.request
 
 from typing import Optional,Dict,Union,IO
-
-import httplib2 #type: ignore
 
 try:
     import argcomplete #type: ignore
@@ -64,16 +63,15 @@ def outlook_get_initial_tokens(client_id:str, tenant:str, code:str) -> Dict[str,
     token_request['redirect_uri'] = OUTLOOK_REDIRECT_URI
     token_request['grant_type'] = 'authorization_code'
 
-    resp, content = httplib2.Http().request(
-        uri=url,
-        method="POST",
-        headers={"Content-Type": "application/x-www-form-urlencoded"},
-        body=urllib.parse.urlencode(token_request))
-    content = content.decode("utf-8")
-    if resp.status != 200:
-        raise Exception(f"Request failed: {content}")
+    resp = urllib.request.urlopen(
+        urllib.request.Request(
+            url,
+            data=urllib.parse.urlencode(token_request).encode('ascii'),
+            headers={ "Content-Type": "application/x-www-form-urlencoded" }))
+    if resp.code != 200:
+        raise Exception(f"Request failed: {resp.code}")
     try:
-        content = json.loads(content)
+        content = json.load(resp)
         return {
             'access_token': content["access_token"],
             'refresh_token': content["refresh_token"],
