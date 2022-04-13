@@ -13,7 +13,6 @@
 # limitations under the License.
 
 set(SCRIPTS
-  get-initial-gmail-tokens.py
   sasl-xoauth2-tool)
 
 install(

@@ -194,16 +194,16 @@ We'll also need these credentials in the next step.
 #### Initial Access Token
 
 The sasl-xoauth2
-[repository](https://github.com/tarickb/sasl-xoauth2/blob/master/scripts/get-initial-gmail-tokens.py)
-and pre-built packages include a script to assist in the generation of Gmail
+[repository](https://github.com/tarickb/sasl-xoauth2/blob/master/scripts/sasl-xoauth2-tool)
+and pre-built packages include a script that can assist in the generation of Gmail
 OAuth tokens. Run the script as follows:
 
 ```shell
-$ python3 /usr/share/sasl-xoauth2/get-initial-gmail-tokens.py \
+$ /usr/share/sasl-xoauth2/sasl-xoauth2-tool get-token \
     --client_id=CLIENT_ID_FROM_SASL_XOAUTH2_CONF \
     --client_secret=CLIENT_SECRET_FROM_SASL_XOAUTH2_CONF \
     --scope="https://mail.google.com/" \
-    PATH_TO_TOKENS_FILE
+    gmail PATH_TO_TOKENS_FILE
 
 Please open this URL in a browser ON THIS HOST:
 

@@ -4,13 +4,15 @@
 
 import os
 import sys
+import http
 import json
 import logging
 import argparse
+import http.server
 import urllib.parse
 import urllib.request
 
-from typing import Optional,Dict,Union,IO
+from typing import Optional,Dict,Union,IO,Any
 
 try:
     import argcomplete #type: ignore
@@ -19,13 +21,100 @@ except ImportError:
 
 ##########
 
-def get_token_gmail(client_id:str,
-                    client_secret:str,
-                    scope:str,
-                    outputfile:str) -> None:
-    raise NotImplementedError()
+GOOGLE_OAUTH2_AUTH_URL = 'https://accounts.google.com/o/oauth2/auth'
+GOOGLE_OAUTH2_TOKEN_URL = 'https://accounts.google.com/o/oauth2/token'
+GOOGLE_OAUTH2_RESULT_PATH = '/oauth2_result'
+
+
+def url_safe_escape(instring:str) -> str:
+    return urllib.parse.quote(instring, safe='~-._')
+
+
+def gmail_redirect_uri(local_port:int) -> str:
+    return 'http://127.0.0.1:%d%s' % (local_port, GOOGLE_OAUTH2_RESULT_PATH)
+
+
+def gmail_get_auth_url(client_id:str, scope:str, local_port:int) -> str:
+    client_id = url_safe_escape(client_id)
+    scope = url_safe_escape(scope)
+    redirect_uri = url_safe_escape(gmail_redirect_uri(local_port))
+    return '{}?client_id={}&scope={}&response_type={}&redirect_uri={}'.format(
+        GOOGLE_OAUTH2_AUTH_URL, client_id, scope, 'code', redirect_uri)
+
+
+def gmail_get_token_from_code(client_id:str, client_secret:str, authorization_code:str, local_port:int) -> Any:
+    params = {}
+    params['client_id'] = client_id
+    params['client_secret'] = client_secret
+    params['code'] = authorization_code
+    params['redirect_uri'] = gmail_redirect_uri(local_port)
+    params['grant_type'] = 'authorization_code'
+    data = urllib.parse.urlencode(params)
+    response = urllib.request.urlopen(GOOGLE_OAUTH2_TOKEN_URL, data.encode('ascii')).read()
+    return json.loads(response)
+
+
+def gmail_get_RequestHandler(client_id:str, client_secret:str, output_file:IO[str]) -> type:
+    class GMailRequestHandler(http.server.BaseHTTPRequestHandler):
+        def log_request(self, code:Union[int,str]='-', size:Union[int,str]='-') -> None:
+            # Silence request logging.
+            return
+
+        def do_GET(self) -> None:
+            code = self.ExtractCodeFromResponse()
+            response_code = 400
+            response_text = '<html><head><title>Error</title></head><body><h1>Invalid request.</h1></body></html>'
+
+            if code:
+                response_code = 200
+                response_text = '<html><head><title>Done</title></head><body><h1>You may close this window now.</h1></body></html>'
+
+            self.send_response(response_code)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
+            self.wfile.write(response_text.encode('utf8'))
+
+            if code:
+                token = gmail_get_token_from_code(
+                    client_id,
+                    client_secret,
+                    code,
+                    self.server.server_address[1],
+                )
+                json.dump(token, output_file)
+                output_file.close()
+                sys.exit(0)
+
+        def ExtractCodeFromResponse(self) -> Optional[str]:
+            parse = urllib.parse.urlparse(self.path)
+            if parse.path != GOOGLE_OAUTH2_RESULT_PATH:
+                return None
+            qs = urllib.parse.parse_qs(parse.query)
+            if 'code' not in qs:
+                return None
+            if len(qs['code']) != 1:
+                return None
+            return qs['code'][0]
+   
+    return GMailRequestHandler
+
+
+def get_token_gmail(client_id:str, client_secret:str, scope:str, output_file:IO[str]) -> None:
+    request_handler_class = gmail_get_RequestHandler(
+        client_id,
+        client_secret,
+        output_file,
+    )
+    server = http.server.HTTPServer(('', 0), request_handler_class)
+    _, port = server.server_address
+
+    url = gmail_get_auth_url(client_id, scope, port)
+    print(f"Please open this URL in a browser ON THIS HOST:\n\n{url}\n", file=sys.stderr)
+
+    server.serve_forever()
 
 ##########
+
 
 OUTLOOK_REDIRECT_URI = "https://login.microsoftonline.com/common/oauth2/nativeclient"
 OUTLOOK_SCOPE = "openid offline_access https://outlook.office.com/SMTP.Send"
