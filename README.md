@@ -62,7 +62,7 @@ same "SSF" setting of "0". This made SASL's automatic detection of which
 plug-in to use non-deterministic. Now, with the higher SSF of "60" for
 "xoauth2", providers offering OAUTH2 will be handled via the xoauth2 plug-in.
 
-You can check the effective value by calling `pluginviewer -c` (on Debian/Ubuntu it’s called `saslpluginviewer`); look for
+You can check the effective value by calling `pluginviewer -c` (on Debian/Ubuntu it’s installed as `/usr/sbin/saslpluginviewer` in the `sasl2-bin` package); look for
 the "SSF" value:
 ```
 Plugin "sasl-xoauth2" [loaded],         API version: 4
@@ -131,7 +131,7 @@ This means that **even though the path in `/etc/postfix/sasl_passwd` is
 attempt to read from `/var/spool/postfix/etc/tokens/username@domain.com`.
 
 Additionally, if you see an error message similar to the following, you may need
-to copy over root CA certificates for SSL to work within sasl-xoauth2:
+to copy over root CA certificates for the TLS handshake to work within sasl-xoauth2:
 
 ```
 TokenStore::Refresh: http error: error setting certificate verify locations: ...
@@ -159,12 +159,27 @@ on setting up `postmulti` with sasl-xoauth2.
 
 ### Gmail Configuration
 
+From a new account, Google requires several steps to enable access.
+Once you are logged into your Gmail account in the browser, all these steps happen at the [Google Cloud Platform console](https://console.cloud.google.com/).
+
+#### Basic Account Setup
+
+- Select an exisitng project, or add a Project if you don't have one yet (it can be any name)
+
+- Set up "OAuth Consent Screen" for the project
+
+  - If this is an "External" and "Testing" app, be sure to add add your own e-mail address to the "test users"
+
 #### Client Credentials
 
-Visit the [Google API Console](https://console.developers.google.com/) to obtain
-OAuth 2 credentials (a client ID and client secret) for a "Desktop app"
-application type.
+From the [Google Cloud Platform console](https://console.cloud.google.com/), 
 
+- Credentials: Create Credentials: OAuth client ID
+
+  - Application type: Desktop app
+  
+  - Choose a memorable name
+  
 Store the client ID and secret in `/etc/sasl-xoauth2.conf`:
 
 ```json
@@ -251,8 +266,7 @@ Then, add API permissions for `SMTP.Send`.
 
 Store the "application (client) ID" (which you'll find in the "Overview" page
 for the application you registered with Azure) in `/etc/sasl-xoauth2.conf`.
-Leave `client_secret` blank. Additionally, override the token endpoint (which
-points to Gmail by default):
+Leave `client_secret` blank. Additionally, explicitly set the token endpoint (`sasl-xoauth2` points to Gmail's token endpoint by default):
 
 ```json
 {
