@@ -164,11 +164,12 @@ Once you are logged into your Gmail account in the browser, all these steps happ
 
 #### Basic Account Setup
 
-- Select an exisitng project, or add a Project if you don't have one yet (it can be any name)
+- Select an existing project, or add a Project if you don't have one yet (it can be any name)
 
 - Set up "OAuth Consent Screen" for the project
 
-  - If this is an "External" and "Testing" app, be sure to add add your own e-mail address to the "test users"
+  - If this is an "External" app, make sure the "Publishing status" of the app is set to "In production" (as opposed to "Testing"), otherwise the token [will be revoked after 7 days](https://github.com/tarickb/sasl-xoauth2/issues/29).
+    - You can ignore any requests to "verify" your app. The warnings shown in the console are misleading. You don't actually need to go through verification.
 
 #### Client Credentials
 
