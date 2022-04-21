@@ -278,6 +278,23 @@ Leave `client_secret` blank. Additionally, explicitly set the token endpoint (`s
 
 We'll also need these credentials in the next step.
 
+### Proxy support 
+
+In case the system is behind a corporate web proxy you can configure a proxy that is used by the curl library when refreshing the token.
+
+```json
+{
+  "client_id": "client ID goes here",
+  "client_secret": "",
+  "token_endpoint": "https://login.microsoftonline.com/consumers/oauth2/v2.0/token",
+  "proxy" : "http://proxy:8080"
+}
+```
+
+For supported proxy schemes please refer to the [curl library documentation](https://curl.se/libcurl/c/CURLOPT_PROXY.html):
+
+```
+
 #### A Note on Token Endpoints
 
 The endpoint above

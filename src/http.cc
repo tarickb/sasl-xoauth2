@@ -87,7 +87,7 @@ void SetHttpInterceptForTesting(HttpIntercept intercept) {
   s_intercept = intercept;
 }
 
-int HttpPost(const std::string &url, const std::string &data,
+int HttpPost(const std::string &url, const std::string &data, const std::string &proxy,
              long *response_code, std::string *response, std::string *error) {
   if (s_intercept)
     return s_intercept(url, data, response_code, response, error);
@@ -119,6 +119,7 @@ int HttpPost(const std::string &url, const std::string &data,
   // HTTP.
   curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, true);
   curl_easy_setopt(curl, CURLOPT_USERAGENT, kUserAgent);
+  curl_easy_setopt(curl, CURLOPT_PROXY, proxy.c_str());
   curl_easy_setopt(curl, CURLOPT_POST, true);
   curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE_LARGE,
                    static_cast<curl_off_t>(context.to_server_size()));

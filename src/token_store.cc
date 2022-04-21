@@ -101,6 +101,10 @@ int TokenStore::Refresh() {
       (override_token_endpoint_.empty() ? Config::Get()->token_endpoint()
                                         : override_token_endpoint_);
 
+  const std::string proxy =
+      (override_proxy_.empty() ? Config::Get()->proxy()
+                                        : override_proxy_);
+
   const std::string request =
       std::string("client_id=") + client_id +
       "&client_secret=" + client_secret +
@@ -113,7 +117,7 @@ int TokenStore::Refresh() {
 
   std::string http_error;
   int err =
-      HttpPost(token_endpoint, request, &response_code, &response, &http_error);
+      HttpPost(token_endpoint, request, proxy, &response_code, &response, &http_error);
   if (err != SASL_OK) {
     log_->Write("TokenStore::Refresh: http error: %s", http_error.c_str());
     return err;
