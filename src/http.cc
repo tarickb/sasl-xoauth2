@@ -116,7 +116,7 @@ int HttpPost(const std::string &url, const std::string &data, const std::string 
   // Network.
   curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 
-    // HTTP.
+  // HTTP.
   curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, true);
   curl_easy_setopt(curl, CURLOPT_USERAGENT, kUserAgent);
   if (!proxy.empty()) curl_easy_setopt(curl, CURLOPT_PROXY, proxy.c_str());

@@ -291,9 +291,7 @@ In case the system is behind a corporate web proxy you can configure a proxy tha
 }
 ```
 
-For supported proxy schemes please refer to the [curl library documentation](https://curl.se/libcurl/c/CURLOPT_PROXY.html):
-
-```
+For supported proxy schemes please refer to the [curl library documentation](https://curl.se/libcurl/c/CURLOPT_PROXY.html)
 
 #### A Note on Token Endpoints
 
