@@ -116,10 +116,10 @@ int HttpPost(const std::string &url, const std::string &data, const std::string 
   // Network.
   curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 
-  // HTTP.
+    // HTTP.
   curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, true);
   curl_easy_setopt(curl, CURLOPT_USERAGENT, kUserAgent);
-  curl_easy_setopt(curl, CURLOPT_PROXY, proxy.c_str());
+  if (!proxy.empty()) curl_easy_setopt(curl, CURLOPT_PROXY, proxy.c_str());
   curl_easy_setopt(curl, CURLOPT_POST, true);
   curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE_LARGE,
                    static_cast<curl_off_t>(context.to_server_size()));

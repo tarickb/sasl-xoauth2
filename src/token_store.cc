@@ -190,6 +190,7 @@ int TokenStore::Read() {
     ReadOverride(root, "client_id", &override_client_id_);
     ReadOverride(root, "client_secret", &override_client_secret_);
     ReadOverride(root, "token_endpoint", &override_token_endpoint_);
+    ReadOverride(root, "proxy", &override_proxy_);
 
     refresh_ = root["refresh_token"].asString();
     if (root.isMember("access_token"))
@@ -218,6 +219,7 @@ int TokenStore::Write() {
     WriteOverride("client_id", override_client_id_, &root);
     WriteOverride("client_secret", override_client_secret_, &root);
     WriteOverride("token_endpoint", override_token_endpoint_, &root);
+    WriteOverride("proxy", override_proxy_, &root);
 
     std::ofstream file(new_path);
     if (!file.good()) {
