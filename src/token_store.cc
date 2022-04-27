@@ -101,6 +101,10 @@ int TokenStore::Refresh() {
       (override_token_endpoint_.empty() ? Config::Get()->token_endpoint()
                                         : override_token_endpoint_);
 
+  const std::string proxy =
+      (override_proxy_.empty() ? Config::Get()->proxy()
+                                        : override_proxy_);
+
   const std::string request =
       std::string("client_id=") + client_id +
       "&client_secret=" + client_secret +
@@ -113,7 +117,7 @@ int TokenStore::Refresh() {
 
   std::string http_error;
   int err =
-      HttpPost(token_endpoint, request, &response_code, &response, &http_error);
+      HttpPost(token_endpoint, request, proxy, &response_code, &response, &http_error);
   if (err != SASL_OK) {
     log_->Write("TokenStore::Refresh: http error: %s", http_error.c_str());
     return err;
@@ -186,6 +190,7 @@ int TokenStore::Read() {
     ReadOverride(root, "client_id", &override_client_id_);
     ReadOverride(root, "client_secret", &override_client_secret_);
     ReadOverride(root, "token_endpoint", &override_token_endpoint_);
+    ReadOverride(root, "proxy", &override_proxy_);
 
     refresh_ = root["refresh_token"].asString();
     if (root.isMember("access_token"))
@@ -214,6 +219,7 @@ int TokenStore::Write() {
     WriteOverride("client_id", override_client_id_, &root);
     WriteOverride("client_secret", override_client_secret_, &root);
     WriteOverride("token_endpoint", override_token_endpoint_, &root);
+    WriteOverride("proxy", override_proxy_, &root);
 
     std::ofstream file(new_path);
     if (!file.good()) {

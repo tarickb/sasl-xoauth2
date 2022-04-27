@@ -46,6 +46,7 @@ class TokenStore {
   std::string override_client_id_;
   std::string override_client_secret_;
   std::string override_token_endpoint_;
+  std::string override_proxy_;
 
   std::string access_;
   std::string refresh_;

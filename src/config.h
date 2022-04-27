@@ -35,6 +35,7 @@ class Config {
   bool log_to_syslog_on_failure() const { return log_to_syslog_on_failure_; }
   bool log_full_trace_on_failure() const { return log_full_trace_on_failure_; }
   std::string token_endpoint() const { return token_endpoint_; }
+  std::string proxy() const { return proxy_; }
 
  private:
   Config() = default;
@@ -46,6 +47,7 @@ class Config {
   bool log_to_syslog_on_failure_ = true;
   bool log_full_trace_on_failure_ = false;
   std::string token_endpoint_ = "https://accounts.google.com/o/oauth2/token";
+  std::string proxy_ = "";
 };
 
 }  // namespace sasl_xoauth2
