@@ -1,0 +1,261 @@
+#!/usr/bin/python3
+# PYTHON_ARGCOMPLETE_OK
+# -*- coding: utf-8 -*-
+
+import os
+import sys
+import http
+import json
+import logging
+import argparse
+import http.server
+import urllib.parse
+import urllib.request
+
+from typing import Optional,Dict,Union,IO,Any
+
+try:
+    import argcomplete #type: ignore
+except ImportError:
+    argcomplete = None
+
+##########
+
+GOOGLE_OAUTH2_AUTH_URL = 'https://accounts.google.com/o/oauth2/auth'
+GOOGLE_OAUTH2_TOKEN_URL = 'https://accounts.google.com/o/oauth2/token'
+GOOGLE_OAUTH2_RESULT_PATH = '/oauth2_result'
+
+
+def url_safe_escape(instring:str) -> str:
+    return urllib.parse.quote(instring, safe='~-._')
+
+
+def gmail_redirect_uri(local_port:int) -> str:
+    return 'http://127.0.0.1:%d%s' % (local_port, GOOGLE_OAUTH2_RESULT_PATH)
+
+
+def gmail_get_auth_url(client_id:str, scope:str, local_port:int) -> str:
+    client_id = url_safe_escape(client_id)
+    scope = url_safe_escape(scope)
+    redirect_uri = url_safe_escape(gmail_redirect_uri(local_port))
+    return '{}?client_id={}&scope={}&response_type={}&redirect_uri={}'.format(
+        GOOGLE_OAUTH2_AUTH_URL, client_id, scope, 'code', redirect_uri)
+
+
+def gmail_get_token_from_code(client_id:str, client_secret:str, authorization_code:str, local_port:int) -> Any:
+    params = {}
+    params['client_id'] = client_id
+    params['client_secret'] = client_secret
+    params['code'] = authorization_code
+    params['redirect_uri'] = gmail_redirect_uri(local_port)
+    params['grant_type'] = 'authorization_code'
+    data = urllib.parse.urlencode(params)
+    response = urllib.request.urlopen(GOOGLE_OAUTH2_TOKEN_URL, data.encode('ascii')).read()
+    return json.loads(response)
+
+
+def gmail_get_RequestHandler(client_id:str, client_secret:str, output_file:IO[str]) -> type:
+    class GMailRequestHandler(http.server.BaseHTTPRequestHandler):
+        def log_request(self, code:Union[int,str]='-', size:Union[int,str]='-') -> None:
+            # Silence request logging.
+            return
+
+        def do_GET(self) -> None:
+            code = self.ExtractCodeFromResponse()
+            response_code = 400
+            response_text = '<html><head><title>Error</title></head><body><h1>Invalid request.</h1></body></html>'
+
+            if code:
+                response_code = 200
+                response_text = '<html><head><title>Done</title></head><body><h1>You may close this window now.</h1></body></html>'
+
+            self.send_response(response_code)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
+            self.wfile.write(response_text.encode('utf8'))
+
+            if code:
+                token = gmail_get_token_from_code(
+                    client_id,
+                    client_secret,
+                    code,
+                    self.server.server_address[1],
+                )
+                json.dump(token, output_file)
+                output_file.close()
+                sys.exit(0)
+
+        def ExtractCodeFromResponse(self) -> Optional[str]:
+            parse = urllib.parse.urlparse(self.path)
+            if parse.path != GOOGLE_OAUTH2_RESULT_PATH:
+                return None
+            qs = urllib.parse.parse_qs(parse.query)
+            if 'code' not in qs:
+                return None
+            if len(qs['code']) != 1:
+                return None
+            return qs['code'][0]
+   
+    return GMailRequestHandler
+
+
+def get_token_gmail(client_id:str, client_secret:str, scope:str, output_file:IO[str]) -> None:
+    request_handler_class = gmail_get_RequestHandler(
+        client_id,
+        client_secret,
+        output_file,
+    )
+    server = http.server.HTTPServer(('', 0), request_handler_class)
+    _, port = server.server_address
+
+    url = gmail_get_auth_url(client_id, scope, port)
+    print(f"Please open this URL in a browser ON THIS HOST:\n\n{url}\n", file=sys.stderr)
+
+    server.serve_forever()
+
+##########
+
+
+OUTLOOK_REDIRECT_URI = "https://login.microsoftonline.com/common/oauth2/nativeclient"
+OUTLOOK_SCOPE = "openid offline_access https://outlook.office.com/SMTP.Send"
+
+
+def outlook_get_authorization_code(client_id:str, tenant:str) -> str:
+    url = f"https://login.microsoftonline.com/{tenant}/oauth2/v2.0/authorize"
+    query:Dict[str,str] = {}
+    query['client_id'] = client_id
+    query['response_type'] = 'code'
+    query['redirect_uri'] = OUTLOOK_REDIRECT_URI
+    query['response_mode'] = 'query'
+    query['scope'] = OUTLOOK_SCOPE
+
+    print("Please visit the following link in a web browser, then paste the resulting URL:\n\n" +
+          f"{url}?{urllib.parse.urlencode(query)}\n",
+          file=sys.stderr)
+
+    resulting_url_input:str = input("Resulting URL: ")
+    if OUTLOOK_REDIRECT_URI not in resulting_url_input:
+        raise Exception(f"Resulting URL does not contain expected prefix: {OUTLOOK_REDIRECT_URI}")
+    resulting_url = urllib.parse.urlparse(resulting_url_input)
+    code = urllib.parse.parse_qs(resulting_url.query)
+    if "code" not in code:
+        raise Exception(f"Missing code in result: {resulting_url.query}")
+    return code["code"][0]
+
+
+def outlook_get_initial_tokens(client_id:str, tenant:str, code:str) -> Dict[str,Union[str,int]]:
+    url = f"https://login.microsoftonline.com/{tenant}/oauth2/v2.0/token"
+    token_request:Dict[str,str] = {}
+    token_request['client_id'] = client_id
+    token_request['scope'] = OUTLOOK_SCOPE
+    token_request['code'] = code
+    token_request['redirect_uri'] = OUTLOOK_REDIRECT_URI
+    token_request['grant_type'] = 'authorization_code'
+
+    resp = urllib.request.urlopen(
+        urllib.request.Request(
+            url,
+            data=urllib.parse.urlencode(token_request).encode('ascii'),
+            headers={ "Content-Type": "application/x-www-form-urlencoded" }))
+    if resp.code != 200:
+        raise Exception(f"Request failed: {resp.code}")
+    try:
+        content = json.load(resp)
+        return {
+            'access_token': content["access_token"],
+            'refresh_token': content["refresh_token"],
+            'expiry': 0,
+        }
+    except:
+        raise Exception(f"Tokens not found in response: {content}")
+
+
+def get_token_outlook(client_id:str, tenant:str, output_file:IO[str]) -> None:
+    code = outlook_get_authorization_code(client_id, tenant)
+    tokens = outlook_get_initial_tokens(client_id, tenant, code)
+    json.dump(tokens, output_file, indent=4)
+
+##########
+
+
+parser = argparse.ArgumentParser()
+subparse = parser.add_subparsers(
+    #title="subcommands",
+    required=True,
+)
+
+
+def subcommand_get_token(args:argparse.Namespace) -> None:
+    if args.service == 'outlook':
+        if not args.tenant:
+            parser.error("'outlook' service requires 'tenant' argument.")
+        get_token_outlook(
+            args.client_id,
+            args.tenant,
+            args.output_file,
+        )
+    elif args.service == 'gmail':
+        if not args.client_secret:
+            parser.error("'gmail' service requires 'client-secret' argument.")
+        if not args.scope:
+            parser.error("'gmail' service requires 'scope' argument.")
+        get_token_gmail(
+            args.client_id,
+            args.client_secret,
+            args.scope,
+            args.output_file,
+        )
+
+
+sp_get_token = subparse.add_parser('get-token')
+sp_get_token.set_defaults(func=subcommand_get_token)
+sp_get_token.add_argument(
+    'service', choices=['outlook', 'gmail'],
+    help="service type",
+)
+sp_get_token.add_argument(
+    '--client-id', required=True,
+    help="required for both services",
+)
+sp_get_token.add_argument(
+    '--tenant', default='consumers',
+    help="wanted by 'outlook' (defaults to 'consumers')",
+)
+sp_get_token.add_argument(
+    '--client-secret',
+    help="required for 'gmail'",
+)
+sp_get_token.add_argument(
+    '--scope',
+    help="required for 'gmail'",
+)
+sp_get_token.add_argument(
+    'output_file', nargs='?', type=argparse.FileType('w'), default='-',
+    help="output file, '-' for stdout",
+)
+
+
+def subcommand_test(args:argparse.Namespace) -> None:
+    raise NotImplementedError()
+
+
+sp_test = subparse.add_parser('test')
+sp_test.set_defaults(func=subcommand_test)
+
+##########
+
+
+def main() -> None:
+    if argcomplete:
+        argcomplete.autocomplete(parser)
+    elif '_ARGCOMPLETE' in os.environ:
+        logging.error('Argument completion requested but the "argcomplete" '
+                      'module is not installed. '
+                      'Maybe you want to "apt install python3-argcomplete"')
+        sys.exit(1)
+    args = parser.parse_args()
+    args.func(args)
+
+
+if __name__ == '__main__':
+    main()

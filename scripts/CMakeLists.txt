@@ -13,10 +13,9 @@
 # limitations under the License.
 
 set(SCRIPTS
-  get-initial-gmail-tokens.py
-  get-initial-outlook-tokens.py)
+  sasl-xoauth2-tool)
 
 install(
   FILES ${SCRIPTS}
-  DESTINATION ${CMAKE_INSTALL_DATADIR}/${CMAKE_PROJECT_NAME}
+  DESTINATION ${CMAKE_INSTALL_BINDIR}
   COMPONENT scripts)
