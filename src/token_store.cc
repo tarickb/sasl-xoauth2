@@ -66,8 +66,8 @@ void WriteOverride(const std::string &key, const std::string &value,
 }  // namespace
 
 /* static */ std::unique_ptr<TokenStore> TokenStore::Create(
-    Log *log, const std::string &path) {
-  std::unique_ptr<TokenStore> store(new TokenStore(log, path));
+    Log *log, const std::string &path, bool enable_updates) {
+  std::unique_ptr<TokenStore> store(new TokenStore(log, path, enable_updates));
   if (store->Read() != SASL_OK) return {};
   return store;
 }
@@ -162,8 +162,8 @@ int TokenStore::Refresh() {
   return Write();
 }
 
-TokenStore::TokenStore(Log *log, const std::string &path)
-    : log_(log), path_(path) {}
+TokenStore::TokenStore(Log *log, const std::string &path, bool enable_updates)
+    : log_(log), path_(path), enable_updates_(enable_updates) {}
 
 int TokenStore::Read() {
   refresh_.clear();
@@ -209,6 +209,11 @@ int TokenStore::Read() {
 
 int TokenStore::Write() {
   const std::string new_path = path_ + "." + GetTempSuffix();
+
+  if (!enable_updates_) {
+    log_->Write("TokenStore::Write: skipping write to %s", new_path.c_str());
+    return SASL_OK;
+  }
 
   try {
     Json::Value root;

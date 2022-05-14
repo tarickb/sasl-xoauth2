@@ -28,19 +28,21 @@ class Log;
 
 class TokenStore {
  public:
-  static std::unique_ptr<TokenStore> Create(Log *log, const std::string &path);
+  static std::unique_ptr<TokenStore> Create(Log *log, const std::string &path,
+      bool enable_updates = true);
 
   int GetAccessToken(std::string *token);
   int Refresh();
 
  private:
-  TokenStore(Log *log, const std::string &path);
+  TokenStore(Log *log, const std::string &path, bool enable_updates);
 
   int Read();
   int Write();
 
   Log *const log_ = nullptr;
   const std::string path_;
+  const bool enable_updates_;
 
   // Normally these values come from the config file, but they can be overriden.
   std::string override_client_id_;
