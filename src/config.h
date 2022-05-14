@@ -25,7 +25,9 @@ namespace sasl_xoauth2 {
 
 class Config {
  public:
-  static int Init();
+  static void EnableLoggingToStderr();
+
+  static int Init(std::string path = "");
   static int InitForTesting(const Json::Value &root);
 
   static Config *Get();

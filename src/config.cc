@@ -31,14 +31,14 @@ namespace {
 
 constexpr char kConfigFilePath[] = CONFIG_FILE_FULL_PATH;
 
-bool s_test_mode = false;
+bool s_log_to_stderr = false;
 Config *s_config = nullptr;
 
 void Log(const char *fmt, ...) {
   va_list args;
   va_start(args, fmt);
 
-  if (s_test_mode)
+  if (s_log_to_stderr)
     vfprintf(stderr, fmt, args);
   else
     vsyslog(LOG_WARNING, fmt, args);
@@ -88,14 +88,22 @@ int Fetch(const Json::Value &root, const std::string &name, bool optional,
 
 }  // namespace
 
-int Config::Init() {
+void Config::EnableLoggingToStderr() {
+  s_log_to_stderr = true;
+}
+
+int Config::Init(std::string path) {
   // Fail silently if we've already been initialized (via InitForTesting, say).
   if (s_config) return SASL_OK;
 
+  if (path.empty()) {
+    path = kConfigFilePath;
+  }
+
   try {
-    std::ifstream f(kConfigFilePath);
+    std::ifstream f(path);
     if (!f.good()) {
-      Log("sasl-xoauth2: Unable to open config file %s: %s\n", kConfigFilePath,
+      Log("sasl-xoauth2: Unable to open config file %s: %s\n", path.c_str(),
           strerror(errno));
       return SASL_FAIL;
     }
@@ -117,7 +125,6 @@ int Config::InitForTesting(const Json::Value &root) {
     exit(1);
   }
 
-  s_test_mode = true;
   s_config = new Config();
   return s_config->Init(root);
 }

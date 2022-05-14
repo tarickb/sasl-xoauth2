@@ -519,6 +519,7 @@ int main(int argc, char **argv) {
   Json::Value config;
   config["client_id"] = "dummy client id";
   config["client_secret"] = "dummy client secret";
+  sasl_xoauth2::Config::EnableLoggingToStderr();
   TEST_ASSERT_OK(sasl_xoauth2::Config::InitForTesting(config));
 
   int version = 0;
