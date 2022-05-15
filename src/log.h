@@ -17,6 +17,7 @@
 #ifndef SASL_XOAUTH2_LOG_H
 #define SASL_XOAUTH2_LOG_H
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -26,7 +27,23 @@ void EnableLoggingForTesting();
 
 class Log {
  public:
-  Log() = default;
+  enum Options {
+    OPTIONS_NONE = 0,
+    OPTIONS_IMMEDIATE = 1,
+    OPTIONS_FULL_TRACE_ON_FAILURE = 2,
+    OPTIONS_FLUSH_ON_DESTROY = 4,
+  };
+
+  enum Target {
+    TARGET_DEFAULT = 0,
+    TARGET_NONE = 1,
+    TARGET_SYSLOG = 2,
+    TARGET_STDERR = 3,
+  };
+
+  static std::unique_ptr<Log> Create(Options options = OPTIONS_NONE,
+      Target target = TARGET_DEFAULT);
+
   ~Log();
 
   void Write(const char *fmt, ...);
@@ -34,7 +51,11 @@ class Log {
   void SetFlushOnDestroy();
 
  private:
-  bool flush_on_destroy_ = false;
+  Log(Options options, Target target)
+    : options_(options), target_(target) {}
+
+  Options options_ = OPTIONS_NONE;
+  const Target target_ = TARGET_DEFAULT;
   std::string summary_;
   std::vector<std::string> lines_;
 };

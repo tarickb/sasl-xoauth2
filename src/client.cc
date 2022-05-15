@@ -19,6 +19,7 @@
 
 #include <sstream>
 
+#include "config.h"
 #include "log.h"
 #include "token_store.h"
 
@@ -135,7 +136,11 @@ int RequestPrompts(sasl_client_params_t *params, sasl_interact_t **prompts,
 }  // namespace
 
 Client::Client() {
-  log_.reset(new Log());
+  const Log::Options log_options = Config::Get()->log_full_trace_on_failure() ?
+    Log::OPTIONS_FULL_TRACE_ON_FAILURE : Log::OPTIONS_NONE;
+  const Log::Target log_target = Config::Get()->log_to_syslog_on_failure() ?
+    Log::TARGET_DEFAULT : Log::TARGET_NONE;
+  log_ = Log::Create(log_options, log_target);
   log_->Write("Client: created");
 }
 

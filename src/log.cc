@@ -26,13 +26,23 @@
 namespace sasl_xoauth2 {
 
 namespace {
-bool s_test_mode = false;
+Log::Options s_default_options = Log::OPTIONS_NONE;
+Log::Target s_default_target = Log::TARGET_SYSLOG;
 }  // namespace
 
-void EnableLoggingForTesting() { s_test_mode = true; }
+void EnableLoggingForTesting() {
+  s_default_options = Log::OPTIONS_IMMEDIATE;
+  s_default_target = Log::TARGET_STDERR;
+}
+
+std::unique_ptr<Log> Log::Create(Options options, Target target) {
+  options = static_cast<Options>(options | s_default_options);
+  if (target == TARGET_DEFAULT) target = s_default_target;
+  return std::unique_ptr<Log>(new Log(options, target));
+}
 
 Log::~Log() {
-  if (flush_on_destroy_ && !lines_.empty()) Flush();
+  if (options_ & OPTIONS_FLUSH_ON_DESTROY && !lines_.empty()) Flush();
 }
 
 void Log::Write(const char *fmt, ...) {
@@ -49,7 +59,7 @@ void Log::Write(const char *fmt, ...) {
   va_end(args);
   lines_.push_back(std::string(time_str) + ": " + buf);
 
-  if (s_test_mode) {
+  if (options_ & OPTIONS_IMMEDIATE && target_ == TARGET_STDERR) {
     va_start(args, fmt);
     vfprintf(stderr, fmt, args);
     fprintf(stderr, "\n");
@@ -58,32 +68,35 @@ void Log::Write(const char *fmt, ...) {
 }
 
 void Log::Flush() {
-  if (s_test_mode) {
-    fprintf(stderr, "LOGGING: skipping write of %zu line(s).\n", lines_.size());
-    return;
-  }
-
-  if (!Config::Get()->log_to_syslog_on_failure()) return;
-
-  openlog("sasl-xoauth2", 0, 0);
-  if (Config::Get()->log_full_trace_on_failure()) {
-    syslog(LOG_WARNING, "auth failed:\n");
-    for (const auto &line : lines_) syslog(LOG_WARNING, "  %s\n", line.c_str());
-  } else {
-    if (summary_.empty()) summary_ = lines_.back();
-    syslog(LOG_WARNING, "auth failed: %s\n", summary_.c_str());
-    if (lines_.size() > 1) {
-      syslog(LOG_WARNING,
-             "set log_full_trace_on_failure to see full %zu "
-             "line(s) of tracing.\n",
-             lines_.size());
+  if (target_ == TARGET_SYSLOG) {
+    openlog("sasl-xoauth2", 0, 0);
+    if (options_ & OPTIONS_FULL_TRACE_ON_FAILURE) {
+      syslog(LOG_WARNING, "auth failed:\n");
+      for (const auto &line : lines_)
+        syslog(LOG_WARNING, "  %s\n", line.c_str());
+    } else {
+      if (summary_.empty()) summary_ = lines_.back();
+      syslog(LOG_WARNING, "auth failed: %s\n", summary_.c_str());
+      if (lines_.size() > 1) {
+        syslog(LOG_WARNING,
+               "set log_full_trace_on_failure to see full %zu "
+               "line(s) of tracing.\n",
+               lines_.size());
+      }
+    }
+    closelog();
+  } else if (target_ == TARGET_STDERR) {
+    if (options_ & OPTIONS_IMMEDIATE) {
+      fprintf(stderr, "LOGGING: skipping write of %zu line(s).\n",
+          lines_.size());
+    } else {
+      for (const auto& line : lines_) fprintf(stderr, "%s\n", line.c_str());
     }
   }
-  closelog();
 }
 
 void Log::SetFlushOnDestroy() {
-  flush_on_destroy_ = true;
+  options_ = static_cast<Options>(options_ | OPTIONS_FLUSH_ON_DESTROY);
   if (!lines_.empty()) summary_ = lines_.back();
 }
 
