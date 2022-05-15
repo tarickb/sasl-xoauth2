@@ -36,14 +36,23 @@ set(SOURCES
   token_store.cc
   token_store.h)
 
+set(TEST_CONFIG_SOURCES
+  test_config.cc)
+
 set(CONFIG_FILE ${PROJECT_NAME}.conf)
 set(CONFIG_FILE_FULL_PATH ${CMAKE_INSTALL_FULL_SYSCONFDIR}/${CONFIG_FILE})
 
 link_directories(${JSON_LIBRARY_DIRS})
+
 add_library(${PROJECT_NAME} SHARED ${SOURCES} ${CONFIG_FILE})
 target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC ${CURL_INCLUDE_DIRS} ${SASL_INCLUDE_DIRS} ${JSON_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} ${CURL_LIBRARIES} ${JSON_LIBRARIES})
 target_compile_definitions(${PROJECT_NAME} PRIVATE CONFIG_FILE_FULL_PATH="${CONFIG_FILE_FULL_PATH}")
+
+add_executable(${PROJECT_NAME}-test-config ${TEST_CONFIG_SOURCES} ${CONFIG_FILE})
+target_include_directories(${PROJECT_NAME}-test-config SYSTEM PUBLIC ${CURL_INCLUDE_DIRS} ${SASL_INCLUDE_DIRS} ${JSON_INCLUDE_DIRS})
+target_link_libraries(${PROJECT_NAME}-test-config ${PROJECT_NAME} ${CURL_LIBRARIES} ${JSON_LIBRARIES})
+target_compile_definitions(${PROJECT_NAME}-test-config PRIVATE CONFIG_FILE_FULL_PATH="${CONFIG_FILE_FULL_PATH}")
 
 install(
   TARGETS ${PROJECT_NAME}
