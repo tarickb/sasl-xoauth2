@@ -88,9 +88,7 @@ int Fetch(const Json::Value &root, const std::string &name, bool optional,
 
 }  // namespace
 
-void Config::EnableLoggingToStderr() {
-  s_log_to_stderr = true;
-}
+void Config::EnableLoggingToStderr() { s_log_to_stderr = true; }
 
 int Config::Init(std::string path) {
   // Fail silently if we've already been initialized (via InitForTesting, say).

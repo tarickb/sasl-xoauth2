@@ -88,9 +88,9 @@ void Log::Flush() {
   } else if (target_ == TARGET_STDERR) {
     if (options_ & OPTIONS_IMMEDIATE) {
       fprintf(stderr, "LOGGING: skipping write of %zu line(s).\n",
-          lines_.size());
+              lines_.size());
     } else {
-      for (const auto& line : lines_) fprintf(stderr, "%s\n", line.c_str());
+      for (const auto &line : lines_) fprintf(stderr, "%s\n", line.c_str());
     }
   }
 }

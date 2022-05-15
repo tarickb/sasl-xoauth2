@@ -28,8 +28,9 @@ using HttpIntercept = std::function<int(
 
 void SetHttpInterceptForTesting(HttpIntercept intercept);
 
-int HttpPost(const std::string &url, const std::string &data, const std::string &proxy,
-             long *response_code, std::string *response, std::string *error);
+int HttpPost(const std::string &url, const std::string &data,
+             const std::string &proxy, long *response_code,
+             std::string *response, std::string *error);
 
 }  // namespace sasl_xoauth2
 

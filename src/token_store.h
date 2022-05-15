@@ -29,7 +29,7 @@ class Log;
 class TokenStore {
  public:
   static std::unique_ptr<TokenStore> Create(Log *log, const std::string &path,
-      bool enable_updates = true);
+                                            bool enable_updates = true);
 
   int GetAccessToken(std::string *token);
   int Refresh();

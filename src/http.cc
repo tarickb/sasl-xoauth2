@@ -87,8 +87,9 @@ void SetHttpInterceptForTesting(HttpIntercept intercept) {
   s_intercept = intercept;
 }
 
-int HttpPost(const std::string &url, const std::string &data, const std::string &proxy,
-             long *response_code, std::string *response, std::string *error) {
+int HttpPost(const std::string &url, const std::string &data,
+             const std::string &proxy, long *response_code,
+             std::string *response, std::string *error) {
   if (s_intercept)
     return s_intercept(url, data, response_code, response, error);
 

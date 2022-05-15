@@ -42,7 +42,7 @@ class Log {
   };
 
   static std::unique_ptr<Log> Create(Options options = OPTIONS_NONE,
-      Target target = TARGET_DEFAULT);
+                                     Target target = TARGET_DEFAULT);
 
   ~Log();
 
@@ -51,8 +51,7 @@ class Log {
   void SetFlushOnDestroy();
 
  private:
-  Log(Options options, Target target)
-    : options_(options), target_(target) {}
+  Log(Options options, Target target) : options_(options), target_(target) {}
 
   Options options_ = OPTIONS_NONE;
   const Target target_ = TARGET_DEFAULT;

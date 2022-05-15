@@ -13,12 +13,11 @@ struct Options {
   std::string token_path;
 };
 
-bool TryParseCommandLine(int argc, char** argv, Options* out) {
-  const char* kShortOptions = "c:r:";
-  const option kLongOptions[] = {
-    { "config", required_argument, nullptr, 'c' },
-    { "token", required_argument, nullptr, 'r' },
-    { nullptr, 0, nullptr, 0 } };
+bool TryParseCommandLine(int argc, char **argv, Options *out) {
+  const char *kShortOptions = "c:r:";
+  const option kLongOptions[] = {{"config", required_argument, nullptr, 'c'},
+                                 {"token", required_argument, nullptr, 'r'},
+                                 {nullptr, 0, nullptr, 0}};
 
   while (true) {
     int opt = getopt_long(argc, argv, kShortOptions, kLongOptions, nullptr);
@@ -41,18 +40,18 @@ bool TryParseCommandLine(int argc, char** argv, Options* out) {
   return true;
 }
 
-void PrintUsage(const std::string& base_name) {
+void PrintUsage(const std::string &base_name) {
   fprintf(stderr,
-      "Usage: %s [options]\n\n"
-      "Options:\n"
-      "  -c, --config=<file>  use <file> for configuration rather than\n"
-      "                       system default\n"
-      "  -r, --token=<file>   attempt to request a token from the OAuth\n"
-      "                       provider using the refresh token in <file>\n",
-      base_name.c_str());
+          "Usage: %s [options]\n\n"
+          "Options:\n"
+          "  -c, --config=<file>  use <file> for configuration rather than\n"
+          "                       system default\n"
+          "  -r, --token=<file>   attempt to request a token from the OAuth\n"
+          "                       provider using the refresh token in <file>\n",
+          base_name.c_str());
 }
 
-Options ParseCommandLine(int argc, char** argv) {
+Options ParseCommandLine(int argc, char **argv) {
   const std::string base_name = basename(argv[0]);
   Options parsed_options;
 
@@ -66,7 +65,7 @@ Options ParseCommandLine(int argc, char** argv) {
 
 }  // namespace
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
   const Options options = ParseCommandLine(argc, argv);
 
   sasl_xoauth2::Config::EnableLoggingToStderr();
@@ -77,13 +76,11 @@ int main(int argc, char** argv) {
   printf("Config check passed.\n");
 
   if (!options.token_path.empty()) {
-    auto logger =
-      sasl_xoauth2::Log::Create(
-          sasl_xoauth2::Log::OPTIONS_NONE,
-          sasl_xoauth2::Log::TARGET_STDERR);
-    auto token_store = sasl_xoauth2::TokenStore::Create(logger.get(),
-        options.token_path,
-        /*enable_updates=*/false);
+    auto logger = sasl_xoauth2::Log::Create(sasl_xoauth2::Log::OPTIONS_NONE,
+                                            sasl_xoauth2::Log::TARGET_STDERR);
+    auto token_store =
+        sasl_xoauth2::TokenStore::Create(logger.get(), options.token_path,
+                                         /*enable_updates=*/false);
     if (token_store->Refresh() != SASL_OK) {
       logger->Flush();
       printf("Token refresh failed.\n");
