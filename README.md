@@ -51,7 +51,8 @@ smtp_sasl_security_options =
 smtp_sasl_mechanism_filter = xoauth2
 ```
 
-Alternatively, you could specify multiple mechanisms, i.e. 
+Alternatively, you could specify multiple mechanisms, i.e.
+
 ```
 smtp_sasl_mechanism_filter = xoauth2,login
 ```
@@ -64,6 +65,7 @@ plug-in to use non-deterministic. Now, with the higher SSF of "60" for
 
 You can check the effective value by calling `pluginviewer -c` (on Debian/Ubuntu it’s installed as `/usr/sbin/saslpluginviewer` in the `sasl2-bin` package); look for
 the "SSF" value:
+
 ```
 Plugin "sasl-xoauth2" [loaded],         API version: 4
         SASL mechanism: XOAUTH2, best SSF: 60
@@ -74,8 +76,8 @@ Plugin "login" [loaded],        API version: 4
         security flags: NO_ANONYMOUS|PASS_CREDENTIALS
         features: SERVER_FIRST
 ```
-See https://www.cyrusimap.org/sasl/sasl/authentication_mechanisms.html#authentication-mechanisms for details on the fields.
 
+See https://www.cyrusimap.org/sasl/sasl/authentication_mechanisms.html#authentication-mechanisms for details on the fields.
 
 While you're at it, enable TLS:
 
@@ -173,14 +175,14 @@ Once you are logged into your Gmail account in the browser, all these steps happ
 
 #### Client Credentials
 
-From the [Google Cloud Platform console](https://console.cloud.google.com/), 
+From the [Google Cloud Platform console](https://console.cloud.google.com/),
 
 - Credentials: Create Credentials: OAuth client ID
 
   - Application type: Desktop app
-  
+
   - Choose a memorable name
-  
+
 Store the client ID and secret in `/etc/sasl-xoauth2.conf`:
 
 ```json
@@ -279,7 +281,7 @@ Leave `client_secret` blank. Additionally, explicitly set the token endpoint (`s
 
 We'll also need these credentials in the next step.
 
-### Proxy support 
+### Proxy support
 
 In case the system is behind a corporate web proxy you can configure a proxy that is used by the curl library when refreshing the token.
 
@@ -360,9 +362,9 @@ $ sudo chown -R postfix:postfix /var/spool/postfix/etc/tokens
 The following references were useful while developing, testing, and debugging
 Outlook support:
 
-* [Authenticate an IMAP, POP or SMTP connection using OAuth](https://docs.microsoft.com/en-us/exchange/client-developer/legacy-protocols/how-to-authenticate-an-imap-pop-smtp-application-by-using-oauth)
-* [Microsoft identity platform and OAuth 2.0 authorization code flow](https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-auth-code-flow)
-* [Microsoft identity platform and OAuth 2.0 Resource Owner Password Credentials](https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth-ropc)
+- [Authenticate an IMAP, POP or SMTP connection using OAuth](https://docs.microsoft.com/en-us/exchange/client-developer/legacy-protocols/how-to-authenticate-an-imap-pop-smtp-application-by-using-oauth)
+- [Microsoft identity platform and OAuth 2.0 authorization code flow](https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-auth-code-flow)
+- [Microsoft identity platform and OAuth 2.0 Resource Owner Password Credentials](https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth-ropc)
 
 ### Restart Postfix
 
