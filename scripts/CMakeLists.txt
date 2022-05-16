@@ -13,7 +13,7 @@
 # limitations under the License.
 
 set(SCRIPTS
-  sasl-xoauth2-tool)
+  sasl-xoauth2-token-tool)
 
 install(
   FILES ${SCRIPTS}
