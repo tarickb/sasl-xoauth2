@@ -1,1 +1,1 @@
-scripts/update-ca-certificates.sh /etc/ca-certificates/update.d/postfix-sasl-xoauth2
+scripts/postfix-sasl-xoauth2-update-ca-certs /etc/ca-certificates/update.d

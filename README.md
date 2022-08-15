@@ -150,8 +150,8 @@ $ sudo cp /etc/ssl/certs/ca-certificates.crt /var/spool/postfix/etc/ssl/certs/ca
 The Debian and Ubuntu packages install a script that is automatically run by
 `update-ca-certificates` to ensure the certificates are copied whenever the
 system certificates are updated:
-`/etc/ca-certificates/update.d/postfix-sasl-xoauth2`. It is also run when
-the package is installed.
+`/etc/ca-certificates/update.d/postfix-sasl-xoauth2-update-ca-certs`. It is also
+run when the package is installed.
 
 #### A Note on postmulti
 
