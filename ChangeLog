@@ -1,3 +1,14 @@
+sasl-xoauth2 (0.14) unstable; urgency=low
+
+  * Add sasl-xoauth2-token-tool, to allow creation of initial tokens.
+  * Add proxy support.
+  * Add sasl-xoauth2-test-config, to allow interactive testing of configs and
+    token refreshes.
+  * Rename CA certificate update script and ensure it lands in the correct
+    directory during installation.
+
+ -- Tarick Bedeir <tarick@bedeir.com>  Mon, 15 Aug 2022 08:27:00 -0700
+
 sasl-xoauth2 (0.13) unstable; urgency=low
 
   * Rebuild for Ubuntu 22.04 (Jammy).
