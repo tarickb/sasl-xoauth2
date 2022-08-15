@@ -1,3 +1,9 @@
+sasl-xoauth2 (0.14-1ubuntu1~jammy1~ppa1) jammy; urgency=low
+
+  * Update for 0.14.
+
+ -- Tarick Bedeir (Ubuntu Development) <tarick@bedeir.com>  Mon, 15 Aug 2022 11:24:00 -0700
+
 sasl-xoauth2 (0.13-1ubuntu1~jammy1~ppa1) jammy; urgency=low
 
   * Update for 0.13.
