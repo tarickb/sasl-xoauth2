@@ -1,3 +1,9 @@
+sasl-xoauth2 (0.13) unstable; urgency=low
+
+  * Rebuild for Ubuntu 22.04 (Jammy).
+
+ -- Tarick Bedeir <tarick@bedeir.com>  Sun, 14 Aug 2022 13:23:00 -0700
+
 sasl-xoauth2 (0.12) unstable; urgency=low
 
   * Prevent Office 365 tokens from expiring after 90 days.
