@@ -30,7 +30,9 @@ void SetHttpInterceptForTesting(HttpIntercept intercept);
 
 int HttpPost(const std::string &url, const std::string &data,
              const std::string &proxy, long *response_code,
-             std::string *response, std::string *error);
+             std::string *response, std::string *error,
+             const std::string &ca_bundle_file,
+             const std::string &ca_certs_dir);
 
 }  // namespace sasl_xoauth2
 

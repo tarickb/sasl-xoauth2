@@ -89,7 +89,9 @@ void SetHttpInterceptForTesting(HttpIntercept intercept) {
 
 int HttpPost(const std::string &url, const std::string &data,
              const std::string &proxy, long *response_code,
-             std::string *response, std::string *error) {
+             std::string *response, std::string *error,
+             const std::string &ca_bundle_file,
+             const std::string &ca_certs_dir) {
   if (s_intercept)
     return s_intercept(url, data, response_code, response, error);
 
@@ -116,6 +118,14 @@ int HttpPost(const std::string &url, const std::string &data,
 
   // Network.
   curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+
+  // Certs.
+  if (ca_certs_dir.empty()) {
+    if (!ca_bundle_file.empty())
+      curl_easy_setopt(curl, CURLOPT_CAINFO, ca_bundle_file.c_str());
+  } else {
+    curl_easy_setopt(curl, CURLOPT_CAPATH, ca_certs_dir.c_str());
+  }
 
   // HTTP.
   curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, true);
