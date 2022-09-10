@@ -49,14 +49,23 @@ target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC ${CURL_INCLUDE_DIRS} ${
 target_link_libraries(${PROJECT_NAME} ${CURL_LIBRARIES} ${JSON_LIBRARIES})
 target_compile_definitions(${PROJECT_NAME} PRIVATE CONFIG_FILE_FULL_PATH="${CONFIG_FILE_FULL_PATH}")
 
+add_library(${PROJECT_NAME}-static STATIC ${SOURCES} ${CONFIG_FILE})
+target_include_directories(${PROJECT_NAME}-static SYSTEM PUBLIC ${CURL_INCLUDE_DIRS} ${SASL_INCLUDE_DIRS} ${JSON_INCLUDE_DIRS})
+target_link_libraries(${PROJECT_NAME}-static ${CURL_LIBRARIES} ${JSON_LIBRARIES})
+target_compile_definitions(${PROJECT_NAME}-static PRIVATE CONFIG_FILE_FULL_PATH="${CONFIG_FILE_FULL_PATH}")
+
 add_executable(${PROJECT_NAME}-test-config ${TEST_CONFIG_SOURCES} ${CONFIG_FILE})
 target_include_directories(${PROJECT_NAME}-test-config SYSTEM PUBLIC ${CURL_INCLUDE_DIRS} ${SASL_INCLUDE_DIRS} ${JSON_INCLUDE_DIRS})
-target_link_libraries(${PROJECT_NAME}-test-config ${PROJECT_NAME} ${CURL_LIBRARIES} ${JSON_LIBRARIES})
+target_link_libraries(${PROJECT_NAME}-test-config ${PROJECT_NAME}-static ${CURL_LIBRARIES} ${JSON_LIBRARIES})
 target_compile_definitions(${PROJECT_NAME}-test-config PRIVATE CONFIG_FILE_FULL_PATH="${CONFIG_FILE_FULL_PATH}")
 
 install(
   TARGETS ${PROJECT_NAME}
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/sasl2)
+
+install(
+  TARGETS ${PROJECT_NAME}-test-config
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 install(
   FILES ${CONFIG_FILE}
