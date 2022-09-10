@@ -366,6 +366,52 @@ Outlook support:
 - [Microsoft identity platform and OAuth 2.0 authorization code flow](https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-auth-code-flow)
 - [Microsoft identity platform and OAuth 2.0 Resource Owner Password Credentials](https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth-ropc)
 
+### Testing Your Configuration
+
+sasl-xoauth2 provides a tool, `sasl-xoauth2-test-config`, that allows the
+semi-interative testing of configuration and token files (which is a lot more
+useful than parsing log files when trying to figure out why Postfix isn't
+delivering mail correctly).
+
+First, test your configuration file:
+
+```
+$ sasl-xoauth2-test-config -c ./bad-config.conf
+sasl-xoauth2: Missing required value: client_secret
+Config check failed.
+$ sasl-xoauth2-test-config -c ./good-config.conf
+Config check passed.
+$ sasl-xoauth2-test-config -c /etc/sasl-xoauth2.conf
+Config check passed.
+```
+
+(Specifying the path is only required if your configuration file isn't located
+in the system-default path.)
+
+Next, test your token file:
+
+```
+$ sasl-xoauth2-test-config -r ./bad-token.json
+Config check passed.
+2022-09-10 09:18:59: TokenStore::Read: file=./bad-token.json
+2022-09-10 09:18:59: TokenStore::Read: refresh=REDACTED
+2022-09-10 09:18:59: TokenStore::Refresh: attempt 1
+2022-09-10 09:18:59: TokenStore::Refresh: token_endpoint: https://accounts.google.com/o/oauth2/token
+2022-09-10 09:18:59: TokenStore::Refresh: request: client_id=REDACTED&client_secret=REDACTED&grant_type=refresh_token&refresh_token=REDACTED
+2022-09-10 09:19:00: TokenStore::Refresh: code=400, response={
+  "error": "invalid_grant",
+  "error_description": "Bad Request"
+}
+2022-09-10 09:19:00: TokenStore::Refresh: request failed
+Token refresh failed.
+$ sasl-xoauth2-test-config -r ./good-token.json
+Config check passed.
+Token refresh succeeded.
+```
+
+(Again, you'll have to specify your configuration file with `-c <config file>`
+if it isn't located at the system-default path.)
+
 ### Restart Postfix
 
 ```
