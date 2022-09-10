@@ -1,3 +1,10 @@
+sasl-xoauth2 (0.15) unstable; urgency=low
+
+  * Fix packaging of sasl-xoauth2-test-config, and explain its use in the
+    README.
+
+ -- Tarick Bedeir <tarick@bedeir.com>  Sat, 10 Sep 2022 09:49:00 -0700
+
 sasl-xoauth2 (0.14) unstable; urgency=low
 
   * Add sasl-xoauth2-token-tool, to allow creation of initial tokens.
