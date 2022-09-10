@@ -281,7 +281,7 @@ Leave `client_secret` blank. Additionally, explicitly set the token endpoint (`s
 
 We'll also need these credentials in the next step.
 
-### Proxy support
+### Proxy Support
 
 In case the system is behind a corporate web proxy you can configure a proxy that is used by the curl library when refreshing the token.
 
