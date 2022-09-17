@@ -88,8 +88,7 @@ void SetHttpInterceptForTesting(HttpIntercept intercept) {
 }
 
 int HttpPost(HttpPostOptions options) {
-  if (s_intercept)
-    return s_intercept(options);
+  if (s_intercept) return s_intercept(options);
 
   *options.response_code = 0;
   options.response->clear();

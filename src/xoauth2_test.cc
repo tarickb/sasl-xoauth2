@@ -83,7 +83,8 @@ void Cleanup() {
 }
 
 int DefaultHttpIntercept(sasl_xoauth2::HttpPostOptions options) {
-  fprintf(stderr, "TEST: default http intercept for url=%s\n", options.url.c_str());
+  fprintf(stderr, "TEST: default http intercept for url=%s\n",
+          options.url.c_str());
   return SASL_FAIL;
 }
 
