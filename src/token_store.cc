@@ -123,8 +123,16 @@ int TokenStore::Refresh() {
   log_->Write("TokenStore::Refresh: request: %s", request.c_str());
 
   std::string http_error;
-  int err = HttpPost(token_endpoint, request, proxy, ca_bundle_file,
-                     ca_certs_dir, &response_code, &response, &http_error);
+  int err = HttpPost({
+    .url = token_endpoint,
+    .data = request,
+    .proxy = proxy,
+    .ca_bundle_file = ca_bundle_file,
+    .ca_certs_dir = ca_certs_dir,
+    .response_code = &response_code,
+    .response = &response,
+    .error = &http_error
+  });
   if (err != SASL_OK) {
     log_->Write("TokenStore::Refresh: http error: %s", http_error.c_str());
     return err;

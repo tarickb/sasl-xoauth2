@@ -22,16 +22,23 @@
 
 namespace sasl_xoauth2 {
 
-using HttpIntercept = std::function<int(
-    const std::string &url, const std::string &data, long *response_code,
-    std::string *response, std::string *error)>;
+struct HttpPostOptions {
+  const std::string &url;
+  const std::string &data;
+  const std::string &proxy;
+  const std::string &ca_bundle_file;
+  const std::string &ca_certs_dir;
+
+  long *response_code;
+  std::string *response;
+  std::string *error;
+};
+
+using HttpIntercept = std::function<int(HttpPostOptions)>;
 
 void SetHttpInterceptForTesting(HttpIntercept intercept);
 
-int HttpPost(const std::string &url, const std::string &data,
-             const std::string &proxy, const std::string &ca_bundle_file,
-             const std::string &ca_certs_dir, long *response_code,
-             std::string *response, std::string *error);
+int HttpPost(HttpPostOptions options);
 
 }  // namespace sasl_xoauth2
 

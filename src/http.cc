@@ -87,23 +87,20 @@ void SetHttpInterceptForTesting(HttpIntercept intercept) {
   s_intercept = intercept;
 }
 
-int HttpPost(const std::string &url, const std::string &data,
-             const std::string &proxy, const std::string &ca_bundle_file,
-             const std::string &ca_certs_dir, long *response_code,
-             std::string *response, std::string *error) {
+int HttpPost(HttpPostOptions options) {
   if (s_intercept)
-    return s_intercept(url, data, response_code, response, error);
+    return s_intercept(options);
 
-  *response_code = 0;
-  response->clear();
+  *options.response_code = 0;
+  options.response->clear();
 
   CURL *curl = curl_easy_init();
   if (!curl) {
-    *error = "Unable to create CURL handle.";
+    *options.error = "Unable to create CURL handle.";
     return SASL_BADPROT;
   }
 
-  RequestContext context(data);
+  RequestContext context(options.data);
 
   char transport_error[CURL_ERROR_SIZE] = {'\0'};
 
@@ -116,23 +113,24 @@ int HttpPost(const std::string &url, const std::string &data,
   curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, transport_error);
 
   // Network.
-  curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+  curl_easy_setopt(curl, CURLOPT_URL, options.url.c_str());
 
   // Certs.
-  if (ca_certs_dir.empty()) {
-    if (ca_bundle_file.empty()) {
+  if (options.ca_certs_dir.empty()) {
+    if (options.ca_bundle_file.empty()) {
       // Use default CA location.
     } else {
-      curl_easy_setopt(curl, CURLOPT_CAINFO, ca_bundle_file.c_str());
+      curl_easy_setopt(curl, CURLOPT_CAINFO, options.ca_bundle_file.c_str());
     }
   } else {
-    curl_easy_setopt(curl, CURLOPT_CAPATH, ca_certs_dir.c_str());
+    curl_easy_setopt(curl, CURLOPT_CAPATH, options.ca_certs_dir.c_str());
   }
 
   // HTTP.
   curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, true);
   curl_easy_setopt(curl, CURLOPT_USERAGENT, kUserAgent);
-  if (!proxy.empty()) curl_easy_setopt(curl, CURLOPT_PROXY, proxy.c_str());
+  if (!options.proxy.empty())
+    curl_easy_setopt(curl, CURLOPT_PROXY, options.proxy.c_str());
   curl_easy_setopt(curl, CURLOPT_POST, true);
   curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE_LARGE,
                    static_cast<curl_off_t>(context.to_server_size()));
@@ -149,16 +147,16 @@ int HttpPost(const std::string &url, const std::string &data,
   curl_easy_cleanup(curl);
 
   if (err != CURLE_OK) {
-    *error = transport_error;
-    if (error->empty()) {
-      *error = curl_easy_strerror(err);
-      *error += " (no further error information)";
+    *options.error = transport_error;
+    if (options.error->empty()) {
+      *options.error = curl_easy_strerror(err);
+      *options.error += " (no further error information)";
     }
     return SASL_BADPROT;
   }
 
-  curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, response_code);
-  *response = context.from_server();
+  curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, options.response_code);
+  *options.response = context.from_server();
   return SASL_OK;
 }
 

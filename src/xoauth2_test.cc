@@ -82,10 +82,8 @@ void Cleanup() {
   }
 }
 
-int DefaultHttpIntercept(const std::string &url, const std::string &data,
-                         long *response_code, std::string *response,
-                         std::string *error) {
-  fprintf(stderr, "TEST: default http intercept for url=%s\n", url.c_str());
+int DefaultHttpIntercept(sasl_xoauth2::HttpPostOptions options) {
+  fprintf(stderr, "TEST: default http intercept for url=%s\n", options.url.c_str());
   return SASL_FAIL;
 }
 
@@ -400,11 +398,9 @@ bool TestWithTokenExpiredError(sasl_client_plug_t plug) {
 
   bool intercept_called = false;
   sasl_xoauth2::SetHttpInterceptForTesting(
-      [&intercept_called](const std::string &url, const std::string &data,
-                          long *response_code, std::string *response,
-                          std::string *error) {
-        *response = R"({"access_token": "access", "expires_in": 3600})";
-        *response_code = 200;
+      [&intercept_called](sasl_xoauth2::HttpPostOptions options) {
+        *options.response = R"({"access_token": "access", "expires_in": 3600})";
+        *options.response_code = 200;
         intercept_called = true;
         return SASL_OK;
       });
@@ -445,12 +441,10 @@ bool TestPreemptiveTokenRefresh(sasl_client_plug_t plug) {
 
   bool intercept_called = false;
   sasl_xoauth2::SetHttpInterceptForTesting(
-      [&intercept_called](const std::string &url, const std::string &data,
-                          long *response_code, std::string *response,
-                          std::string *error) {
-        *response =
+      [&intercept_called](sasl_xoauth2::HttpPostOptions options) {
+        *options.response =
             R"({"access_token": "refreshed_access", "expires_in": 3600})";
-        *response_code = 200;
+        *options.response_code = 200;
         intercept_called = true;
         return SASL_OK;
       });
@@ -494,11 +488,9 @@ bool TestFailedPreemptiveTokenRefresh(sasl_client_plug_t plug) {
 
   bool intercept_called = false;
   sasl_xoauth2::SetHttpInterceptForTesting(
-      [&intercept_called](const std::string &url, const std::string &data,
-                          long *response_code, std::string *response,
-                          std::string *error) {
-        *response = "";
-        *response_code = 400;
+      [&intercept_called](sasl_xoauth2::HttpPostOptions options) {
+        *options.response = "";
+        *options.response_code = 400;
         intercept_called = true;
         return SASL_OK;
       });
