@@ -38,6 +38,8 @@ class Config {
   bool log_full_trace_on_failure() const { return log_full_trace_on_failure_; }
   std::string token_endpoint() const { return token_endpoint_; }
   std::string proxy() const { return proxy_; }
+  std::string ca_bundle_file() const { return ca_bundle_file_; }
+  std::string ca_certs_dir() const { return ca_certs_dir_; }
 
  private:
   Config() = default;
@@ -50,6 +52,8 @@ class Config {
   bool log_full_trace_on_failure_ = false;
   std::string token_endpoint_ = "https://accounts.google.com/o/oauth2/token";
   std::string proxy_ = "";
+  std::string ca_bundle_file_ = "";
+  std::string ca_certs_dir_ = "";
 };
 
 }  // namespace sasl_xoauth2

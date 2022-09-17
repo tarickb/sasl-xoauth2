@@ -104,6 +104,14 @@ int TokenStore::Refresh() {
   const std::string proxy =
       (override_proxy_.empty() ? Config::Get()->proxy() : override_proxy_);
 
+  const std::string ca_bundle_file =
+      (override_ca_bundle_file_.empty() ? Config::Get()->ca_bundle_file()
+                                        : override_ca_bundle_file_);
+
+  const std::string ca_certs_dir =
+      (override_ca_certs_dir_.empty() ? Config::Get()->ca_certs_dir()
+                                      : override_ca_certs_dir_);
+
   const std::string request =
       std::string("client_id=") + client_id +
       "&client_secret=" + client_secret +
@@ -115,8 +123,8 @@ int TokenStore::Refresh() {
   log_->Write("TokenStore::Refresh: request: %s", request.c_str());
 
   std::string http_error;
-  int err = HttpPost(token_endpoint, request, proxy, &response_code, &response,
-                     &http_error);
+  int err = HttpPost(token_endpoint, request, proxy, ca_bundle_file,
+                     ca_certs_dir, &response_code, &response, &http_error);
   if (err != SASL_OK) {
     log_->Write("TokenStore::Refresh: http error: %s", http_error.c_str());
     return err;
@@ -190,6 +198,8 @@ int TokenStore::Read() {
     ReadOverride(root, "client_secret", &override_client_secret_);
     ReadOverride(root, "token_endpoint", &override_token_endpoint_);
     ReadOverride(root, "proxy", &override_proxy_);
+    ReadOverride(root, "ca_bundle_file", &override_ca_bundle_file_);
+    ReadOverride(root, "ca_certs_dir", &override_ca_certs_dir_);
 
     refresh_ = root["refresh_token"].asString();
     if (root.isMember("access_token"))
@@ -224,6 +234,8 @@ int TokenStore::Write() {
     WriteOverride("client_secret", override_client_secret_, &root);
     WriteOverride("token_endpoint", override_token_endpoint_, &root);
     WriteOverride("proxy", override_proxy_, &root);
+    WriteOverride("ca_bundle_file", override_ca_bundle_file_, &root);
+    WriteOverride("ca_certs_dir", override_ca_certs_dir_, &root);
 
     std::ofstream file(new_path);
     if (!file.good()) {
