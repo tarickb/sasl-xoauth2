@@ -132,8 +132,10 @@ This means that **even though the path in `/etc/postfix/sasl_passwd` is
 (and should be) `/etc/tokens/username@domain.com`**, at runtime Postfix will
 attempt to read from `/var/spool/postfix/etc/tokens/username@domain.com`.
 
-Additionally, if you see an error message similar to the following, you may need
-to copy over root CA certificates for the TLS handshake to work within sasl-xoauth2:
+#### SSL/TLS Certificates
+
+If you see an error message similar to the following, you may need to copy over
+root CA certificates for the TLS handshake to work within sasl-xoauth2:
 
 ```
 TokenStore::Refresh: http error: error setting certificate verify locations: ...
@@ -152,6 +154,11 @@ The Debian and Ubuntu packages install a script that is automatically run by
 system certificates are updated:
 `/etc/ca-certificates/update.d/postfix-sasl-xoauth2-update-ca-certs`. It is also
 run when the package is installed.
+
+sasl-xoauth2 also provides two configuration variables, `ca_bundle_file` and
+`ca_certs_dir`, that may be used to manually configure where the SSL/TLS
+libraries will look for a CA certificate bundle (for `ca_bundle_file`) or a set
+of CA certificates (for `ca_certs_dir`). Specify one or the other, but not both.
 
 #### A Note on postmulti
 
