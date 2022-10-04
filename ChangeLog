@@ -1,8 +1,9 @@
 sasl-xoauth2 (0.17) unstable; urgency=low
 
   * Reorganize packaging.
+  * Fix sasl-xoauth2-token-tool for compatibility with Python 3.6.
 
- -- Tarick Bedeir <tarick@bedeir.com>  Tue, 04 Oct 2022 08:59:00 -0700
+ -- Tarick Bedeir <tarick@bedeir.com>  Tue, 04 Oct 2022 12:11:00 -0700
 
 sasl-xoauth2 (0.16) unstable; urgency=low
 

@@ -179,10 +179,7 @@ def get_token_outlook(client_id:str, tenant:str, output_file:IO[str]) -> None:
 
 
 parser = argparse.ArgumentParser()
-subparse = parser.add_subparsers(
-    #title="subcommands",
-    required=True,
-)
+subparse = parser.add_subparsers()
 
 
 def subcommand_get_token(args:argparse.Namespace) -> None:
@@ -254,7 +251,11 @@ def main() -> None:
                       'Maybe you want to "apt install python3-argcomplete"')
         sys.exit(1)
     args = parser.parse_args()
-    args.func(args)
+    try:
+      args.func(args)
+    except:
+      parser.print_help()
+      sys.exit(1)
 
 
 if __name__ == '__main__':
