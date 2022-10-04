@@ -1,0 +1,36 @@
+sasl-xoauth2 (0.17-1ubuntu1~focal1~ppa1) focal; urgency=medium
+
+  * Update packaging.
+  * Fix sasl-xoauth2-token-tool for compatibility with Python 3.6.
+
+ -- Tarick Bedeir (Ubuntu Development) <tarick@bedeir.com>  Tue, 04 Oct 2022 12:20:58 -0700
+
+sasl-xoauth2 (0.12-1ubuntu1~focal1~ppa1) focal; urgency=low
+
+  * Update for 0.12.
+
+ -- Tarick Bedeir (Ubuntu Development) <tarick@bedeir.com>  Sun, 10 Apr 2022 22:38:00 -0700
+
+sasl-xoauth2 (0.11-1ubuntu1~focal1~ppa1) focal; urgency=low
+
+  * Update for 0.11.
+
+ -- Tarick Bedeir (Ubuntu Development) <tarick@bedeir.com>  Sat, 05 Feb 2022 09:58:00 -0800
+
+sasl-xoauth2 (0.10-1ubuntu1~focal2~ppa1) focal; urgency=low
+
+  * Try actually specifying focal this time...
+
+ -- Tarick Bedeir (Ubuntu Development) <tarick@bedeir.com>  Sun, 29 Nov 2020 23:05:00 -0800
+
+sasl-xoauth2 (0.10-1ubuntu1~focal1~ppa1) bionic; urgency=low
+
+  * Update for 0.10.
+
+ -- Tarick Bedeir (Ubuntu Development) <tarick@bedeir.com>  Sun, 29 Nov 2020 22:48:00 -0800
+
+sasl-xoauth2 (0.9-1ubuntu1~focal1~ppa1) bionic; urgency=low
+
+  * Package for Ubuntu 20.04.
+
+ -- Tarick Bedeir (Ubuntu Development) <tarick@bedeir.com>  Mon, 10 Aug 2020 13:28:00 -0700
