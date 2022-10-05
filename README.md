@@ -464,3 +464,51 @@ If Postfix complains about not finding a SASL mechanism (along the lines of
 `warning: SASL authentication failure: No worthy mechs found`), it's possible
 that either `make install` or the pre-built package put libsasl-xoauth2.so in
 the wrong directory.
+
+## Building
+
+sasl-xoauth2 uses [git-buildpackage](https://github.com/agx/git-buildpackage)
+for Debian and Ubuntu builds. The following is mostly intended as a cheat-sheet.
+
+### Creating a New Distribution Branch for an Existing Release
+
+```
+$ TARGET_DIST=dist-name # debian, ubuntu, etc.
+$ TARGET_DIST_RELEASE=release-name # focal, jammy, etc.
+$ RELEASE=0.NN
+$ RELEASE_VERSION="$RELEASE-1ubuntu1~${TARGET_DIST_RELEASE}1~ppa1"
+$ git clone --no-checkout -o upstream git@github.com:tarickb/sasl-xoauth2.git
+$ cd sasl-xoauth2
+$ git checkout -b "$TARGET_DIST/$TARGET_DIST_RELEASE" "release-$RELEASE"
+$ git checkout "upstream/packaging/$TARGET_DIST" debian/
+$ dch --create --package "sasl-xoauth2" --newversion "$RELEASE_VERSION" \
+    --distribution "$TARGET_DIST_RELEASE"
+$ git add debian/
+$ git commit -m \
+    "Initial packaging commit for $TARGET_DIST/$TARGET_DIST_RELEASE." debian/
+```
+
+### Updating an Existing Release Branch for a New Release
+
+```
+$ TARGET_DIST=dist-name # debian, ubuntu, etc.
+$ TARGET_DIST_RELEASE=release-name # focal, jammy, etc.
+$ RELEASE=0.NN
+$ RELEASE_VERSION="$RELEASE-1ubuntu1~${TARGET_DIST_RELEASE}1~ppa1"
+$ git fetch upstream
+$ git checkout "$TARGET_DIST/$TARGET_DIST_RELEASE"
+$ git merge "release-$RELEASE"
+$ gbp dch --release --auto --debian-branch="$TARGET_DIST/$TARGET_DIST_RELEASE" \
+    -N "$RELEASE_VERSION" --distribution="$TARGET_DIST_RELEASE"
+$ git commit -m "Release $RELEASE_VERSION" debian/changelog
+```
+
+### Building and Uploading a Release
+
+```
+$ TARGET_DIST=dist-name # debian, ubuntu, etc.
+$ TARGET_DIST_RELEASE=release-name # focal, jammy, etc.
+$ gbp buildpackage --git-debian-branch="$TARGET_DIST/$TARGET_DIST_RELEASE" \
+    -S --git-tag
+$ dput ppa:sasl-xoauth2/stable build/*.changes
+```
