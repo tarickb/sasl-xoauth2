@@ -243,7 +243,10 @@ def main() -> None:
                       'module is not installed. '
                       'Maybe you want to "apt install python3-argcomplete"')
         sys.exit(1)
-    args = parser.parse_args()
+    try:
+      args = parser.parse_intermixed_args()
+    except:
+      args = parser.parse_args()
     try:
       args.func(args)
     except:
