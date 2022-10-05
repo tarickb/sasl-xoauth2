@@ -81,6 +81,11 @@ int main(int argc, char **argv) {
     auto token_store =
         sasl_xoauth2::TokenStore::Create(logger.get(), options.token_path,
                                          /*enable_updates=*/false);
+    if (!token_store) {
+      logger->Flush();
+      printf("Failed to read token.\n");
+      return EXIT_FAILURE;
+    }
     if (token_store->Refresh() != SASL_OK) {
       logger->Flush();
       printf("Token refresh failed.\n");
