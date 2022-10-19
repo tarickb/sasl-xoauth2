@@ -1,3 +1,13 @@
+sasl-xoauth2 (0.18-1ubuntu1~focal1~ppa1) focal; urgency=medium
+
+  * Add build notes to README.
+  * Fix bug in sasl-xoauth2-test-config if token file can't be opened.
+  * Remove "test" subcommand from sasl-xoauth2-token-tool.
+  * Allow intermixed arguments for sasl-xoauth2-token-tool.
+  * Remove Debian build script.
+
+ -- Tarick Bedeir (Ubuntu Development) <tarick@bedeir.com>  Wed, 19 Oct 2022 07:26:30 -0700
+
 sasl-xoauth2 (0.17-1ubuntu1~focal1~ppa1) focal; urgency=medium
 
   * Update packaging.
