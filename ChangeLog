@@ -1,3 +1,10 @@
+sasl-xoauth2 (0.18) unstable; urgency=low
+
+  * Fix bug in sasl-xoauth2-test-config that resulted in a crash if the token
+    file could not be opened.
+
+ -- Tarick Bedeir <tarick@bedeir.com>  Tue, 04 Oct 2022 22:08:00 -0700
+
 sasl-xoauth2 (0.17) unstable; urgency=low
 
   * Reorganize packaging.
