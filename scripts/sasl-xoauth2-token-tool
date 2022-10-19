@@ -232,13 +232,6 @@ sp_get_token.add_argument(
 )
 
 
-def subcommand_test(args:argparse.Namespace) -> None:
-    raise NotImplementedError()
-
-
-sp_test = subparse.add_parser('test')
-sp_test.set_defaults(func=subcommand_test)
-
 ##########
 
 
@@ -250,7 +243,10 @@ def main() -> None:
                       'module is not installed. '
                       'Maybe you want to "apt install python3-argcomplete"')
         sys.exit(1)
-    args = parser.parse_args()
+    try:
+      args = parser.parse_intermixed_args()
+    except:
+      args = parser.parse_args()
     try:
       args.func(args)
     except:
