@@ -1,0 +1,5 @@
+sasl-xoauth2 (0.18-1ubuntu1~bionic1~ppa1) bionic; urgency=medium
+
+  * Update for Bionic.
+
+ -- Tarick Bedeir (Ubuntu Development) <tarick@bedeir.com>  Wed, 19 Oct 2022 07:28:15 -0700
