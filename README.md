@@ -272,7 +272,10 @@ application](https://docs.microsoft.com/en-us/azure/active-directory/develop/qui
 Use any name you like (it doesn't have to be "sasl-xoauth2"). Under "Platform
 configurations", add a native-client redirect URI for mobile/desktop
 applications: `https://login.microsoftonline.com/common/oauth2/nativeclient`.
-Then, add API permissions for `SMTP.Send`.
+Then, add API permissions for `SMTP.Send`: from the app registration
+"API permissions" page, click "add a permission", then "Microsoft Graph", and
+from there enter "SMTP.Send" in the search box. Expand the `SMTP` permission,
+then check the `SMTP.Send` checkbox.
 
 Store the "application (client) ID" (which you'll find in the "Overview" page
 for the application you registered with Azure) in `/etc/sasl-xoauth2.conf`.
