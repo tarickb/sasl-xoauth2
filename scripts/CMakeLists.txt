@@ -12,10 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+configure_file(
+  sasl-xoauth2-tool.in
+  sasl-xoauth2-tool)
+
 set(SCRIPTS
-  sasl-xoauth2-token-tool)
+  ${CMAKE_CURRENT_BINARY_DIR}/sasl-xoauth2-tool)
 
 install(
-  FILES ${SCRIPTS}
+  PROGRAMS ${SCRIPTS}
   DESTINATION ${CMAKE_INSTALL_BINDIR}
   COMPONENT scripts)

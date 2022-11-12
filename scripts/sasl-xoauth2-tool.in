@@ -2,13 +2,14 @@
 # PYTHON_ARGCOMPLETE_OK
 # -*- coding: utf-8 -*-
 
-import os
-import sys
+import argparse
 import http
+import http.server
 import json
 import logging
-import argparse
-import http.server
+import os
+import subprocess
+import sys
 import urllib.parse
 import urllib.request
 
@@ -18,6 +19,13 @@ try:
     import argcomplete #type: ignore
 except ImportError:
     argcomplete = None
+
+##########
+
+# These are set by CMake at project build time.
+
+TEST_TOOL_PATH = '${CMAKE_INSTALL_FULL_LIBDIR}/${PROJECT_NAME}/test-config'
+DEFAULT_CONFIG_FILE = '${CMAKE_INSTALL_FULL_SYSCONFDIR}/${PROJECT_NAME}.conf'
 
 ##########
 
@@ -232,6 +240,41 @@ sp_get_token.add_argument(
 )
 
 
+def subcommand_test_config(args:argparse.Namespace) -> None:
+  subprocess_args = [TEST_TOOL_PATH]
+  if args.config_file:
+    subprocess_args.extend(['--config', args.config_file])
+  result = subprocess.run(subprocess_args, shell=False)
+  sys.exit(result.returncode)
+
+
+sp_test_config = subparse.add_parser('test-config')
+sp_test_config.set_defaults(func=subcommand_test_config)
+sp_test_config.add_argument(
+    '--config-file',
+    help="config file path (defaults to '%s')" % DEFAULT_CONFIG_FILE,
+)
+
+
+def subcommand_test_token_refresh(args:argparse.Namespace) -> None:
+  subprocess_args = [TEST_TOOL_PATH, '--token', args.token_file]
+  if args.config_file:
+    subprocess_args.extend(['--config', args.config_file])
+  result = subprocess.run(subprocess_args, shell=False)
+  sys.exit(result.returncode)
+
+
+sp_test_token_refresh = subparse.add_parser('test-token-refresh')
+sp_test_token_refresh.set_defaults(func=subcommand_test_token_refresh)
+sp_test_token_refresh.add_argument(
+    '--config-file',
+    help="config file path (defaults to '%s')" % DEFAULT_CONFIG_FILE,
+)
+sp_test_token_refresh.add_argument(
+    'token_file',
+    help="file containing initial access token",
+)
+
 ##########
 
 
@@ -247,9 +290,9 @@ def main() -> None:
       args = parser.parse_intermixed_args()
     except:
       args = parser.parse_args()
-    try:
+    if hasattr(args, 'func'):
       args.func(args)
-    except:
+    else:
       parser.print_help()
       sys.exit(1)
 
