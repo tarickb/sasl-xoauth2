@@ -204,12 +204,12 @@ We'll also need these credentials in the next step.
 #### Initial Access Token
 
 The sasl-xoauth2
-[repository](https://github.com/tarickb/sasl-xoauth2/blob/master/scripts/sasl-xoauth2-token-tool)
+[repository](https://github.com/tarickb/sasl-xoauth2/blob/master/scripts/sasl-xoauth2-tool)
 and pre-built packages include a script that can assist in the generation of Gmail
 OAuth tokens. Run the script as follows:
 
 ```shell
-$ sasl-xoauth2-token-tool get-token gmail \
+$ sasl-xoauth2-tool get-token gmail \
     --client_id=CLIENT_ID_FROM_SASL_XOAUTH2_CONF \
     --client_secret=CLIENT_SECRET_FROM_SASL_XOAUTH2_CONF \
     --scope="https://mail.google.com/" \
@@ -319,12 +319,12 @@ for more on this.
 #### Initial Access Token
 
 The sasl-xoauth2
-[repository](https://github.com/tarickb/sasl-xoauth2/blob/master/scripts/sasl-xoauth2-token-tool)
+[repository](https://github.com/tarickb/sasl-xoauth2/blob/master/scripts/sasl-xoauth2-tool)
 and pre-built packages include a script that can assist in the generation of Microsoft
 OAuth tokens. Run the script as follows:
 
 ```shell
-$ sasl-xoauth2-token-tool get-token outlook \
+$ sasl-xoauth2-tool get-token outlook \
     --client-id=CLIENT_ID_FROM_SASL_XOAUTH2_CONF \
     PATH_TO_TOKENS_FILE
 Please visit the following link in a web browser, then paste the resulting URL:
