@@ -378,7 +378,7 @@ Outlook support:
 
 ### Testing Your Configuration
 
-sasl-xoauth2 provides a tool, `sasl-xoauth2-test-config`, that allows the
+sasl-xoauth2 provides a tool, `sasl-xoauth2-tool`, that allows the
 semi-interative testing of configuration and token files (which is a lot more
 useful than parsing log files when trying to figure out why Postfix isn't
 delivering mail correctly).
@@ -386,12 +386,12 @@ delivering mail correctly).
 First, test your configuration file:
 
 ```
-$ sasl-xoauth2-test-config -c ./bad-config.conf
+$ sasl-xoauth2-tool test-config --config-file ./bad-config.conf
 sasl-xoauth2: Missing required value: client_secret
 Config check failed.
-$ sasl-xoauth2-test-config -c ./good-config.conf
+$ sasl-xoauth2-tool test-config --config-file ./good-config.conf
 Config check passed.
-$ sasl-xoauth2-test-config -c /etc/sasl-xoauth2.conf
+$ sasl-xoauth2-tool test-config --config-file /etc/sasl-xoauth2.conf
 Config check passed.
 ```
 
@@ -401,7 +401,7 @@ in the system-default path.)
 Next, test your token file:
 
 ```
-$ sasl-xoauth2-test-config -r ./bad-token.json
+$ sasl-xoauth2-tool test-token-refresh ./bad-token.json
 Config check passed.
 2022-09-10 09:18:59: TokenStore::Read: file=./bad-token.json
 2022-09-10 09:18:59: TokenStore::Read: refresh=REDACTED
@@ -414,13 +414,13 @@ Config check passed.
 }
 2022-09-10 09:19:00: TokenStore::Refresh: request failed
 Token refresh failed.
-$ sasl-xoauth2-test-config -r ./good-token.json
+$ sasl-xoauth2-tool test-token-refresh ./good-token.json
 Config check passed.
 Token refresh succeeded.
 ```
 
-(Again, you'll have to specify your configuration file with `-c <config file>`
-if it isn't located at the system-default path.)
+(Again, you'll have to specify your configuration file with
+`--config-file <config file>` if it isn't located at the system-default path.)
 
 ### Restart Postfix
 
