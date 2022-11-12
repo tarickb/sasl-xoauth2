@@ -1,3 +1,11 @@
+sasl-xoauth2 (0.19) unstable; urgency=low
+
+  * sasl-xoauth2-tool is the new one-stop-shop for requesting initial tokens,
+    testing configuration files, and testing token refreshes. It replaces the
+    standalone sasl-xoauth2-token-tool and sasl-xoauth2-test-config tools.
+
+ -- Tarick Bedeir <tarick@bedeir.com>  Sat, 12 Nov 2022 12:05:00 -0500
+
 sasl-xoauth2 (0.18) unstable; urgency=low
 
   * Fix bug in sasl-xoauth2-test-config that resulted in a crash if the token
