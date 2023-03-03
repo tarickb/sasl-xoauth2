@@ -203,10 +203,8 @@ We'll also need these credentials in the next step.
 
 #### Initial Access Token
 
-The sasl-xoauth2
-[repository](https://github.com/tarickb/sasl-xoauth2/blob/master/scripts/sasl-xoauth2-tool)
-and pre-built packages include a script that can assist in the generation of Gmail
-OAuth tokens. Run the script as follows:
+The sasl-xoauth2 package includes a script that can assist in the generation of
+Gmail OAuth tokens. Run the script as follows:
 
 ```shell
 $ sasl-xoauth2-tool get-token gmail \
@@ -318,10 +316,8 @@ for more on this.
 
 #### Initial Access Token
 
-The sasl-xoauth2
-[repository](https://github.com/tarickb/sasl-xoauth2/blob/master/scripts/sasl-xoauth2-tool)
-and pre-built packages include a script that can assist in the generation of Microsoft
-OAuth tokens. Run the script as follows:
+The sasl-xoauth2 package includes a script that can assist in the generation of
+Microsoft OAuth tokens. Run the script as follows:
 
 ```shell
 $ sasl-xoauth2-tool get-token outlook \
