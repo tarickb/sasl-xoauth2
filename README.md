@@ -208,8 +208,8 @@ Gmail OAuth tokens. Run the script as follows:
 
 ```shell
 $ sasl-xoauth2-tool get-token gmail \
-    --client_id=CLIENT_ID_FROM_SASL_XOAUTH2_CONF \
-    --client_secret=CLIENT_SECRET_FROM_SASL_XOAUTH2_CONF \
+    --client-id=CLIENT_ID_FROM_SASL_XOAUTH2_CONF \
+    --client-secret=CLIENT_SECRET_FROM_SASL_XOAUTH2_CONF \
     --scope="https://mail.google.com/" \
     PATH_TO_TOKENS_FILE
 
