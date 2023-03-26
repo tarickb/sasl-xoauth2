@@ -1,3 +1,10 @@
+sasl-xoauth2 (0.20) unstable; urgency=low
+
+  * Prompt for client secret when using sasl-xoauth2-tool, if it isn't
+    specified as a command-line argument.
+
+ -- Tarick Bedeir <tarick@bedeir.com>  Sun, 26 Mar 2023 08:58:00 -0700
+
 sasl-xoauth2 (0.19) unstable; urgency=low
 
   * sasl-xoauth2-tool is the new one-stop-shop for requesting initial tokens,
