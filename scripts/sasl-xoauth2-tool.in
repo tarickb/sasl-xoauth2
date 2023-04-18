@@ -151,10 +151,11 @@ def outlook_get_authorization_code(client_id:str, tenant:str) -> str:
     return code["code"][0]
 
 
-def outlook_get_initial_tokens(client_id:str, tenant:str, code:str) -> Dict[str,Union[str,int]]:
+def outlook_get_initial_tokens(client_id:str, client_secret:str, tenant:str, code:str) -> Dict[str,Union[str,int]]:
     url = f"https://login.microsoftonline.com/{tenant}/oauth2/v2.0/token"
     token_request:Dict[str,str] = {}
     token_request['client_id'] = client_id
+    token_request['client_secret'] = client_secret
     token_request['scope'] = OUTLOOK_SCOPE
     token_request['code'] = code
     token_request['redirect_uri'] = OUTLOOK_REDIRECT_URI
@@ -178,9 +179,9 @@ def outlook_get_initial_tokens(client_id:str, tenant:str, code:str) -> Dict[str,
         raise Exception(f"Tokens not found in response: {content}")
 
 
-def get_token_outlook(client_id:str, tenant:str, output_file:IO[str]) -> None:
+def get_token_outlook(client_id:str, client_secret:str, tenant:str, output_file:IO[str]) -> None:
     code = outlook_get_authorization_code(client_id, tenant)
-    tokens = outlook_get_initial_tokens(client_id, tenant, code)
+    tokens = outlook_get_initial_tokens(client_id, client_secret, tenant, code)
     json.dump(tokens, output_file, indent=4)
 
 ##########
@@ -192,10 +193,15 @@ subparse = parser.add_subparsers()
 
 def subcommand_get_token(args:argparse.Namespace) -> None:
     if args.service == 'outlook':
+        if not args.client_secret:
+            args.client_secret = input('Please enter OAuth2 client secret: ')
+        if not args.client_secret:
+            parser.error("'outlook' service requires 'client-secret' argument.")
         if not args.tenant:
             parser.error("'outlook' service requires 'tenant' argument.")
         get_token_outlook(
             args.client_id,
+            args.client_secret,
             args.tenant,
             args.output_file,
         )
