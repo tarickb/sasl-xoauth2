@@ -1,9 +1,11 @@
-sasl-xoauth2 (0.20) unstable; urgency=low
+[NOT YET RELEASED] sasl-xoauth2 (0.20) unstable; urgency=low
 
   * Prompt for client secret when using sasl-xoauth2-tool, if it isn't
     specified as a command-line argument.
+  * Update sasl-xoauth2-tool to pass a client secret when requesting an
+    initial access token for Outlook.
 
- -- Tarick Bedeir <tarick@bedeir.com>  Sun, 26 Mar 2023 08:58:00 -0700
+ -- Tarick Bedeir <tarick@bedeir.com>  Wed, 19 Apr 2023 18:41:00 -0700
 
 sasl-xoauth2 (0.19) unstable; urgency=low
 
