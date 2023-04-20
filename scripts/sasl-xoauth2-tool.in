@@ -192,11 +192,11 @@ subparse = parser.add_subparsers()
 
 
 def subcommand_get_token(args:argparse.Namespace) -> None:
+    if not args.client_secret:
+        args.client_secret = input('Please enter OAuth2 client secret: ')
+    if not args.client_secret:
+        parser.error("fetching initial token requires 'client-secret' argument.")
     if args.service == 'outlook':
-        if not args.client_secret:
-            args.client_secret = input('Please enter OAuth2 client secret: ')
-        if not args.client_secret:
-            parser.error("'outlook' service requires 'client-secret' argument.")
         if not args.tenant:
             parser.error("'outlook' service requires 'tenant' argument.")
         get_token_outlook(
@@ -206,10 +206,6 @@ def subcommand_get_token(args:argparse.Namespace) -> None:
             args.output_file,
         )
     elif args.service == 'gmail':
-        if not args.client_secret:
-            args.client_secret = input('Please enter OAuth2 client secret: ')
-        if not args.client_secret:
-            parser.error("'gmail' service requires 'client-secret' argument.")
         if not args.scope:
             parser.error("'gmail' service requires 'scope' argument.")
         get_token_gmail(
@@ -236,7 +232,7 @@ sp_get_token.add_argument(
 )
 sp_get_token.add_argument(
     '--client-secret',
-    help="required for 'gmail', will prompt the user if blank",
+    help="required for both services, will prompt the user if blank",
 )
 sp_get_token.add_argument(
     '--scope',
