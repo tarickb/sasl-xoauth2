@@ -277,7 +277,10 @@ then check the `SMTP.Send` checkbox.
 
 Store the "application (client) ID" (which you'll find in the "Overview" page
 for the application you registered with Azure) in `/etc/sasl-xoauth2.conf`.
-Leave `client_secret` blank. Additionally, explicitly set the token endpoint (`sasl-xoauth2` points to Gmail's token endpoint by default):
+Leave `client_secret` blank (but see [A Note on Client
+Secrets](#a-note-on-client-secrets) below for non-personal-Outlook-account
+situations). Additionally, explicitly set the token endpoint (`sasl-xoauth2`
+points to Gmail's token endpoint by default):
 
 ```json
 {
@@ -316,10 +319,11 @@ Resulting URL:
 ```
 
 If using a tenant other than `consumers`, pass `--tenant=common`,
-`--tenant=organizations`, or `--tenant=TENANT_ID`. The client ID will be the
-same one written to `/etc/sasl-xoauth2.conf`. And `PATH_TO_TOKENS_FILE` will be
-the file specified in `/etc/postfix/sasl_passwd`. In our example that file will
-be either `/etc/tokens/username@domain.com` or
+`--tenant=organizations`, or `--tenant=TENANT_ID` (and see [A Note on Client
+Secrets](#a-note-on-client-secrets), which may be relevant). The client ID will
+be the same one written to `/etc/sasl-xoauth2.conf`. And `PATH_TO_TOKENS_FILE`
+will be the file specified in `/etc/postfix/sasl_passwd`. In our example that
+file will be either `/etc/tokens/username@domain.com` or
 `/var/spool/postfix/etc/tokens/username@domain.com` (see [A Note on
 chroot](#a-note-on-chroot)).
 
@@ -347,6 +351,15 @@ or:
 ```
 $ sudo chown -R postfix:postfix /var/spool/postfix/etc/tokens
 ```
+
+#### A Note on Client Secrets
+
+Some users have [reported](https://github.com/tarickb/sasl-xoauth2/issues/61)
+needing to specify client secrets when requesting access and refresh tokens for
+Outlook. This would seem to be the case when registering an application that has
+access to "accounts in any organizational directory" (i.e., non-personal
+Microsoft accounts). If this applies to you, please specify the client secret in
+`/etc/sasl-xoauth2.conf` and on the command line when using `sasl-xoauth2-tool`.
 
 #### Further Reading
 
