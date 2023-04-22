@@ -289,21 +289,6 @@ Leave `client_secret` blank. Additionally, explicitly set the token endpoint (`s
 
 We'll also need these credentials in the next step.
 
-### Proxy Support
-
-In case the system is behind a corporate web proxy you can configure a proxy that is used by the curl library when refreshing the token.
-
-```json
-{
-  "client_id": "client ID goes here",
-  "client_secret": "",
-  "token_endpoint": "https://login.microsoftonline.com/consumers/oauth2/v2.0/token",
-  "proxy" : "http://proxy:8080"
-}
-```
-
-For supported proxy schemes please refer to the [curl library documentation](https://curl.se/libcurl/c/CURLOPT_PROXY.html)
-
 #### A Note on Token Endpoints
 
 The endpoint above
@@ -371,6 +356,22 @@ Outlook support:
 - [Authenticate an IMAP, POP or SMTP connection using OAuth](https://docs.microsoft.com/en-us/exchange/client-developer/legacy-protocols/how-to-authenticate-an-imap-pop-smtp-application-by-using-oauth)
 - [Microsoft identity platform and OAuth 2.0 authorization code flow](https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-auth-code-flow)
 - [Microsoft identity platform and OAuth 2.0 Resource Owner Password Credentials](https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth-ropc)
+
+### Proxy Support
+
+In case the system is behind a corporate web proxy you can configure a proxy
+that is used by the curl library when refreshing the token.
+
+```json
+{
+  "client_id": "client ID goes here",
+  "client_secret": "client secret goes here",
+  "token_endpoint": "token endpoint goes here",
+  "proxy" : "http://proxy:8080"
+}
+```
+
+For supported proxy schemes please refer to the [curl library documentation](https://curl.se/libcurl/c/CURLOPT_PROXY.html)
 
 ### Testing Your Configuration
 
