@@ -39,7 +39,7 @@ $ sudo apt-get install sasl-xoauth2
 
 ## Pre-Built Packages for RHEL/Fedora
 
-(Thank you augustus-p@ for confirming that this works!)
+(Thank you @augustus-p for confirming that this works!)
 
 Add the [sasl-xoauth2 Copr
 repository](https://copr.fedorainfracloud.org/coprs/jjelen/sasl-xoauth2/):
