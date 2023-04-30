@@ -37,6 +37,30 @@ Install the plugin:
 $ sudo apt-get install sasl-xoauth2
 ```
 
+## Pre-Built Packages for RHEL/Fedora
+
+(Thank you augustus-p@ for confirming that this works!)
+
+Add the [sasl-xoauth2 Copr
+repository](https://copr.fedorainfracloud.org/coprs/jjelen/sasl-xoauth2/):
+
+```
+$ sudo dnf copr enable jjelen/sasl-xoauth2
+```
+
+Install the plugin:
+
+```
+$ sudo dnf install sasl-xoauth2
+```
+
+### A Note on SELinux
+
+If SELinux is enabled, you may find that authentication is failing. This is
+likely because the sasl-xoauth2 plugin, running within the Postfix `smtp`
+process, is unable to read, write, or create a new token file. If in doubt,
+check your SELinux audit logs.
+
 ## Configuration
 
 ### Configure Mail Agent
