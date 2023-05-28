@@ -191,6 +191,10 @@ parser = argparse.ArgumentParser()
 subparse = parser.add_subparsers()
 
 
+def argparse_get_parser() -> argparse.ArgumentParser:
+  return parser
+
+
 def subcommand_get_token(args:argparse.Namespace) -> None:
     if not args.client_secret:
         args.client_secret = input('Please enter OAuth2 client secret: ')
@@ -216,7 +220,7 @@ def subcommand_get_token(args:argparse.Namespace) -> None:
         )
 
 
-sp_get_token = subparse.add_parser('get-token')
+sp_get_token = subparse.add_parser('get-token', description='Fetches initial access and refresh tokens from an OAuth 2 provider')
 sp_get_token.set_defaults(func=subcommand_get_token)
 sp_get_token.add_argument(
     'service', choices=['outlook', 'gmail'],
@@ -252,7 +256,7 @@ def subcommand_test_config(args:argparse.Namespace) -> None:
   sys.exit(result.returncode)
 
 
-sp_test_config = subparse.add_parser('test-config')
+sp_test_config = subparse.add_parser('test-config', description='Tests a sasl-xoauth2 config file for syntax errors')
 sp_test_config.set_defaults(func=subcommand_test_config)
 sp_test_config.add_argument(
     '--config-file',
@@ -268,7 +272,7 @@ def subcommand_test_token_refresh(args:argparse.Namespace) -> None:
   sys.exit(result.returncode)
 
 
-sp_test_token_refresh = subparse.add_parser('test-token-refresh')
+sp_test_token_refresh = subparse.add_parser('test-token-refresh', description='Tests that a token can be refreshed (i.e., that the OAuth 2 flow is working correctly)')
 sp_test_token_refresh.set_defaults(func=subcommand_test_token_refresh)
 sp_test_token_refresh.add_argument(
     '--config-file',
