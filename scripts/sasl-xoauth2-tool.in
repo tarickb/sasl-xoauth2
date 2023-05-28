@@ -2,13 +2,14 @@
 # PYTHON_ARGCOMPLETE_OK
 # -*- coding: utf-8 -*-
 
-import os
-import sys
+import argparse
 import http
+import http.server
 import json
 import logging
-import argparse
-import http.server
+import os
+import subprocess
+import sys
 import urllib.parse
 import urllib.request
 
@@ -18,6 +19,13 @@ try:
     import argcomplete #type: ignore
 except ImportError:
     argcomplete = None
+
+##########
+
+# These are set by CMake at project build time.
+
+TEST_TOOL_PATH = '${CMAKE_INSTALL_FULL_LIBDIR}/${PROJECT_NAME}/test-config'
+DEFAULT_CONFIG_FILE = '${CMAKE_INSTALL_FULL_SYSCONFDIR}/${PROJECT_NAME}.conf'
 
 ##########
 
@@ -143,10 +151,11 @@ def outlook_get_authorization_code(client_id:str, tenant:str) -> str:
     return code["code"][0]
 
 
-def outlook_get_initial_tokens(client_id:str, tenant:str, code:str) -> Dict[str,Union[str,int]]:
+def outlook_get_initial_tokens(client_id:str, client_secret:str, tenant:str, code:str) -> Dict[str,Union[str,int]]:
     url = f"https://login.microsoftonline.com/{tenant}/oauth2/v2.0/token"
     token_request:Dict[str,str] = {}
     token_request['client_id'] = client_id
+    token_request['client_secret'] = client_secret
     token_request['scope'] = OUTLOOK_SCOPE
     token_request['code'] = code
     token_request['redirect_uri'] = OUTLOOK_REDIRECT_URI
@@ -170,9 +179,9 @@ def outlook_get_initial_tokens(client_id:str, tenant:str, code:str) -> Dict[str,
         raise Exception(f"Tokens not found in response: {content}")
 
 
-def get_token_outlook(client_id:str, tenant:str, output_file:IO[str]) -> None:
+def get_token_outlook(client_id:str, client_secret:str, tenant:str, output_file:IO[str]) -> None:
     code = outlook_get_authorization_code(client_id, tenant)
-    tokens = outlook_get_initial_tokens(client_id, tenant, code)
+    tokens = outlook_get_initial_tokens(client_id, client_secret, tenant, code)
     json.dump(tokens, output_file, indent=4)
 
 ##########
@@ -182,18 +191,25 @@ parser = argparse.ArgumentParser()
 subparse = parser.add_subparsers()
 
 
+def argparse_get_parser() -> argparse.ArgumentParser:
+  return parser
+
+
 def subcommand_get_token(args:argparse.Namespace) -> None:
+    if not args.client_secret:
+        args.client_secret = input('Please enter OAuth2 client secret: ')
+    if not args.client_secret:
+        parser.error("fetching initial token requires 'client-secret' argument.")
     if args.service == 'outlook':
         if not args.tenant:
             parser.error("'outlook' service requires 'tenant' argument.")
         get_token_outlook(
             args.client_id,
+            args.client_secret,
             args.tenant,
             args.output_file,
         )
     elif args.service == 'gmail':
-        if not args.client_secret:
-            parser.error("'gmail' service requires 'client-secret' argument.")
         if not args.scope:
             parser.error("'gmail' service requires 'scope' argument.")
         get_token_gmail(
@@ -204,7 +220,7 @@ def subcommand_get_token(args:argparse.Namespace) -> None:
         )
 
 
-sp_get_token = subparse.add_parser('get-token')
+sp_get_token = subparse.add_parser('get-token', description='Fetches initial access and refresh tokens from an OAuth 2 provider')
 sp_get_token.set_defaults(func=subcommand_get_token)
 sp_get_token.add_argument(
     'service', choices=['outlook', 'gmail'],
@@ -220,7 +236,7 @@ sp_get_token.add_argument(
 )
 sp_get_token.add_argument(
     '--client-secret',
-    help="required for 'gmail'",
+    help="required for both services, will prompt the user if blank",
 )
 sp_get_token.add_argument(
     '--scope',
@@ -231,6 +247,41 @@ sp_get_token.add_argument(
     help="output file, '-' for stdout",
 )
 
+
+def subcommand_test_config(args:argparse.Namespace) -> None:
+  subprocess_args = [TEST_TOOL_PATH]
+  if args.config_file:
+    subprocess_args.extend(['--config', args.config_file])
+  result = subprocess.run(subprocess_args, shell=False)
+  sys.exit(result.returncode)
+
+
+sp_test_config = subparse.add_parser('test-config', description='Tests a sasl-xoauth2 config file for syntax errors')
+sp_test_config.set_defaults(func=subcommand_test_config)
+sp_test_config.add_argument(
+    '--config-file',
+    help="config file path (defaults to '%s')" % DEFAULT_CONFIG_FILE,
+)
+
+
+def subcommand_test_token_refresh(args:argparse.Namespace) -> None:
+  subprocess_args = [TEST_TOOL_PATH, '--token', args.token_file]
+  if args.config_file:
+    subprocess_args.extend(['--config', args.config_file])
+  result = subprocess.run(subprocess_args, shell=False)
+  sys.exit(result.returncode)
+
+
+sp_test_token_refresh = subparse.add_parser('test-token-refresh', description='Tests that a token can be refreshed (i.e., that the OAuth 2 flow is working correctly)')
+sp_test_token_refresh.set_defaults(func=subcommand_test_token_refresh)
+sp_test_token_refresh.add_argument(
+    '--config-file',
+    help="config file path (defaults to '%s')" % DEFAULT_CONFIG_FILE,
+)
+sp_test_token_refresh.add_argument(
+    'token_file',
+    help="file containing initial access token",
+)
 
 ##########
 
@@ -247,9 +298,9 @@ def main() -> None:
       args = parser.parse_intermixed_args()
     except:
       args = parser.parse_args()
-    try:
+    if hasattr(args, 'func'):
       args.func(args)
-    except:
+    else:
       parser.print_help()
       sys.exit(1)
 

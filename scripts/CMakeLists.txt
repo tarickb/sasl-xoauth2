@@ -13,9 +13,44 @@
 # limitations under the License.
 
 set(SCRIPTS
-  sasl-xoauth2-token-tool)
+  sasl-xoauth2-tool)
 
-install(
-  FILES ${SCRIPTS}
-  DESTINATION ${CMAKE_INSTALL_BINDIR}
-  COMPONENT scripts)
+find_program(ARGPARSE_MANPAGE_PATH NAMES argparse-manpage DOC "Path to argparse-manpage, to generate man pages from Python scripts")
+if(NOT EXISTS ${ARGPARSE_MANPAGE_PATH})
+  message(FATAL_ERROR "Unable to find argparse-manpage")
+else()
+  message(STATUS "Found argparse-manpage: ${ARGPARSE_MANPAGE_PATH}")
+endif()
+
+foreach(script IN LISTS SCRIPTS)
+  set(man_num 1)
+
+  set(src ${CMAKE_CURRENT_SOURCE_DIR}/${script}.in)
+  set(dst ${CMAKE_CURRENT_BINARY_DIR}/${script})
+  set(man_base ${script}.${man_num})
+  set(man ${CMAKE_CURRENT_BINARY_DIR}/${man_base})
+
+  if(NOT EXISTS "${src}")
+    message(FATAL_ERROR "Unable to find template at ${src} for ${script}")
+  endif()
+
+  configure_file(${src} ${dst})
+
+  add_custom_command(
+    OUTPUT ${man}
+    COMMAND ${ARGPARSE_MANPAGE_PATH} --pyfile "${dst}" --function "argparse_get_parser" --author "Tarick Bedeir" --author-email "tarick@bedeir.com" --project-name "sasl-xoauth2" --url "https://github.com/tarickb/sasl-xoauth2" > "${man}"
+    DEPENDS ${dst}
+    COMMENT "Generating man page for ${script}"
+    VERBATIM)
+
+  install(
+    PROGRAMS ${dst}
+    DESTINATION ${CMAKE_INSTALL_BINDIR}
+    COMPONENT scripts)
+
+  add_custom_target("${man_base}_man" ALL DEPENDS ${man})
+  install(
+    FILES ${man}
+    DESTINATION "${CMAKE_INSTALL_FULL_MANDIR}/man${man_num}"
+    COMPONENT doc)
+endforeach()
