@@ -37,6 +37,31 @@ Install the plugin:
 $ sudo apt-get install sasl-xoauth2
 ```
 
+## Pre-Built Packages for RHEL/Fedora
+
+(Thank you [@augustus-p](https://github.com/augustus-p) for confirming that
+this works!)
+
+Add the [sasl-xoauth2 Copr
+repository](https://copr.fedorainfracloud.org/coprs/jjelen/sasl-xoauth2/):
+
+```
+$ sudo dnf copr enable jjelen/sasl-xoauth2
+```
+
+Install the plugin:
+
+```
+$ sudo dnf install sasl-xoauth2
+```
+
+### A Note on SELinux
+
+If SELinux is enabled, you may find that authentication is failing. This is
+likely because the sasl-xoauth2 plugin, running within the Postfix `smtp`
+process, is unable to read, write, or create a new token file. If in doubt,
+check your SELinux audit logs.
+
 ## Configuration
 
 ### Configure Mail Agent
@@ -203,15 +228,13 @@ We'll also need these credentials in the next step.
 
 #### Initial Access Token
 
-The sasl-xoauth2
-[repository](https://github.com/tarickb/sasl-xoauth2/blob/master/scripts/sasl-xoauth2-token-tool)
-and pre-built packages include a script that can assist in the generation of Gmail
-OAuth tokens. Run the script as follows:
+The sasl-xoauth2 package includes a script that can assist in the generation of
+Gmail OAuth tokens. Run the script as follows:
 
 ```shell
-$ sasl-xoauth2-token-tool get-token gmail \
-    --client_id=CLIENT_ID_FROM_SASL_XOAUTH2_CONF \
-    --client_secret=CLIENT_SECRET_FROM_SASL_XOAUTH2_CONF \
+$ sasl-xoauth2-tool get-token gmail \
+    --client-id=CLIENT_ID_FROM_SASL_XOAUTH2_CONF \
+    --client-secret=CLIENT_SECRET_FROM_SASL_XOAUTH2_CONF \
     --scope="https://mail.google.com/" \
     PATH_TO_TOKENS_FILE
 
@@ -272,11 +295,17 @@ application](https://docs.microsoft.com/en-us/azure/active-directory/develop/qui
 Use any name you like (it doesn't have to be "sasl-xoauth2"). Under "Platform
 configurations", add a native-client redirect URI for mobile/desktop
 applications: `https://login.microsoftonline.com/common/oauth2/nativeclient`.
-Then, add API permissions for `SMTP.Send`.
+Then, add API permissions for `SMTP.Send`: from the app registration
+"API permissions" page, click "add a permission", then "Microsoft Graph", and
+from there enter "SMTP.Send" in the search box. Expand the `SMTP` permission,
+then check the `SMTP.Send` checkbox.
 
 Store the "application (client) ID" (which you'll find in the "Overview" page
 for the application you registered with Azure) in `/etc/sasl-xoauth2.conf`.
-Leave `client_secret` blank. Additionally, explicitly set the token endpoint (`sasl-xoauth2` points to Gmail's token endpoint by default):
+Leave `client_secret` blank (but see [A Note on Client
+Secrets](#a-note-on-client-secrets) below for non-personal-Outlook-account
+situations). Additionally, explicitly set the token endpoint (`sasl-xoauth2`
+points to Gmail's token endpoint by default):
 
 ```json
 {
@@ -287,21 +316,6 @@ Leave `client_secret` blank. Additionally, explicitly set the token endpoint (`s
 ```
 
 We'll also need these credentials in the next step.
-
-### Proxy Support
-
-In case the system is behind a corporate web proxy you can configure a proxy that is used by the curl library when refreshing the token.
-
-```json
-{
-  "client_id": "client ID goes here",
-  "client_secret": "",
-  "token_endpoint": "https://login.microsoftonline.com/consumers/oauth2/v2.0/token",
-  "proxy" : "http://proxy:8080"
-}
-```
-
-For supported proxy schemes please refer to the [curl library documentation](https://curl.se/libcurl/c/CURLOPT_PROXY.html)
 
 #### A Note on Token Endpoints
 
@@ -315,13 +329,11 @@ for more on this.
 
 #### Initial Access Token
 
-The sasl-xoauth2
-[repository](https://github.com/tarickb/sasl-xoauth2/blob/master/scripts/sasl-xoauth2-token-tool)
-and pre-built packages include a script that can assist in the generation of Microsoft
-OAuth tokens. Run the script as follows:
+The sasl-xoauth2 package includes a script that can assist in the generation of
+Microsoft OAuth tokens. Run the script as follows:
 
 ```shell
-$ sasl-xoauth2-token-tool get-token outlook \
+$ sasl-xoauth2-tool get-token outlook \
     --client-id=CLIENT_ID_FROM_SASL_XOAUTH2_CONF \
     PATH_TO_TOKENS_FILE
 Please visit the following link in a web browser, then paste the resulting URL:
@@ -332,10 +344,11 @@ Resulting URL:
 ```
 
 If using a tenant other than `consumers`, pass `--tenant=common`,
-`--tenant=organizations`, or `--tenant=TENANT_ID`. The client ID will be the
-same one written to `/etc/sasl-xoauth2.conf`. And `PATH_TO_TOKENS_FILE` will be
-the file specified in `/etc/postfix/sasl_passwd`. In our example that file will
-be either `/etc/tokens/username@domain.com` or
+`--tenant=organizations`, or `--tenant=TENANT_ID` (and see [A Note on Client
+Secrets](#a-note-on-client-secrets), which may be relevant). The client ID will
+be the same one written to `/etc/sasl-xoauth2.conf`. And `PATH_TO_TOKENS_FILE`
+will be the file specified in `/etc/postfix/sasl_passwd`. In our example that
+file will be either `/etc/tokens/username@domain.com` or
 `/var/spool/postfix/etc/tokens/username@domain.com` (see [A Note on
 chroot](#a-note-on-chroot)).
 
@@ -364,6 +377,15 @@ or:
 $ sudo chown -R postfix:postfix /var/spool/postfix/etc/tokens
 ```
 
+#### A Note on Client Secrets
+
+Some users have [reported](https://github.com/tarickb/sasl-xoauth2/issues/61)
+needing to specify client secrets when requesting access and refresh tokens for
+Outlook. This would seem to be the case when registering an application that has
+access to "accounts in any organizational directory" (i.e., non-personal
+Microsoft accounts). If this applies to you, please specify the client secret in
+`/etc/sasl-xoauth2.conf` and on the command line when using `sasl-xoauth2-tool`.
+
 #### Further Reading
 
 The following references were useful while developing, testing, and debugging
@@ -373,9 +395,25 @@ Outlook support:
 - [Microsoft identity platform and OAuth 2.0 authorization code flow](https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-auth-code-flow)
 - [Microsoft identity platform and OAuth 2.0 Resource Owner Password Credentials](https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth-ropc)
 
+### Proxy Support
+
+In case the system is behind a corporate web proxy you can configure a proxy
+that is used by the curl library when refreshing the token.
+
+```json
+{
+  "client_id": "client ID goes here",
+  "client_secret": "client secret goes here",
+  "token_endpoint": "token endpoint goes here",
+  "proxy" : "http://proxy:8080"
+}
+```
+
+For supported proxy schemes please refer to the [curl library documentation](https://curl.se/libcurl/c/CURLOPT_PROXY.html)
+
 ### Testing Your Configuration
 
-sasl-xoauth2 provides a tool, `sasl-xoauth2-test-config`, that allows the
+sasl-xoauth2 provides a tool, `sasl-xoauth2-tool`, that allows the
 semi-interative testing of configuration and token files (which is a lot more
 useful than parsing log files when trying to figure out why Postfix isn't
 delivering mail correctly).
@@ -383,12 +421,12 @@ delivering mail correctly).
 First, test your configuration file:
 
 ```
-$ sasl-xoauth2-test-config -c ./bad-config.conf
+$ sasl-xoauth2-tool test-config --config-file ./bad-config.conf
 sasl-xoauth2: Missing required value: client_secret
 Config check failed.
-$ sasl-xoauth2-test-config -c ./good-config.conf
+$ sasl-xoauth2-tool test-config --config-file ./good-config.conf
 Config check passed.
-$ sasl-xoauth2-test-config -c /etc/sasl-xoauth2.conf
+$ sasl-xoauth2-tool test-config --config-file /etc/sasl-xoauth2.conf
 Config check passed.
 ```
 
@@ -398,7 +436,7 @@ in the system-default path.)
 Next, test your token file:
 
 ```
-$ sasl-xoauth2-test-config -r ./bad-token.json
+$ sasl-xoauth2-tool test-token-refresh ./bad-token.json
 Config check passed.
 2022-09-10 09:18:59: TokenStore::Read: file=./bad-token.json
 2022-09-10 09:18:59: TokenStore::Read: refresh=REDACTED
@@ -411,13 +449,13 @@ Config check passed.
 }
 2022-09-10 09:19:00: TokenStore::Refresh: request failed
 Token refresh failed.
-$ sasl-xoauth2-test-config -r ./good-token.json
+$ sasl-xoauth2-tool test-token-refresh ./good-token.json
 Config check passed.
 Token refresh succeeded.
 ```
 
-(Again, you'll have to specify your configuration file with `-c <config file>`
-if it isn't located at the system-default path.)
+(Again, you'll have to specify your configuration file with
+`--config-file <config file>` if it isn't located at the system-default path.)
 
 ### Restart Postfix
 
