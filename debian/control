@@ -8,6 +8,7 @@ Build-Depends: debhelper (>= 11~),
                libjsoncpp-dev,
                libsasl2-dev,
                libstdc++6-4.6-dev | libstdc++-dev,
+               pandoc,
                pkg-config,
                python3-argparse-manpage
 Standards-Version: 4.1.3
