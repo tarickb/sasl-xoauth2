@@ -31,6 +31,7 @@ option(EnableTests "Enable tests." ON)
 if(EnableTests)
   enable_testing()
 endif()
+add_subdirectory(docs)
 add_subdirectory(scripts)
 add_subdirectory(src)
 
