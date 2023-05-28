@@ -22,8 +22,6 @@ foreach(man_page IN LISTS MD_TO_MAN)
     message(FATAL_ERROR "No man number in ${man_page}")
   endif()
 
-  message(STATUS "[${src}] -> [${dst}] -> [${man_num}]")
-
   add_custom_command(
     OUTPUT ${dst}
     COMMAND ${PANDOC_PATH} -s -t man "${src}" -o "${dst}"
