@@ -1,3 +1,9 @@
+sasl-xoauth2 (0.20-1ubuntu1~bionic1~ppa5) bionic; urgency=medium
+
+  * Add patch to series.
+
+ -- Tarick Bedeir (Ubuntu Development) <tarick@bedeir.com>  Sun, 28 May 2023 10:35:12 -0700
+
 sasl-xoauth2 (0.20-1ubuntu1~bionic1~ppa4) bionic; urgency=medium
 
   * Patch to make argparse-manpage optional.
