@@ -1,3 +1,9 @@
+sasl-xoauth2 (0.20-1ubuntu1~bionic1~ppa2) bionic; urgency=medium
+
+  * Fix build deps.
+
+ -- Tarick Bedeir (Ubuntu Development) <tarick@bedeir.com>  Sun, 28 May 2023 09:28:28 -0700
+
 sasl-xoauth2 (0.20-1ubuntu1~bionic1~ppa1) bionic; urgency=medium
 
   * Expand instructions for enabling SMTP.Send.
