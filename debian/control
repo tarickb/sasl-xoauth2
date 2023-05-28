@@ -10,7 +10,8 @@ Build-Depends: debhelper (>= 11~),
                libstdc++6-4.6-dev | libstdc++-dev,
                pandoc,
                pkg-config,
-               python3-argparse-manpage
+               python3-argparse-manpage,
+               python3-distutils
 Standards-Version: 4.1.3
 
 Package: sasl-xoauth2
