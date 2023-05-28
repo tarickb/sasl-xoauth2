@@ -1,0 +1,49 @@
+diff --git a/scripts/CMakeLists.txt b/scripts/CMakeLists.txt
+index 9db3bd7..d3febbe 100644
+--- a/scripts/CMakeLists.txt
++++ b/scripts/CMakeLists.txt
+@@ -17,7 +17,7 @@ set(SCRIPTS
+ 
+ find_program(ARGPARSE_MANPAGE_PATH NAMES argparse-manpage DOC "Path to argparse-manpage, to generate man pages from Python scripts")
+ if(NOT EXISTS ${ARGPARSE_MANPAGE_PATH})
+-  message(FATAL_ERROR "Unable to find argparse-manpage")
++  message(WARNING "Unable to find argparse-manpage, will not generate man pages for scripts")
+ else()
+   message(STATUS "Found argparse-manpage: ${ARGPARSE_MANPAGE_PATH}")
+ endif()
+@@ -36,21 +36,23 @@ foreach(script IN LISTS SCRIPTS)
+ 
+   configure_file(${src} ${dst})
+ 
+-  add_custom_command(
+-    OUTPUT ${man}
+-    COMMAND ${ARGPARSE_MANPAGE_PATH} --pyfile "${dst}" --function "argparse_get_parser" --author "Tarick Bedeir" --author-email "tarick@bedeir.com" --project-name "sasl-xoauth2" --url "https://github.com/tarickb/sasl-xoauth2" > "${man}"
+-    DEPENDS ${dst}
+-    COMMENT "Generating man page for ${script}"
+-    VERBATIM)
+-
+   install(
+     PROGRAMS ${dst}
+     DESTINATION ${CMAKE_INSTALL_BINDIR}
+     COMPONENT scripts)
+ 
+-  add_custom_target("${man_base}_man" ALL DEPENDS ${man})
+-  install(
+-    FILES ${man}
+-    DESTINATION "${CMAKE_INSTALL_FULL_MANDIR}/man${man_num}"
+-    COMPONENT doc)
++  if(EXISTS ${ARGPARSE_MANPAGE_PATH})
++    add_custom_command(
++      OUTPUT ${man}
++      COMMAND ${ARGPARSE_MANPAGE_PATH} --pyfile "${dst}" --function "argparse_get_parser" --author "Tarick Bedeir" --author-email "tarick@bedeir.com" --project-name "sasl-xoauth2" --url "https://github.com/tarickb/sasl-xoauth2" > "${man}"
++      DEPENDS ${dst}
++      COMMENT "Generating man page for ${script}"
++      VERBATIM)
++
++    add_custom_target("${man_base}_man" ALL DEPENDS ${man})
++    install(
++      FILES ${man}
++      DESTINATION "${CMAKE_INSTALL_FULL_MANDIR}/man${man_num}"
++      COMPONENT doc)
++  endif()
+ endforeach()
