@@ -1,5 +1,11 @@
 sasl-xoauth2 (0.20-1ubuntu1~bionic1~ppa3) bionic; urgency=medium
 
+  * Revert scripts/CMakeLists.txt.
+
+ -- Tarick Bedeir (Ubuntu Development) <tarick@bedeir.com>  Sun, 28 May 2023 10:28:47 -0700
+
+sasl-xoauth2 (0.20-1ubuntu1~bionic1~ppa3) bionic; urgency=medium
+
   * Workaround for lack of argparse-manpage on bionic.
 
  -- Tarick Bedeir (Ubuntu Development) <tarick@bedeir.com>  Sun, 28 May 2023 10:15:45 -0700
