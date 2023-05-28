@@ -1,3 +1,23 @@
+sasl-xoauth2 (0.20-1ubuntu1~jammy1~ppa1) jammy; urgency=medium
+
+  * Expand instructions for enabling SMTP.Send.
+  * Update README to remove stale links.
+  * Fix parameter names in sample invocation of sasl-xoauth2-tool.
+  * Manpage for sasl-xoauth2.conf(5)
+  * Prompt for client secret if not specified on the command line.
+  * Minor refactoring of client secret prompt.
+  * Move proxy support notes into a separate section of the README.
+  * Add note on client secrets for Outlook.
+  * Add note on RHEL/Fedora and SELinux.
+  * CMake changes to build man pages.
+  * Flesh out man page for sasl-xoauth2.conf.
+  * Remove extraneous doc-generation logging.
+  * Extend sasl-xoauth2-tool argument parser setup in preparation for man page generation.
+  * Generate man pages from scripts.
+  * Changelog for 0.20.
+
+ -- Tarick Bedeir (Ubuntu Development) <tarick@bedeir.com>  Sun, 28 May 2023 09:15:53 -0700
+
 sasl-xoauth2 (0.18-1ubuntu1~jammy1~ppa1) jammy; urgency=medium
 
   * Add build notes to README.
