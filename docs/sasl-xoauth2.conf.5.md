@@ -19,38 +19,54 @@ A minimal configuration file looks like:
 }
 ```
 
+See the full README for guidance on initial configuration:
+https://github.com/tarickb/sasl-xoauth2
+
 # OPTIONS
 
 The top-level JSON object can contain the following keys:
 
 `client_id`
 
-: describe `client_id` here
+: identifies this client for OAuth 2 token requests
 
 `client_secret`
 
-: describe `client_secret` here
-
-`token_endpoint`
-
-: describe `token_endpoint` here
-
-`proxy`
-
-: describe `proxy` here
+: authenticates this client for OAuth 2 token requests; world-readable by default (but see below to place this in token files instead)
 
 `log_to_syslog_on_failure`
 
-: describe `log_to_syslog_on_failure` here
+: log to syslog if XOAUTH2 flow fails (defaults to "yes")
+
+`log_full_trace_on_failure`
+
+: log a full trace to syslog if XOAUTH2 flow fails; may contain tokens/secrets (defaults to "no")
+
+`token_endpoint`
+
+: URL to use when requesting tokens; defaults to Google, must be overridden for use with Microsoft/Outlook.
+
+`proxy`
+
+: if set, HTTP requests will be proxied through this server
+
+`ca_bundle_file`
+
+: if set, overrides CURL's default certificate-authority bundle file
+
+`ca_certs_dir`
+
+: if set, overrides CURL's default certificate-authority directory
 
 # TOKEN FILE
 
 In addition to this file, `sasl-xoauth2` relies on a "token file" which it updates independently.
 The token file is also JSON-formatted.
-The contents of this token file MAY contain values for the keys described above.
+The contents of this token file MAY contain values for the keys described above (except for the logging-related keys).
 If they do, the value in the token file overrides the value in the main configuration file.
 
 This makes it possible to use the same installation of `sasl-xoauth2` to connect to two different providers simultaneously.
+This also has the benefit of providing storage for client secrets that is not world-readable.
 
 # BUGS
 
