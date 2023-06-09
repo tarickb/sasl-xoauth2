@@ -155,7 +155,8 @@ def outlook_get_initial_tokens(client_id: str, client_secret: str, tenant: str, 
     url = f"https://login.microsoftonline.com/{tenant}/oauth2/v2.0/token"
     token_request: Dict[str, str] = {}
     token_request['client_id'] = client_id
-    token_request['client_secret'] = client_secret
+    if client_secret:
+        token_request['client_secret'] = client_secret
     token_request['scope'] = OUTLOOK_SCOPE
     token_request['code'] = code
     token_request['redirect_uri'] = OUTLOOK_REDIRECT_URI
@@ -196,10 +197,8 @@ def argparse_get_parser() -> argparse.ArgumentParser:
 
 
 def subcommand_get_token(args: argparse.Namespace) -> None:
-    if not args.client_secret:
+    if args.client_secret == ':':
         args.client_secret = input('Please enter OAuth2 client secret: ')
-    if not args.client_secret:
-        parser.error("fetching initial token requires 'client-secret' argument.")
     if args.service == 'outlook':
         if not args.tenant:
             parser.error("'outlook' service requires 'tenant' argument.")
@@ -210,6 +209,8 @@ def subcommand_get_token(args: argparse.Namespace) -> None:
             args.output_file,
         )
     elif args.service == 'gmail':
+        if not args.client_secret:
+            parser.error("'gmail' service requires 'client-secret' argument.")
         if not args.scope:
             parser.error("'gmail' service requires 'scope' argument.")
         get_token_gmail(
@@ -239,7 +240,7 @@ sp_get_token.add_argument(
 )
 sp_get_token.add_argument(
     '--client-secret',
-    help="required for both services, will prompt the user if blank",
+    help="required for gmail, sometimes required for outlook; will prompt if value is ':'",
 )
 sp_get_token.add_argument(
     '--scope',
