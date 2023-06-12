@@ -290,6 +290,11 @@ Skip to [restart Postfix](#restart-postfix) below.
 
 #### Client Credentials
 
+There's both the internally implemented token management, as well as the
+possibility to use tokens managed externally (i. e. when already having
+the proper OAuth2 tokens managed by a different application work-flow).
+
+##### Internal management of client credentials
 Follow [Microsoft's instructions to register an
 application](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app#register-an-application).
 Use any name you like (it doesn't have to be "sasl-xoauth2"). Under "Platform
@@ -315,7 +320,32 @@ points to Gmail's token endpoint by default):
 }
 ```
 
-We'll also need these credentials in the next step.
+We'll also need these credentials in the next step ("Initial Access Token").
+
+#### External token management
+
+When running multiple applications using the same OAuth2 access (i. e. fetchmail and Postfix),
+you may already have the according token management processes in place (and providing an always
+current token in a user-specific file).
+
+Under such circumstances, using another token manager may be problematic, leading to possible
+token contention and other difficulties.
+
+Assuming that the token management is already in place and provides a token file per user (and of course
+maintaining that file to always contain the then valid token), you can configure sasl-xoauth2 to
+simply read that user token file, without further interaction with upstream token issuers.
+
+When doing so, you provide the token file name as the SASL password and need to set "external_token_manager" to "yes"
+in sasl-xoauth's configuration file:
+
+```json
+{
+  "external_token_manager": "yes"
+}
+```
+
+This setting will apply to all authentications handled by this plug-in. Please also make sure that the user
+under which this plug-in is run, has access to the token file's content.
 
 #### A Note on Token Endpoints
 

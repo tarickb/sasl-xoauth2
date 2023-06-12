@@ -32,6 +32,7 @@ class Config {
 
   static Config *Get();
 
+  bool external_token_manager() const { return external_token_manager_; }
   std::string client_id() const { return client_id_; }
   std::string client_secret() const { return client_secret_; }
   bool log_to_syslog_on_failure() const { return log_to_syslog_on_failure_; }
@@ -48,6 +49,7 @@ class Config {
 
   std::string client_id_;
   std::string client_secret_;
+  bool external_token_manager_ = false;
   bool log_to_syslog_on_failure_ = true;
   bool log_full_trace_on_failure_ = false;
   std::string token_endpoint_ = "https://accounts.google.com/o/oauth2/token";

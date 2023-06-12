@@ -18,6 +18,7 @@
 #include <string.h>
 
 #include <sstream>
+#include <fstream>
 
 #include "config.h"
 #include "log.h"
@@ -214,8 +215,13 @@ int Client::InitialStep(sasl_client_params_t *params,
   if (err != SASL_OK) return err;
 
   user_ = auth_name;
-  token_ = TokenStore::Create(log_.get(), password);
-  if (!token_) return SASL_FAIL;
+
+  if (Config::Get()->external_token_manager() == false) {
+    token_ = TokenStore::Create(log_.get(), password);
+    if (!token_) return SASL_FAIL;
+  } else {
+    tokenfile_ = password;
+  }
 
   err = SendToken(to_server, to_server_len);
   if (err != SASL_OK) return err;
@@ -251,8 +257,10 @@ int Client::TokenSentStep(sasl_client_params_t *params,
   }
 
   if (status == "400" || status == "401") {
-    int err = token_->Refresh();
-    if (err != SASL_OK) return err;
+    if (Config::Get()->external_token_manager() == false) {
+      int err = token_->Refresh();
+      if (err != SASL_OK) return err;
+    }
     return SASL_TRYAGAIN;
   }
 
@@ -267,8 +275,20 @@ int Client::TokenSentStep(sasl_client_params_t *params,
 
 int Client::SendToken(const char **to_server, unsigned int *to_server_len) {
   std::string token;
-  int err = token_->GetAccessToken(&token);
-  if (err != SASL_OK) return err;
+
+  if (Config::Get()->external_token_manager() == false) {
+    int err = token_->GetAccessToken(&token);
+    if (err != SASL_OK) return err;
+  } else {
+    std::ifstream file(tokenfile_);
+    if (!file.good()) {
+      log_->Write("Client::SendToken: failed to open file %s: %s", tokenfile_.c_str(),
+                  strerror(errno));
+      return SASL_FAIL;
+    } else {
+      file >> token;
+    }
+  }
 
   response_ = "user=" + user_ + "\1auth=Bearer " + token + "\1\1";
   log_->Write("Client::SendToken: response: %s", response_.c_str());
