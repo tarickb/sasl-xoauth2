@@ -1,3 +1,10 @@
+sasl-xoauth2 (0.21-1ubuntu1~jammy1~ppa1) jammy; urgency=medium
+
+  * Make argparse man page generation optional.
+  * Don't require client secret for Outlook initial token requests.
+
+ -- Tarick Bedeir (Ubuntu Development) <tarick@bedeir.com>  Thu, 15 Jun 2023 15:26:15 -0700
+
 sasl-xoauth2 (0.20-1ubuntu1~jammy1~ppa2) jammy; urgency=medium
 
   * Fix build deps.
