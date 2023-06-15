@@ -1,3 +1,9 @@
+sasl-xoauth2 (0.21) unstable; urgency=low
+
+  * Update sasl-xoauth2-tool so that Outlook client secrets are optional.
+
+ -- Tarick Bedeir <tarick@bedeir.com>  Thu, 15 Jun 2023 15:23:00 -0700
+
 sasl-xoauth2 (0.20) unstable; urgency=low
 
   * Prompt for client secret when using sasl-xoauth2-tool, if it isn't
