@@ -36,7 +36,7 @@ The top-level JSON object can contain the following keys:
 
 `always_log_to_syslog`
 
-: always write plugin log messages to syslog, even for successful runs (defaults to "no")
+: always write plugin log messages to syslog, even for successful runs; may contain tokens/secrets (defaults to "no")
 
 `log_to_syslog_on_failure`
 
