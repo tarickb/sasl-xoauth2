@@ -2,8 +2,10 @@ sasl-xoauth2 (0.23) unstable; urgency=low [NOT YET RELEASED]
 
   * Add new config option, "always_log_to_syslog", to unconditionally
     log progress to syslog.
+  * Update sasl-xoauth2-tool to enable simplified device flow for
+    Outlook token acquisition.
 
- -- Tarick Bedeir <tarick@bedeir.com>  Wed, 12 Jul 2023 23:02:00 -0700
+ -- Tarick Bedeir <tarick@bedeir.com>  Thu, 13 Jul 2023 16:17:00 -0700
 
 sasl-xoauth2 (0.22) unstable; urgency=low
 
