@@ -34,6 +34,10 @@ The top-level JSON object can contain the following keys:
 
 : authenticates this client for OAuth 2 token requests; world-readable by default (but see below to place this in token files instead)
 
+`always_log_to_syslog`
+
+: always write plugin log messages to syslog, even for successful runs (defaults to "no")
+
 `log_to_syslog_on_failure`
 
 : log to syslog if XOAUTH2 flow fails (defaults to "yes")
