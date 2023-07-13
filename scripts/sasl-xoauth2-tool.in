@@ -7,6 +7,7 @@ import http
 import http.server
 import json
 import logging
+import msal
 import os
 import subprocess
 import sys
@@ -179,9 +180,31 @@ def outlook_get_initial_tokens(client_id:str, client_secret:str, tenant:str, cod
         raise Exception(f"Tokens not found in response: {content}")
 
 
-def get_token_outlook(client_id:str, client_secret:str, tenant:str, output_file:IO[str]) -> None:
-    code = outlook_get_authorization_code(client_id, tenant)
-    tokens = outlook_get_initial_tokens(client_id, client_secret, tenant, code)
+def outlook_get_initial_tokens_by_device_flow(client_id:str, tenant:str) -> Dict[str,Union[str,int]]:
+    authority = f"https://login.microsoftonline.com/{tenant}"
+    app = msal.PublicClientApplication(client_id, authority=authority)
+    flow = app.initiate_device_flow([OUTLOOK_SCOPE])
+    if "user_code" not in flow:
+        raise Exception("Failed to create device flow. Ensure that public client flows are enabled for the application. Flow: %s" % json.dumps(flow, indent=4))
+    print(flow["message"])
+    sys.stdout.flush()
+    result = app.acquire_token_by_device_flow(flow)
+    if "access_token" not in result or "refresh_token" not in result:
+        raise Exception("Failed to acquire token. Result: %s" % json.dumps(result, indent=4))
+    print("Acquired token.")
+    return {
+        'access_token': result["access_token"],
+        'refresh_token': result["refresh_token"],
+        'expiry': 0,
+    }
+
+
+def get_token_outlook(client_id:str, client_secret:str, tenant:str, use_device_flow:bool, output_file:IO[str]) -> None:
+    if use_device_flow:
+        tokens = outlook_get_initial_tokens_by_device_flow(client_id, tenant)
+    else:
+        code = outlook_get_authorization_code(client_id, tenant)
+        tokens = outlook_get_initial_tokens(client_id, client_secret, tenant, code)
     json.dump(tokens, output_file, indent=4)
 
 ##########
@@ -199,12 +222,13 @@ def subcommand_get_token(args:argparse.Namespace) -> None:
     if args.service == 'outlook':
         if not args.tenant:
             parser.error("'outlook' service requires 'tenant' argument.")
-        if not args.client_secret:
+        if not args.client_secret and not args.use_device_flow:
             args.client_secret = input('Please enter OAuth2 client secret (not always required; Azure docs are unclear): ')
         get_token_outlook(
             args.client_id,
             args.client_secret,
             args.tenant,
+            args.use_device_flow,
             args.output_file,
         )
     elif args.service == 'gmail':
@@ -243,6 +267,11 @@ sp_get_token.add_argument(
 sp_get_token.add_argument(
     '--scope',
     help="required for 'gmail'",
+)
+sp_get_token.add_argument(
+    "--use-device-flow",
+    action=argparse.BooleanOptionalAction,
+    help="use simplified device flow for Outlook/Azure",
 )
 sp_get_token.add_argument(
     'output_file', nargs='?', type=argparse.FileType('w'), default='-',
