@@ -20,6 +20,8 @@ $ mkdir build && cd build && cmake ..
 # cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_SYSCONFDIR=/etc
 $ make
 $ sudo make install
+# Need msal for sasl-xoauth2-tool:
+$ sudo pip3 install msal
 ```
 
 ## Pre-Built Packages for Ubuntu
