@@ -1,3 +1,11 @@
+sasl-xoauth2 (0.23-1ubuntu1~jammy1~ppa1) jammy; urgency=medium
+
+  * Update plugin security flags to include SASL_SEC_NOPLAINTEXT.
+  * Add option to always log to syslog.
+  * Add option to use simplified device flow for Outlook token generation.
+
+ -- Tarick Bedeir (Ubuntu Development) <tarick@bedeir.com>  Sun, 16 Jul 2023 21:43:23 -0700
+
 sasl-xoauth2 (0.21-1ubuntu1~jammy1~ppa1) jammy; urgency=medium
 
   * Make argparse man page generation optional.
