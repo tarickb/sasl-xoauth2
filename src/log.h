@@ -44,17 +44,19 @@ class Log {
   static std::unique_ptr<Log> Create(Options options = OPTIONS_NONE,
                                      Target target = TARGET_DEFAULT);
 
-  ~Log();
+  virtual ~Log();
 
   void Write(const char *fmt, ...);
   void Flush();
   void SetFlushOnDestroy();
 
- private:
-  Log(Options options, Target target) : options_(options), target_(target) {}
+ protected:
+  Log(Options options) : options_(options) {}
 
-  Options options_ = OPTIONS_NONE;
-  const Target target_ = TARGET_DEFAULT;
+  virtual void WriteLine(const std::string &line) = 0;
+
+ private:
+  Options options_;
   std::string summary_;
   std::vector<std::string> lines_;
 };

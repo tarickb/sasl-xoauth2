@@ -286,7 +286,100 @@ $ sudo chown -R postfix:postfix /var/spool/postfix/etc/tokens
 
 Skip to [restart Postfix](#restart-postfix) below.
 
-### Outlook/Office 365 Configuration
+### Outlook/Office 365 Configuration (Device Flow)
+
+This is the preferred method to authenticate with Outlook/Office, but the
+[fallback legacy client
+approach](#outlookoffice-365-configuration-legacy-client-deprecated) does still
+work (... for now).
+
+#### Client Credentials
+
+Follow [Microsoft's instructions to register an
+application](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app#register-an-application),
+with some notes:
+
+* Use any name you like (it doesn't have to be "sasl-xoauth2").
+* Do **not** add any redirect URIs or set up any platform configurations.
+* You **must** toggle "Allow public client flows" to "yes".
+
+Then, add API permissions for `SMTP.Send`:
+
+1. From the app registration "API permissions" page, click "add a permission".
+1. Click "Microsoft Graph".
+1. Enter "SMTP.Send" in the search box.
+1. Expand the `SMTP` permission, then check the `SMTP.Send` checkbox.
+
+Store the "application (client) ID" (which you'll find in the "Overview" page
+for the application you registered with Azure) in `/etc/sasl-xoauth2.conf`.
+Leave `client_secret` blank. Additionally, explicitly set the token endpoint
+(`sasl-xoauth2` points to Gmail's token endpoint by default):
+
+```json
+{
+  "client_id": "client ID goes here",
+  "client_secret": "",
+  "token_endpoint": "https://login.microsoftonline.com/consumers/oauth2/v2.0/token"
+}
+```
+
+We'll also need these credentials in the next step.
+
+#### A Note on Token Endpoints
+
+The endpoint above
+(`https://login.microsoftonline.com/consumers/oauth2/v2.0/token`) is suitable
+for use with consumer Outlook accounts. For other types of accounts it may be
+necessary to replace `consumers` with `common`, `organizations`, or a specific
+tenant ID. See [Microsoft's OAuth protocol
+documentation](https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-v2-protocols#endpoints)
+for more on this.
+
+#### Initial Access Token
+
+The sasl-xoauth2 package includes a script that can assist in the generation of
+Microsoft OAuth tokens. Run the script as follows:
+
+```shell
+$ sasl-xoauth2-tool get-token outlook \
+    --client-id=CLIENT_ID_FROM_SASL_XOAUTH2_CONF \
+    --use-device-flow \
+    PATH_TO_TOKENS_FILE
+To sign in, use a web browser to open the page https://www.microsoft.com/link and enter the code REDACTED to authenticate.
+```
+
+If using a tenant other than `consumers`, pass `--tenant=common`,
+`--tenant=organizations`, or `--tenant=TENANT_ID`. The client ID will
+be the same one written to `/etc/sasl-xoauth2.conf`. And `PATH_TO_TOKENS_FILE`
+will be the file specified in `/etc/postfix/sasl_passwd`. In our example that
+file will be either `/etc/tokens/username@domain.com` or
+`/var/spool/postfix/etc/tokens/username@domain.com` (see [A Note on
+chroot](#a-note-on-chroot)).
+
+Visit the link in a browser, enter the code, then accept the various prompts.
+After authorizing the application, the tool will write a token to the path
+specified.
+
+```
+To sign in, use a web browser to open the page https://www.microsoft.com/link and enter the code REDACTED to authenticate.
+Acquired token.
+```
+
+It may be necessary to adjust permissions on the resulting token file so that
+Postfix (or, more accurately, sasl-xoauth2 running as the Postfix user) can
+update it:
+
+```
+$ sudo chown -R postfix:postfix /etc/tokens
+```
+
+or:
+
+```
+$ sudo chown -R postfix:postfix /var/spool/postfix/etc/tokens
+```
+
+### Outlook/Office 365 Configuration (Legacy Client) (Deprecated)
 
 #### Client Credentials
 
