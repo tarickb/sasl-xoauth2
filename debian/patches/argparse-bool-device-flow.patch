@@ -1,0 +1,14 @@
+diff --git a/scripts/sasl-xoauth2-tool.in b/scripts/sasl-xoauth2-tool.in
+index 410bcb9..caa331d 100755
+--- a/scripts/sasl-xoauth2-tool.in
++++ b/scripts/sasl-xoauth2-tool.in
+@@ -270,7 +270,8 @@ sp_get_token.add_argument(
+ )
+ sp_get_token.add_argument(
+     "--use-device-flow",
+-    action=argparse.BooleanOptionalAction,
++    default=False,
++    action='store_true',
+     help="use simplified device flow for Outlook/Azure",
+ )
+ sp_get_token.add_argument(
