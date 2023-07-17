@@ -145,6 +145,10 @@ int Config::Init(const Json::Value &root) {
     err = Fetch(root, "client_secret", false, &client_secret_);
     if (err != SASL_OK) return err;
 
+    err = Fetch(root, "always_log_to_syslog", true,
+                &always_log_to_syslog_);
+    if (err != SASL_OK) return err;
+
     err = Fetch(root, "log_to_syslog_on_failure", true,
                 &log_to_syslog_on_failure_);
     if (err != SASL_OK) return err;

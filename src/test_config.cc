@@ -76,8 +76,9 @@ int main(int argc, char **argv) {
   printf("Config check passed.\n");
 
   if (!options.token_path.empty()) {
-    auto logger = sasl_xoauth2::Log::Create(sasl_xoauth2::Log::OPTIONS_NONE,
-                                            sasl_xoauth2::Log::TARGET_STDERR);
+    auto logger = sasl_xoauth2::Log::Create(
+        sasl_xoauth2::Log::OPTIONS_FULL_TRACE_ON_FAILURE,
+        sasl_xoauth2::Log::TARGET_STDERR);
     auto token_store =
         sasl_xoauth2::TokenStore::Create(logger.get(), options.token_path,
                                          /*enable_updates=*/false);
