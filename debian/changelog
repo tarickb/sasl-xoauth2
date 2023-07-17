@@ -1,3 +1,9 @@
+sasl-xoauth2 (0.23-1ubuntu1~jammy1~ppa4) jammy; urgency=medium
+
+  * Add python3-msal to runtime dependencies.
+
+ -- Tarick Bedeir (Ubuntu Development) <tarick@bedeir.com>  Sun, 16 Jul 2023 23:48:13 -0700
+
 sasl-xoauth2 (0.23-1ubuntu1~jammy1~ppa3) jammy; urgency=medium
 
   * Add python3-msal to build dependencies.
