@@ -100,13 +100,19 @@ Log::~Log() {
 }
 
 void Log::Write(const char *fmt, ...) {
-  char buf[1024];
   va_list args;
+
   va_start(args, fmt);
-  vsnprintf(buf, sizeof(buf), fmt, args);
+  int buf_len = vsnprintf(nullptr, 0, fmt, args);
   va_end(args);
 
-  const std::string line = buf;
+  // +1 for the trailing \0.
+  std::vector<char> buf(buf_len + 1);
+  va_start(args, fmt);
+  vsnprintf(buf.data(), buf.size(), fmt, args);
+  va_end(args);
+
+  const std::string line(buf.begin(), buf.end());
   if (options_ & OPTIONS_IMMEDIATE) {
     impl_->WriteLine(line);
   } else {
