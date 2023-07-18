@@ -1,8 +1,9 @@
 sasl-xoauth2 (0.25) unstable; urgency=low [NOT YET RELEASED]
 
   * Prevent truncation when writing logs.
+  * Allow token-level username overrides.
 
- -- Tarick Bedeir <tarick@bedeir.com>  Mon, 17 Jul 2023 18:49:00 -0700
+ -- Tarick Bedeir <tarick@bedeir.com>  Tue, 18 Jul 2023 09:01:00 -0700
 
 sasl-xoauth2 (0.24) unstable; urgency=low
 
