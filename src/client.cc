@@ -225,7 +225,7 @@ int Client::InitialStep(sasl_client_params_t *params,
   user_ = auth_name;
   token_ = TokenStore::Create(log_.get(), password);
   if (!token_) return SASL_FAIL;
-  if (token_->HasUser()) user_ = token_->User();
+  if (token_->has_user()) user_ = token_->user();
 
   err = SendToken(to_server, to_server_len);
   if (err != SASL_OK) return err;

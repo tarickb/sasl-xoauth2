@@ -237,7 +237,7 @@ int TokenStore::Write() {
     root["refresh_token"] = refresh_;
     root["access_token"] = access_;
     root["expiry"] = std::to_string(expiry_);
-    if (HasUser()) root["user"] = user_;
+    if (has_user()) root["user"] = user_;
 
     WriteOverride("client_id", override_client_id_, &root);
     WriteOverride("client_secret", override_client_secret_, &root);
