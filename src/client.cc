@@ -141,10 +141,11 @@ Log::Options GetLogOptions() {
 }
 
 Log::Target GetLogTarget() {
-  if (Config::Get()->always_log_to_syslog() ||
-      Config::Get()->log_to_syslog_on_failure())
+  if (Config::Get()->always_log_to_syslog())
     return Log::TARGET_SYSLOG;
-  return Log::TARGET_NONE;
+  if (!Config::Get()->log_to_syslog_on_failure())
+    return Log::TARGET_NONE;
+  return Log::TARGET_DEFAULT;
 }
 
 }  // namespace
