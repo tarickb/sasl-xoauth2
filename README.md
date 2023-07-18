@@ -235,10 +235,10 @@ Gmail OAuth tokens. Run the script as follows:
 
 ```shell
 $ sasl-xoauth2-tool get-token gmail \
+    PATH_TO_TOKENS_FILE \
     --client-id=CLIENT_ID_FROM_SASL_XOAUTH2_CONF \
     --client-secret=CLIENT_SECRET_FROM_SASL_XOAUTH2_CONF \
-    --scope="https://mail.google.com/" \
-    PATH_TO_TOKENS_FILE
+    --scope="https://mail.google.com/"
 
 Please open this URL in a browser ON THIS HOST:
 
@@ -344,9 +344,9 @@ Microsoft OAuth tokens. Run the script as follows:
 
 ```shell
 $ sasl-xoauth2-tool get-token outlook \
+    PATH_TO_TOKENS_FILE \
     --client-id=CLIENT_ID_FROM_SASL_XOAUTH2_CONF \
-    --use-device-flow \
-    PATH_TO_TOKENS_FILE
+    --use-device-flow
 To sign in, use a web browser to open the page https://www.microsoft.com/link and enter the code REDACTED to authenticate.
 ```
 
@@ -429,8 +429,9 @@ Microsoft OAuth tokens. Run the script as follows:
 
 ```shell
 $ sasl-xoauth2-tool get-token outlook \
-    --client-id=CLIENT_ID_FROM_SASL_XOAUTH2_CONF \
-    PATH_TO_TOKENS_FILE
+    PATH_TO_TOKENS_FILE \
+    --client-id=CLIENT_ID_FROM_SASL_XOAUTH2_CONF
+
 Please visit the following link in a web browser, then paste the resulting URL:
 
 https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize?client_id=REDACTED&response_type=code&redirect_uri=https%3A//login.microsoftonline.com/common/oauth2/nativeclient&response_mode=query&scope=openid%20offline_access%20https%3A//outlook.office.com/SMTP.Send
@@ -558,11 +559,14 @@ Token refresh succeeded.
 $ service postfix restart
 ```
 
-## Using Multiple Mail Providers Simultaneously
+## Using Multiple Mail Providers or Users Simultaneously
 
-One instance of sasl-xoauth2 may provide tokens for different mail providers,
-but each provider will require its own client ID, client secret, and token
-endpoint. In this case, each of these may be set in the token file rather than
+One instance of sasl-xoauth2 may provide tokens for different mail providers
+and/or users.
+Each provider will require its own client ID, client secret, and token
+endpoint. Each user may require a username to be specified, if the username
+automatically obtained from postfix is not correct.
+In this case, each of these may be set in the token file rather than
 in `/etc/sasl-xoauth2.conf`. Set them when setting the initial access token:
 
 ```json
@@ -572,7 +576,8 @@ in `/etc/sasl-xoauth2.conf`. Set them when setting the initial access token:
   "client_secret": "client secret goes here, if required",
   "token_endpoint": "token endpoint goes here, for non-Gmail",
   "expiry" : "0",
-  "refresh_token" : "refresh token goes here"
+  "refresh_token" : "refresh token goes here",
+  "user" : "username goes here"
 }
 ```
 

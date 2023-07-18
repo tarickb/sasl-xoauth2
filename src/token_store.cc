@@ -182,6 +182,7 @@ int TokenStore::Read() {
   refresh_.clear();
   access_.clear();
   expiry_ = 0;
+  user_.clear();
 
   try {
     log_->Write("TokenStore::Read: file=%s", path_.c_str());
@@ -211,9 +212,11 @@ int TokenStore::Read() {
     if (root.isMember("access_token"))
       access_ = root["access_token"].asString();
     if (root.isMember("expiry")) expiry_ = stoi(root["expiry"].asString());
+    if (root.isMember("user"))
+      user_ = root["user"].asString();
 
-    log_->Write("TokenStore::Read: refresh=%s, access=%s", refresh_.c_str(),
-                access_.c_str());
+    log_->Write("TokenStore::Read: refresh=%s, access=%s, user=%s", refresh_.c_str(),
+                access_.c_str(), user_.c_str());
     return SASL_OK;
 
   } catch (const std::exception &e) {
@@ -235,6 +238,7 @@ int TokenStore::Write() {
     root["refresh_token"] = refresh_;
     root["access_token"] = access_;
     root["expiry"] = std::to_string(expiry_);
+    if (HasUser()) root["user"] = user_;
 
     WriteOverride("client_id", override_client_id_, &root);
     WriteOverride("client_secret", override_client_secret_, &root);
