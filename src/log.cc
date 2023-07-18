@@ -39,39 +39,48 @@ std::string Now() {
   return std::string(time_str);
 }
 
-class NoOpLogger : public Log {
+class NoOpLogger : public LogImpl {
  public:
-  NoOpLogger(Options options) : Log(options) {}
+  NoOpLogger() = default;
   ~NoOpLogger() override = default;
 
- protected:
   void WriteLine(const std::string &line) override {}
 };
 
-class SysLogLogger : public Log {
+class SysLogLogger : public LogImpl {
  public:
-  SysLogLogger(Options options) : Log(options) {
-    openlog("sasl-xoauth2", 0, 0);
-  }
+  SysLogLogger() = default;
+  ~SysLogLogger() override = default;
 
-  ~SysLogLogger() override { closelog(); }
-
- protected:
   void WriteLine(const std::string &line) override {
+    openlog("sasl-xoauth2", 0, 0);
     syslog(LOG_WARNING, "%s\n", line.c_str());
+    closelog();
   }
 };
 
-class StdErrLogger : public Log {
+class StdErrLogger : public LogImpl {
  public:
-  StdErrLogger(Options options) : Log(options) {}
+  StdErrLogger() = default;
   ~StdErrLogger() override = default;
 
- protected:
   void WriteLine(const std::string &line) override {
     fprintf(stderr, "%s\n", line.c_str());
   }
 };
+
+std::unique_ptr<LogImpl> CreateLogImpl(Log::Target target) {
+  switch (target) {
+    case Log::TARGET_NONE:
+      return std::make_unique<NoOpLogger>();
+    case Log::TARGET_SYSLOG:
+      return std::make_unique<SysLogLogger>();
+    case Log::TARGET_STDERR:
+      return std::make_unique<StdErrLogger>();
+    default:
+      exit(1);
+  };
+}
 
 }  // namespace
 
@@ -83,16 +92,7 @@ void EnableLoggingForTesting() {
 std::unique_ptr<Log> Log::Create(Options options, Target target) {
   options = static_cast<Options>(options | s_default_options);
   if (target == TARGET_DEFAULT) target = s_default_target;
-  switch (target) {
-    case TARGET_NONE:
-      return std::make_unique<NoOpLogger>(options);
-    case TARGET_SYSLOG:
-      return std::make_unique<SysLogLogger>(options);
-    case TARGET_STDERR:
-      return std::make_unique<StdErrLogger>(options);
-    default:
-      return {};
-  };
+  return std::unique_ptr<Log>(new Log(CreateLogImpl(target), options));
 }
 
 Log::~Log() {
@@ -108,7 +108,7 @@ void Log::Write(const char *fmt, ...) {
 
   const std::string line = buf;
   if (options_ & OPTIONS_IMMEDIATE) {
-    WriteLine(line);
+    impl_->WriteLine(line);
   } else {
     lines_.push_back(Now() + ": " + line);
   }
@@ -116,16 +116,15 @@ void Log::Write(const char *fmt, ...) {
 
 void Log::Flush() {
   if (lines_.empty()) return;
-
   if (options_ & OPTIONS_FULL_TRACE_ON_FAILURE) {
-    WriteLine("auth failed:");
-    for (const auto &line : lines_) WriteLine("  " + line);
+    impl_->WriteLine("auth failed:");
+    for (const auto &line : lines_) impl_->WriteLine("  " + line);
   } else {
     if (summary_.empty()) summary_ = lines_.back();
-    WriteLine("auth failed: " + summary_);
+    impl_->WriteLine("auth failed: " + summary_);
     if (lines_.size() > 1) {
-      WriteLine("set log_full_trace_on_failure to see full " +
-                std::to_string(lines_.size()) + " line(s) of tracing.");
+      impl_->WriteLine("set log_full_trace_on_failure to see full " +
+                       std::to_string(lines_.size()) + " line(s) of tracing.");
     }
   }
 }

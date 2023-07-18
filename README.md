@@ -20,6 +20,8 @@ $ mkdir build && cd build && cmake ..
 # cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_SYSCONFDIR=/etc
 $ make
 $ sudo make install
+# Need msal for sasl-xoauth2-tool:
+$ sudo pip3 install msal
 ```
 
 ## Pre-Built Packages for Ubuntu
@@ -288,8 +290,8 @@ Skip to [restart Postfix](#restart-postfix) below.
 
 ### Outlook/Office 365 Configuration (Device Flow)
 
-This is the preferred method to authenticate with Outlook/Office, but the
-[fallback legacy client
+As of sasl-xoauth2-0.23, this is the preferred method to authenticate with
+Outlook/Office, but the [fallback legacy client
 approach](#outlookoffice-365-configuration-legacy-client-deprecated) does still
 work (... for now).
 

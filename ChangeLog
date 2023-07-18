@@ -1,3 +1,10 @@
+sasl-xoauth2 (0.24) unstable; urgency=low [NOT YET RELEASED]
+
+  * Fix bug in logging code that resulted in missing messages (and the
+    occasional segfault).
+
+ -- Tarick Bedeir <tarick@bedeir.com>  Mon, 17 Jul 2023 17:57:00 -0700
+
 sasl-xoauth2 (0.23) unstable; urgency=low [NOT YET RELEASED]
 
   * Add new config option, "always_log_to_syslog", to unconditionally
