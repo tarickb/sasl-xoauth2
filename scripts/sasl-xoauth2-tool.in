@@ -270,7 +270,8 @@ sp_get_token.add_argument(
 )
 sp_get_token.add_argument(
     "--use-device-flow",
-    action=argparse.BooleanOptionalAction,
+    default=False,
+    action='store_true',
     help="use simplified device flow for Outlook/Azure",
 )
 sp_get_token.add_argument(
