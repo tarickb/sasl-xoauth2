@@ -63,11 +63,11 @@ void SetPasswordToValidToken() {
   fclose(f);
 }
 
-void SetPasswordToValidTokenWithUserOverride(const std::string& user) {
+void SetPasswordToValidTokenWithUserOverride(const std::string &user) {
   FILE *f = OpenTempTokenFile();
   std::string expiry_str = std::to_string(time(nullptr) + 3600);
   fprintf(f, kTokenTemplateWithUser, "access", "refresh", expiry_str.c_str(),
-      user.c_str());
+          user.c_str());
   fclose(f);
 }
 
