@@ -1,3 +1,9 @@
+sasl-xoauth2 (0.25) unstable; urgency=low [NOT YET RELEASED]
+
+  * Prevent truncation when writing logs.
+
+ -- Tarick Bedeir <tarick@bedeir.com>  Mon, 17 Jul 2023 18:49:00 -0700
+
 sasl-xoauth2 (0.24) unstable; urgency=low
 
   * Fix bug in logging code that resulted in missing messages (and the
