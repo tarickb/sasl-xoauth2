@@ -578,6 +578,8 @@ in `/etc/sasl-xoauth2.conf`. Set them when setting the initial access token:
 
 ## Debugging
 
+### Increasing Verbosity
+
 By default, sasl-xoauth2 will write to syslog if authentication fails. To
 disable this, set `log_to_syslog_on_failure` to `no` in
 `/etc/sasl-xoauth2.conf`:
@@ -592,6 +594,17 @@ disable this, set `log_to_syslog_on_failure` to `no` in
 
 Conversely, to get more verbose logging when authentication fails, set
 `log_full_trace_on_failure` to `yes`.
+
+To get *even more* logging, set `always_log_to_syslog` to `yes` to have
+sasl-xoauth2 immediately and unconditionally write logs to syslog .
+
+### Postfix Logging
+
+It can be useful (thanks [@kpedro88](https://github.com/kpedro88)!) to increase
+Postfix's logging level, following the instructions
+[here](https://www.postfix.org/DEBUG_README.html#verbose).
+
+### SASL Mechanisms
 
 If Postfix complains about not finding a SASL mechanism (along the lines of
 `warning: SASL authentication failure: No worthy mechs found`), it's possible
