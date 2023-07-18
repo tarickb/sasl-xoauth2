@@ -559,11 +559,14 @@ Token refresh succeeded.
 $ service postfix restart
 ```
 
-## Using Multiple Mail Providers Simultaneously
+## Using Multiple Mail Providers or Users Simultaneously
 
-One instance of sasl-xoauth2 may provide tokens for different mail providers,
-but each provider will require its own client ID, client secret, and token
-endpoint. In this case, each of these may be set in the token file rather than
+One instance of sasl-xoauth2 may provide tokens for different mail providers
+and/or users.
+Each provider will require its own client ID, client secret, and token
+endpoint. Each user may require a username to be specified, if the username
+automatically obtained from postfix is not correct.
+In this case, each of these may be set in the token file rather than
 in `/etc/sasl-xoauth2.conf`. Set them when setting the initial access token:
 
 ```json
@@ -573,7 +576,8 @@ in `/etc/sasl-xoauth2.conf`. Set them when setting the initial access token:
   "client_secret": "client secret goes here, if required",
   "token_endpoint": "token endpoint goes here, for non-Gmail",
   "expiry" : "0",
-  "refresh_token" : "refresh token goes here"
+  "refresh_token" : "refresh token goes here",
+  "user" : "username goes here"
 }
 ```
 
