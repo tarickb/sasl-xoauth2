@@ -212,11 +212,10 @@ int TokenStore::Read() {
     if (root.isMember("access_token"))
       access_ = root["access_token"].asString();
     if (root.isMember("expiry")) expiry_ = stoi(root["expiry"].asString());
-    if (root.isMember("user"))
-      user_ = root["user"].asString();
+    if (root.isMember("user")) user_ = root["user"].asString();
 
-    log_->Write("TokenStore::Read: refresh=%s, access=%s, user=%s", refresh_.c_str(),
-                access_.c_str(), user_.c_str());
+    log_->Write("TokenStore::Read: refresh=%s, access=%s, user=%s",
+                refresh_.c_str(), access_.c_str(), user_.c_str());
     return SASL_OK;
 
   } catch (const std::exception &e) {

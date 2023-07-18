@@ -59,7 +59,6 @@ class TokenStore {
   time_t expiry_ = 0;
   std::string user_;
 
-
   int refresh_attempts_ = 0;
 };
 
