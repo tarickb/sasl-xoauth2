@@ -39,22 +39,26 @@ Install the plugin:
 $ sudo apt-get install sasl-xoauth2
 ```
 
-## Pre-Built Packages for RHEL/Fedora
+## Pre-Built Packages for RHEL/EPEL/Fedora
+
+The package is now available in latest Fedora and EPEL8/9. You can see how to enable epel here:
+
+https://docs.fedoraproject.org/en-US/epel/
+
+After that just install the plugin as any other package:
+
+```
+$ sudo dnf install sasl-xoauth2
+```
 
 (Thank you [@augustus-p](https://github.com/augustus-p) for confirming that
 this works!)
 
-Add the [sasl-xoauth2 Copr
+For older Fedora versions, you can use the [sasl-xoauth2 Copr
 repository](https://copr.fedorainfracloud.org/coprs/jjelen/sasl-xoauth2/):
 
 ```
 $ sudo dnf copr enable jjelen/sasl-xoauth2
-```
-
-Install the plugin:
-
-```
-$ sudo dnf install sasl-xoauth2
 ```
 
 ### A Note on SELinux
