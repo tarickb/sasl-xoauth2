@@ -39,6 +39,13 @@ def url_safe_escape(instring:str) -> str:
     return urllib.parse.quote(instring, safe='~-._')
 
 
+def dump_overwrite(token:dict, output_file:IO[str], input_dict:dict):
+    # overwrite fields in previous token (represented by input_dict)
+    # that also have values from new token
+    input_dict.update(token)
+    json.dump(input_dict, output_file, indent=4)
+
+
 def gmail_redirect_uri(local_port:int) -> str:
     return 'http://127.0.0.1:%d%s' % (local_port, GOOGLE_OAUTH2_RESULT_PATH)
 
@@ -63,7 +70,7 @@ def gmail_get_token_from_code(client_id:str, client_secret:str, authorization_co
     return json.loads(response)
 
 
-def gmail_get_RequestHandler(client_id:str, client_secret:str, output_file:IO[str]) -> type:
+def gmail_get_RequestHandler(client_id:str, client_secret:str, output_file:IO[str], input_dict:dict) -> type:
     class GMailRequestHandler(http.server.BaseHTTPRequestHandler):
         def log_request(self, code:Union[int,str]='-', size:Union[int,str]='-') -> None:
             # Silence request logging.
@@ -90,7 +97,7 @@ def gmail_get_RequestHandler(client_id:str, client_secret:str, output_file:IO[st
                     code,
                     self.server.server_address[1],
                 )
-                json.dump(token, output_file)
+                dump_overwrite(token, output_file, input_dict)
                 output_file.close()
                 sys.exit(0)
 
@@ -104,15 +111,16 @@ def gmail_get_RequestHandler(client_id:str, client_secret:str, output_file:IO[st
             if len(qs['code']) != 1:
                 return None
             return qs['code'][0]
-   
+
     return GMailRequestHandler
 
 
-def get_token_gmail(client_id:str, client_secret:str, scope:str, output_file:IO[str]) -> None:
+def get_token_gmail(client_id:str, client_secret:str, scope:str, output_file:IO[str], input_dict:dict) -> None:
     request_handler_class = gmail_get_RequestHandler(
         client_id,
         client_secret,
         output_file,
+        input_dict,
     )
     server = http.server.HTTPServer(('', 0), request_handler_class)
     _, port = server.server_address
@@ -199,13 +207,13 @@ def outlook_get_initial_tokens_by_device_flow(client_id:str, tenant:str) -> Dict
     }
 
 
-def get_token_outlook(client_id:str, client_secret:str, tenant:str, use_device_flow:bool, output_file:IO[str]) -> None:
+def get_token_outlook(client_id:str, client_secret:str, tenant:str, use_device_flow:bool, output_file:IO[str], input_dict:dict) -> None:
     if use_device_flow:
         tokens = outlook_get_initial_tokens_by_device_flow(client_id, tenant)
     else:
         code = outlook_get_authorization_code(client_id, tenant)
         tokens = outlook_get_initial_tokens(client_id, client_secret, tenant, code)
-    json.dump(tokens, output_file, indent=4)
+    dump_overwrite(tokens, output_file, input_dict)
 
 ##########
 
@@ -219,6 +227,14 @@ def argparse_get_parser() -> argparse.ArgumentParser:
 
 
 def subcommand_get_token(args:argparse.Namespace) -> None:
+    input_dict = {}
+    if args.overwrite_existing_token:
+        if not os.path.isfile(args.output_file):
+            raise Exception("Cannot overwrite nonexistent token file {}".format(args.output_file))
+        else:
+            with open(args.output_file,'r') as input_file:
+                input_dict = json.load(input_file)
+    args.output_file = open(args.output_file,'w')
     if args.service == 'outlook':
         if not args.tenant:
             parser.error("'outlook' service requires 'tenant' argument.")
@@ -230,6 +246,7 @@ def subcommand_get_token(args:argparse.Namespace) -> None:
             args.tenant,
             args.use_device_flow,
             args.output_file,
+            input_dict,
         )
     elif args.service == 'gmail':
         if not args.client_secret:
@@ -243,6 +260,7 @@ def subcommand_get_token(args:argparse.Namespace) -> None:
             args.client_secret,
             args.scope,
             args.output_file,
+            input_dict,
         )
 
 
@@ -275,7 +293,13 @@ sp_get_token.add_argument(
     help="use simplified device flow for Outlook/Azure",
 )
 sp_get_token.add_argument(
-    'output_file', nargs='?', type=argparse.FileType('w'), default='-',
+    '--overwrite-existing-token',
+    default=False,
+    action='store_true',
+    help='overwrite existing token file (preserves extra fields)',
+)
+sp_get_token.add_argument(
+    'output_file', nargs='?', type=str, default='-',
     help="output file, '-' for stdout",
 )
 

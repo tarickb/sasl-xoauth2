@@ -585,6 +585,9 @@ in `/etc/sasl-xoauth2.conf`. Set them when setting the initial access token:
 }
 ```
 
+`sasl-xoauth2-tool` has an argument `--overwrite-existing-token` to preserve the content of these additional fields
+when manually updating an expired or invalidated token.
+
 ## Debugging
 
 ### Increasing Verbosity
