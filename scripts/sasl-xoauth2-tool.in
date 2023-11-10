@@ -39,11 +39,12 @@ def url_safe_escape(instring:str) -> str:
     return urllib.parse.quote(instring, safe='~-._')
 
 
-def dump_overwrite(token:dict, output_file:IO[str], input_dict:dict):
+def dump_overwrite(token:dict, output_filename:str, input_dict:dict):
     # overwrite fields in previous token (represented by input_dict)
     # that also have values from new token
     input_dict.update(token)
-    json.dump(input_dict, output_file, indent=4)
+    with open(output_filename,'w') as output_file:
+        json.dump(input_dict, output_file, indent=4)
 
 
 def gmail_redirect_uri(local_port:int) -> str:
@@ -70,7 +71,7 @@ def gmail_get_token_from_code(client_id:str, client_secret:str, authorization_co
     return json.loads(response)
 
 
-def gmail_get_RequestHandler(client_id:str, client_secret:str, output_file:IO[str], input_dict:dict) -> type:
+def gmail_get_RequestHandler(client_id:str, client_secret:str, output_filename:str, input_dict:dict) -> type:
     class GMailRequestHandler(http.server.BaseHTTPRequestHandler):
         def log_request(self, code:Union[int,str]='-', size:Union[int,str]='-') -> None:
             # Silence request logging.
@@ -97,8 +98,7 @@ def gmail_get_RequestHandler(client_id:str, client_secret:str, output_file:IO[st
                     code,
                     self.server.server_address[1],
                 )
-                dump_overwrite(token, output_file, input_dict)
-                output_file.close()
+                dump_overwrite(token, output_filename, input_dict)
                 sys.exit(0)
 
         def ExtractCodeFromResponse(self) -> Optional[str]:
@@ -115,11 +115,11 @@ def gmail_get_RequestHandler(client_id:str, client_secret:str, output_file:IO[st
     return GMailRequestHandler
 
 
-def get_token_gmail(client_id:str, client_secret:str, scope:str, output_file:IO[str], input_dict:dict) -> None:
+def get_token_gmail(client_id:str, client_secret:str, scope:str, output_filename:str, input_dict:dict) -> None:
     request_handler_class = gmail_get_RequestHandler(
         client_id,
         client_secret,
-        output_file,
+        output_filename,
         input_dict,
     )
     server = http.server.HTTPServer(('', 0), request_handler_class)
@@ -207,13 +207,13 @@ def outlook_get_initial_tokens_by_device_flow(client_id:str, tenant:str) -> Dict
     }
 
 
-def get_token_outlook(client_id:str, client_secret:str, tenant:str, use_device_flow:bool, output_file:IO[str], input_dict:dict) -> None:
+def get_token_outlook(client_id:str, client_secret:str, tenant:str, use_device_flow:bool, output_filename:str, input_dict:dict) -> None:
     if use_device_flow:
         tokens = outlook_get_initial_tokens_by_device_flow(client_id, tenant)
     else:
         code = outlook_get_authorization_code(client_id, tenant)
         tokens = outlook_get_initial_tokens(client_id, client_secret, tenant, code)
-    dump_overwrite(tokens, output_file, input_dict)
+    dump_overwrite(tokens, output_filename, input_dict)
 
 ##########
 
@@ -234,7 +234,6 @@ def subcommand_get_token(args:argparse.Namespace) -> None:
         else:
             with open(args.output_file,'r') as input_file:
                 input_dict = json.load(input_file)
-    args.output_file = open(args.output_file,'w')
     if args.service == 'outlook':
         if not args.tenant:
             parser.error("'outlook' service requires 'tenant' argument.")
