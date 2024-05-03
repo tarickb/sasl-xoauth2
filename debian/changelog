@@ -1,0 +1,5 @@
+sasl-xoauth2 (0.24-1ubuntu1~noble1~ppa1) noble; urgency=medium
+
+  * Package for Ubuntu 24.04.
+
+ -- Tarick Bedeir (Ubuntu Development) <tarick@bedeir.com>  Fri, 03 May 2024 08:13:02 -0700
