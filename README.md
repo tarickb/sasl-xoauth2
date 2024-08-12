@@ -309,7 +309,8 @@ with some notes:
 * Do **not** add any redirect URIs or set up any platform configurations.
 * You **must** toggle "Allow public client flows" to "yes".
 * Be sure to select the appropriate type of account (consumer Outlook vs.
-  "organizational directory") -- see #89 for why.
+  "organizational directory") -- see
+  [#89](https://github.com/tarickb/sasl-xoauth2/issues/89) for why.
 
 Then, add API permissions for `SMTP.Send`:
 
@@ -396,7 +397,8 @@ application](https://docs.microsoft.com/en-us/azure/active-directory/develop/qui
 Use any name you like (it doesn't have to be "sasl-xoauth2").
 
 Be sure to select the appropriate type of account (consumer Outlook vs.
-"organizational directory") -- see #89 for why.
+"organizational directory") -- see
+[#89](https://github.com/tarickb/sasl-xoauth2/issues/89) for why.
 
 Under "Platform configurations", add a native-client redirect URI for
 mobile/desktop applications:
