@@ -308,6 +308,8 @@ with some notes:
 * Use any name you like (it doesn't have to be "sasl-xoauth2").
 * Do **not** add any redirect URIs or set up any platform configurations.
 * You **must** toggle "Allow public client flows" to "yes".
+* Be sure to select the appropriate type of account (consumer Outlook vs.
+  "organizational directory") -- see #89 for why.
 
 Then, add API permissions for `SMTP.Send`:
 
@@ -391,13 +393,18 @@ $ sudo chown -R postfix:postfix /var/spool/postfix/etc/tokens
 
 Follow [Microsoft's instructions to register an
 application](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app#register-an-application).
-Use any name you like (it doesn't have to be "sasl-xoauth2"). Under "Platform
-configurations", add a native-client redirect URI for mobile/desktop
-applications: `https://login.microsoftonline.com/common/oauth2/nativeclient`.
-Then, add API permissions for `SMTP.Send`: from the app registration
-"API permissions" page, click "add a permission", then "Microsoft Graph", and
-from there enter "SMTP.Send" in the search box. Expand the `SMTP` permission,
-then check the `SMTP.Send` checkbox.
+Use any name you like (it doesn't have to be "sasl-xoauth2").
+
+Be sure to select the appropriate type of account (consumer Outlook vs.
+"organizational directory") -- see #89 for why.
+
+Under "Platform configurations", add a native-client redirect URI for
+mobile/desktop applications:
+`https://login.microsoftonline.com/common/oauth2/nativeclient`.  Then, add API
+permissions for `SMTP.Send`: from the app registration "API permissions" page,
+click "add a permission", then "Microsoft Graph", and from there enter
+"SMTP.Send" in the search box. Expand the `SMTP` permission, then check the
+`SMTP.Send` checkbox.
 
 Store the "application (client) ID" (which you'll find in the "Overview" page
 for the application you registered with Azure) in `/etc/sasl-xoauth2.conf`.
