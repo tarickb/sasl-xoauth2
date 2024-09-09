@@ -2,8 +2,9 @@ sasl-xoauth2 (0.25) unstable; urgency=low [NOT YET RELEASED]
 
   * Prevent truncation when writing logs.
   * Allow token-level username overrides.
+  * Script that updates CA certificates creates directories if missing.
 
- -- Tarick Bedeir <tarick@bedeir.com>  Tue, 18 Jul 2023 09:01:00 -0700
+ -- Tarick Bedeir <tarick@bedeir.com>  Sun, 08 Sep 2024 20:30:00 -0700
 
 sasl-xoauth2 (0.24) unstable; urgency=low
 
