@@ -53,9 +53,7 @@ class SysLogLogger : public LogImpl {
   ~SysLogLogger() override = default;
 
   void WriteLine(const std::string &line) override {
-    openlog("sasl-xoauth2", 0, 0);
-    syslog(LOG_WARNING, "%s\n", line.c_str());
-    closelog();
+    syslog(LOG_WARNING, "[sasl-xoauth2] %s\n", line.c_str());
   }
 };
 

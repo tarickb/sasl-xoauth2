@@ -3,8 +3,10 @@ sasl-xoauth2 (0.25) unstable; urgency=low [NOT YET RELEASED]
   * Prevent truncation when writing logs.
   * Allow token-level username overrides.
   * Script that updates CA certificates creates directories if missing.
+  * Avoid opening/closing syslog (which may have been causing lost logs), and
+    add syslog prefix.
 
- -- Tarick Bedeir <tarick@bedeir.com>  Sun, 08 Sep 2024 20:30:00 -0700
+ -- Tarick Bedeir <tarick@bedeir.com>  Sun, 27 Oct 2024 11:22:00 -0400
 
 sasl-xoauth2 (0.24) unstable; urgency=low
 
