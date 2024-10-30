@@ -35,6 +35,9 @@ const std::string kUserName = "abc@def.com";
 constexpr char kTempFileTemplate[] = "/tmp/sasl_xoauth2_test_token.XXXXXX";
 constexpr char kTokenTemplate[] =
     R"({"access_token": "%s", "refresh_token": "%s", "expiry": "%s"})";
+constexpr char kTokenTemplateWithUser[] =
+    R"({"access_token": "%s", "refresh_token": "%s", "expiry": "%s",
+        "user": "%s"})";
 
 constexpr char kServerPermanentError[] =
     R"({"status":"500","schemes":"Bearer","scope":"https://mail.google.com/"})";
@@ -57,6 +60,14 @@ void SetPasswordToValidToken() {
   FILE *f = OpenTempTokenFile();
   std::string expiry_str = std::to_string(time(nullptr) + 3600);
   fprintf(f, kTokenTemplate, "access", "refresh", expiry_str.c_str());
+  fclose(f);
+}
+
+void SetPasswordToValidTokenWithUserOverride(const std::string &user) {
+  FILE *f = OpenTempTokenFile();
+  std::string expiry_str = std::to_string(time(nullptr) + 3600);
+  fprintf(f, kTokenTemplateWithUser, "access", "refresh", expiry_str.c_str(),
+          user.c_str());
   fclose(f);
 }
 
@@ -330,6 +341,44 @@ bool TestWithCallbacks(sasl_client_plug_t plug) {
   return true;
 }
 
+bool TestWithCallbacksAndUserOverride(sasl_client_plug_t plug) {
+  const std::string kUserNameOverride = "override@foo.com";
+
+  PrintTestName(__func__);
+  SetPasswordToValidTokenWithUserOverride(kUserNameOverride);
+  sasl_xoauth2::SetHttpInterceptForTesting(&DefaultHttpIntercept);
+
+  sasl_utils_t utils = {};
+  utils.free = &FakeFree;
+  utils.getcallback = &FakeGetCallbackAll;
+  utils.malloc = &FakeMalloc;
+
+  void *context = nullptr;
+  TEST_ASSERT_OK(plug.mech_new(nullptr, nullptr, &context));
+  PlugCleanup _(&utils, plug, context);
+
+  sasl_client_params_t params = {};
+  params.utils = &utils;
+  params.canon_user = &FakeCanonUser;
+
+  const char *to_server = nullptr;
+  unsigned int to_server_len = 0;
+  sasl_out_params_t out_params = {};
+
+  TEST_ASSERT_OK(plug.mech_step(context, &params, nullptr, 0, nullptr,
+                                &to_server, &to_server_len, &out_params));
+  fprintf(stderr, "to_server=[%s], len=%d\n", to_server, to_server_len);
+  TEST_ASSERT(strstr(to_server, "Bearer") != nullptr);
+  TEST_ASSERT(strstr(to_server, kUserName.c_str()) == nullptr);
+  TEST_ASSERT(strstr(to_server, kUserNameOverride.c_str()) != nullptr);
+
+  TEST_ASSERT_OK(plug.mech_step(context, &params, "", 0, nullptr, &to_server,
+                                &to_server_len, &out_params));
+  TEST_ASSERT(to_server_len == 0);
+
+  return true;
+}
+
 bool TestWithPermanentError(sasl_client_plug_t plug) {
   PrintTestName(__func__);
   SetPasswordToValidToken();
@@ -537,6 +586,7 @@ int main(int argc, char **argv) {
   TEST_ABORT(TestWithPrompts(plug));
   TEST_ABORT(TestWithoutPrompts(plug));
   TEST_ABORT(TestWithCallbacks(plug));
+  TEST_ABORT(TestWithCallbacksAndUserOverride(plug));
   TEST_ABORT(TestWithPermanentError(plug));
   TEST_ABORT(TestWithTokenExpiredError(plug));
   TEST_ABORT(TestPreemptiveTokenRefresh(plug));
