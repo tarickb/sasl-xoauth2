@@ -141,10 +141,11 @@ Log::Options GetLogOptions() {
 }
 
 Log::Target GetLogTarget() {
-  if (Config::Get()->always_log_to_syslog() ||
-      Config::Get()->log_to_syslog_on_failure())
+  if (Config::Get()->always_log_to_syslog())
     return Log::TARGET_SYSLOG;
-  return Log::TARGET_NONE;
+  if (!Config::Get()->log_to_syslog_on_failure())
+    return Log::TARGET_NONE;
+  return Log::TARGET_DEFAULT;
 }
 
 }  // namespace
@@ -224,6 +225,7 @@ int Client::InitialStep(sasl_client_params_t *params,
   user_ = auth_name;
   token_ = TokenStore::Create(log_.get(), password);
   if (!token_) return SASL_FAIL;
+  if (token_->has_user()) user_ = token_->user();
 
   err = SendToken(to_server, to_server_len);
   if (err != SASL_OK) return err;
