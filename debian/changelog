@@ -1,3 +1,29 @@
+sasl-xoauth2 (0.25-1ubuntu1~jammy1~ppa1) jammy; urgency=medium
+
+  * Add logging, verbosity notes to README.
+  * Fix logger init (prevented logging to stderr for tests).
+  * Update logger to prevent truncation.
+  * Remove [NOT YET RELEASED] tags from changelog.
+  * Update changelog for 0.25.
+  * fix positional argument order (#55)
+  * specify user for a given token
+  * Run clang-format on token_store.*.
+  * More consistent style for TokenStore user accessors.
+  * Add unit test for user override.
+  * Update changelog to include user override.
+  * Run clang-format on xoauth2_test.cc.
+  * Update steps for package installation in Fedora/EPEL
+  * add argument --overwrite-existing-token to preserve additional fields in token file
+  * open file for writing only after token is successfully obtained
+  * Add README note re. account type, from #89.
+  * Fix README links.
+  * Create directories if they're missing when updating CA certs.
+  * Avoid opening/closing syslog (which may have been causing lost logs), and add syslog prefix.
+  * Add FUNDING.yml.
+  * Prepare for 0.25 release.
+
+ -- Tarick Bedeir (Ubuntu Development) <tarick@bedeir.com>  Wed, 30 Oct 2024 06:05:26 -0700
+
 sasl-xoauth2 (0.24-1ubuntu1~jammy1~ppa1) jammy; urgency=medium
 
   * Python 3.8-compatible device-flow argument.
