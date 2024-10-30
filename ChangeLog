@@ -1,4 +1,4 @@
-sasl-xoauth2 (0.25) unstable; urgency=low [NOT YET RELEASED]
+sasl-xoauth2 (0.25) unstable; urgency=low
 
   * Prevent truncation when writing logs.
   * Allow token-level username overrides.
@@ -6,7 +6,7 @@ sasl-xoauth2 (0.25) unstable; urgency=low [NOT YET RELEASED]
   * Avoid opening/closing syslog (which may have been causing lost logs), and
     add syslog prefix.
 
- -- Tarick Bedeir <tarick@bedeir.com>  Sun, 27 Oct 2024 11:22:00 -0400
+ -- Tarick Bedeir <tarick@bedeir.com>  Wed, 30 Oct 2024 08:39:00 -0400
 
 sasl-xoauth2 (0.24) unstable; urgency=low
 
