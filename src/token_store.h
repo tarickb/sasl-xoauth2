@@ -34,6 +34,9 @@ class TokenStore {
   int GetAccessToken(std::string *token);
   int Refresh();
 
+  std::string user() const { return user_; }
+  bool has_user() const { return !user_.empty(); }
+
  private:
   TokenStore(Log *log, const std::string &path, bool enable_updates);
 
@@ -54,6 +57,7 @@ class TokenStore {
 
   std::string access_;
   std::string refresh_;
+  std::string user_;
   time_t expiry_ = 0;
 
   int refresh_attempts_ = 0;
