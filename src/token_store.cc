@@ -212,7 +212,7 @@ int TokenStore::Read() {
     ReadOverride(root, "ca_certs_dir", &override_ca_certs_dir_);
 
     if (root.isMember("refresh_window"))
-      override_refresh_window_ = root["refresh_window"].asInt();
+      override_refresh_window_ = stoi(root["refresh_window"].asString());
 
     refresh_ = root["refresh_token"].asString();
     if (root.isMember("access_token"))
@@ -253,7 +253,7 @@ int TokenStore::Write() {
     WriteOverride("ca_certs_dir", override_ca_certs_dir_, &root);
 
     if (override_refresh_window_ > 0) {
-      root["refresh_window"] = override_refresh_window_;
+      root["refresh_window"] = std::to_string(override_refresh_window_);
     }
 
     std::ofstream file(new_path);
