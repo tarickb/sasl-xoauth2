@@ -332,7 +332,7 @@ Leave `client_secret` blank. Additionally, explicitly set the token endpoint
 }
 ```
 
-> [!WARN]
+> [!WARNING]
 > When using the Public Preview of Microsoft's new HVE endpoint (smtp-hve.office365.com), a custom refresh_window should be set to at least 600 seconds (10 minutes) to prevent the 501 5.5.127 Invalid XOAUTH2 auth data - Token will expire soon error
 
 We'll also need these credentials in the next step.
