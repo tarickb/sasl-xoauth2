@@ -36,7 +36,6 @@ namespace sasl_xoauth2 {
 namespace {
 
 constexpr int kMaxRefreshAttempts = 2;
-constexpr int kExpiryMarginSec = 10;
 
 std::string GetTempSuffix() {
   timeval t = {};
@@ -73,7 +72,11 @@ void WriteOverride(const std::string &key, const std::string &value,
 }
 
 int TokenStore::GetAccessToken(std::string *token) {
-  if ((time(nullptr) + kExpiryMarginSec) >= expiry_) {
+  const int refresh_window =
+      (override_refresh_window_.empty() ? Config::Get()->refresh_window()
+                                   : override_refresh_window_);
+
+  if ((time(nullptr) + refresh_window) >= expiry_) {
     log_->Write("TokenStore::GetAccessToken: token expired. refreshing.");
     int err = Refresh();
     if (err != SASL_OK) return err;
