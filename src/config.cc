@@ -75,6 +75,13 @@ int Transform(std::string in, std::string *out) {
   return SASL_OK;
 }
 
+
+template <>
+int Transform(std::string in, int *out) {
+  *out = stoi(in);
+  return SASL_OK;
+}
+
 template <typename T>
 int Fetch(const Json::Value &root, const std::string &name, bool optional,
           T *out) {
@@ -158,6 +165,9 @@ int Config::Init(const Json::Value &root) {
     if (err != SASL_OK) return err;
 
     err = Fetch(root, "token_endpoint", true, &token_endpoint_);
+    if (err != SASL_OK) return err;
+
+    err = Fetch(root, "refresh_window", true, &refresh_window_);
     if (err != SASL_OK) return err;
 
     err = Fetch(root, "proxy", true, &proxy_);

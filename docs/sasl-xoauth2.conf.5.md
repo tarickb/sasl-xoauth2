@@ -62,6 +62,10 @@ The top-level JSON object can contain the following keys:
 
 : if set, overrides CURL's default certificate-authority directory
 
+`refresh_window`
+
+: if set, overrides the default 10 second refresh window with the specified time in seconds(integer).
+
 # TOKEN FILE
 
 In addition to this file, `sasl-xoauth2` relies on a "token file" which it updates independently.
