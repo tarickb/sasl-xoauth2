@@ -73,7 +73,7 @@ void WriteOverride(const std::string &key, const std::string &value,
 
 int TokenStore::GetAccessToken(std::string *token) {
   const int refresh_window =
-      (override_refresh_window_.empty() ? Config::Get()->refresh_window()
+      (override_refresh_window_ == 0 ? Config::Get()->refresh_window()
                                    : override_refresh_window_);
 
   if ((time(nullptr) + refresh_window) >= expiry_) {
@@ -211,6 +211,9 @@ int TokenStore::Read() {
     ReadOverride(root, "ca_bundle_file", &override_ca_bundle_file_);
     ReadOverride(root, "ca_certs_dir", &override_ca_certs_dir_);
 
+    if (root.isMember("refresh_window"))
+      override_refresh_window_ = root["refresh_window"].asInt();
+
     refresh_ = root["refresh_token"].asString();
     if (root.isMember("access_token"))
       access_ = root["access_token"].asString();
@@ -248,6 +251,10 @@ int TokenStore::Write() {
     WriteOverride("proxy", override_proxy_, &root);
     WriteOverride("ca_bundle_file", override_ca_bundle_file_, &root);
     WriteOverride("ca_certs_dir", override_ca_certs_dir_, &root);
+
+    if (override_refresh_window_ > 0) {
+      root["refresh_window"] = override_refresh_window_;
+    }
 
     std::ofstream file(new_path);
     if (!file.good()) {
