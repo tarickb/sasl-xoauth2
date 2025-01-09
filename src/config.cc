@@ -75,7 +75,6 @@ int Transform(std::string in, std::string *out) {
   return SASL_OK;
 }
 
-
 template <>
 int Transform(std::string in, int *out) {
   *out = stoi(in);

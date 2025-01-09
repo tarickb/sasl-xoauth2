@@ -54,7 +54,7 @@ class TokenStore {
   std::string override_proxy_;
   std::string override_ca_bundle_file_;
   std::string override_ca_certs_dir_;
-  int override_refresh_window_;
+  int override_refresh_window_ = 0;
 
   std::string access_;
   std::string refresh_;

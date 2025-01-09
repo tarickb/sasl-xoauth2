@@ -57,7 +57,7 @@ class Config {
   std::string proxy_ = "";
   std::string ca_bundle_file_ = "";
   std::string ca_certs_dir_ = "";
-  int refresh_window_ = 10;
+  int refresh_window_ = 10;  // seconds
 };
 
 }  // namespace sasl_xoauth2
