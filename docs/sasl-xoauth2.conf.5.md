@@ -48,7 +48,7 @@ The top-level JSON object can contain the following keys:
 
 `token_endpoint`
 
-: URL to use when requesting tokens; defaults to Google, must be overridden for use with Microsoft/Outlook.
+: URL to use when requesting tokens; defaults to Google, must be overridden for use with Microsoft/Outlook
 
 `proxy`
 
@@ -61,6 +61,10 @@ The top-level JSON object can contain the following keys:
 `ca_certs_dir`
 
 : if set, overrides CURL's default certificate-authority directory
+
+`refresh_window`
+
+: if set, overrides the default 10 second refresh window with the specified time in seconds (integer)
 
 # TOKEN FILE
 
