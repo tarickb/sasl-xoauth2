@@ -1,3 +1,9 @@
+sasl-xoauth2 (0.26) unstable; urgency=low
+
+  * Add refresh_window parameter to control when tokens are refreshed.
+
+ -- Tarick Bedeir <tarick@bedeir.com>  Sun, 12 Jan 2025 09:06:00 -0800
+
 sasl-xoauth2 (0.25) unstable; urgency=low
 
   * Prevent truncation when writing logs.
