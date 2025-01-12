@@ -1,3 +1,15 @@
+sasl-xoauth2 (0.26-1ubuntu1~jammy1~ppa1) jammy; urgency=medium
+
+  * Implement custom refresh_window parameter
+  * Add warning for Microsoft HVE 10 minute refresh window
+  * Add refresh_window configuration parameter doc
+  * Fix override_refresh_window_ uninitialized check & read + write overrides for it
+  * Add conversion to int
+  * Minor formatting, code tweaks for refresh_window.
+  * Changelog for 0.26.
+
+ -- Tarick Bedeir (Ubuntu Development) <tarick@bedeir.com>  Sun, 12 Jan 2025 09:13:37 -0800
+
 sasl-xoauth2 (0.25-1ubuntu1~jammy1~ppa1) jammy; urgency=medium
 
   * Add logging, verbosity notes to README.
