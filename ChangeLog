@@ -1,3 +1,9 @@
+sasl-xoauth2 (0.27) unstable; urgency=low [NOT YET RELEASED]
+
+  * Fix bug preventing tokens from specifying empty client secrets.
+
+ -- Tarick Bedeir <tarick@bedeir.com>  Wed, 29 Jan 2025 09:22:00 -0800
+
 sasl-xoauth2 (0.26) unstable; urgency=low
 
   * Add refresh_window parameter to control when tokens are refreshed.
