@@ -12,7 +12,7 @@ Postfix.
 
 ## Building from Source
 
-Fetch the sources, then:
+Fetch the sources, install the [dependencies](https://github.com/tarickb/sasl-xoauth2/blob/packaging/ubuntu/debian/control), then:
 
 ```
 $ mkdir build && cd build && cmake ..
