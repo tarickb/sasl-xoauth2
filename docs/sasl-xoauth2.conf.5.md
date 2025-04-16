@@ -66,6 +66,14 @@ The top-level JSON object can contain the following keys:
 
 : if set, overrides the default 10 second refresh window with the specified time in seconds (integer)
 
+`manage_token_externally`
+
+: if set, especially in the token file, the plugin takes the token as is
+
+`use_client_credentials`
+
+: if set, the client credentials grant flow is used, instead of the refresh_token flow
+
 # TOKEN FILE
 
 In addition to this file, `sasl-xoauth2` relies on a "token file" which it updates independently.
