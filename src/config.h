@@ -37,6 +37,8 @@ class Config {
   bool always_log_to_syslog() const { return always_log_to_syslog_; }
   bool log_to_syslog_on_failure() const { return log_to_syslog_on_failure_; }
   bool log_full_trace_on_failure() const { return log_full_trace_on_failure_; }
+  bool manage_token_externally() const { return manage_token_externally_; }
+  bool use_client_credentials() const { return use_client_credentials_; }
   std::string token_endpoint() const { return token_endpoint_; }
   std::string proxy() const { return proxy_; }
   std::string ca_bundle_file() const { return ca_bundle_file_; }
@@ -53,6 +55,8 @@ class Config {
   bool always_log_to_syslog_ = false;
   bool log_to_syslog_on_failure_ = true;
   bool log_full_trace_on_failure_ = false;
+  bool manage_token_externally_ = false;
+  bool use_client_credentials_ = false;
   std::string token_endpoint_ = "https://accounts.google.com/o/oauth2/token";
   std::string proxy_ = "";
   std::string ca_bundle_file_ = "";

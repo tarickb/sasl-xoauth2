@@ -48,6 +48,14 @@ std::string GetTempSuffix() {
   return std::string(buf);
 }
 
+bool s_to_b(const std::string in) {
+  std::for_each(in.begin(), in.end(), [](char c) { return std::tolower(c); });
+  if (in == "yes" || in == "true") {
+    return true;
+  }
+  return false;
+}
+
 void ReadOverride(const Json::Value &root, const std::string &key,
                   std::optional<std::string> *output) {
   if (root.isMember(key)) {
@@ -73,6 +81,14 @@ void WriteOverride(const std::string &key,
 }
 
 int TokenStore::GetAccessToken(std::string *token) {
+  const bool manage_token_externally = manage_token_externally_.value_or(
+        Config::Get()->manage_token_externally());
+
+  if ( manage_token_externally ) {
+    *token = access_;
+    return SASL_OK;
+  }
+
   const int refresh_window =
       override_refresh_window_.value_or(Config::Get()->refresh_window());
 
@@ -109,10 +125,15 @@ int TokenStore::Refresh() {
   const std::string ca_certs_dir =
       override_ca_certs_dir_.value_or(Config::Get()->ca_certs_dir());
 
+  const bool use_client_credentials = use_client_credentials_.value_or(Config::Get()->use_client_credentials());
+
   const std::string request =
       std::string("client_id=") + client_id +
       "&client_secret=" + client_secret +
-      "&grant_type=refresh_token&refresh_token=" + refresh_;
+       (use_client_credentials
+         ? std::string("&grant_type=client_credentials")
+         : ("&grant_type=refresh_token&refresh_token=" + refresh_.value_or("")));
+
   std::string response;
   long response_code = 0;
   log_->Write("TokenStore::Refresh: token_endpoint: %s",
@@ -188,9 +209,24 @@ int TokenStore::Read() {
 
     Json::Value root;
     file >> root;
-    if (!root.isMember("refresh_token")) {
-      log_->Write("TokenStore::Read: missing refresh_token");
-      return SASL_FAIL;
+
+    if (root.isMember("manage_token_externally"))
+      manage_token_externally_ =
+          s_to_b(root["manage_token_externally"].asString());
+    if (root.isMember("use_client_credentials"))
+      use_client_credentials_ = s_to_b(root["use_client_credentials"].asString());
+
+    const bool manage_token_externally = manage_token_externally_.value_or(
+        Config::Get()->manage_token_externally());
+    const bool use_client_credentials = use_client_credentials_.value_or(
+        Config::Get()->use_client_credentials());
+
+    if (!(manage_token_externally || use_client_credentials)) {
+      if (!root.isMember("refresh_token")) {
+        log_->Write("TokenStore::Read: missing refresh_token");
+        return SASL_FAIL;
+      }
+      refresh_ = root["refresh_token"].asString();
     }
 
     ReadOverride(root, "client_id", &override_client_id_);
@@ -203,15 +239,14 @@ int TokenStore::Read() {
     if (root.isMember("refresh_window"))
       override_refresh_window_ = stoi(root["refresh_window"].asString());
 
-    refresh_ = root["refresh_token"].asString();
     if (root.isMember("access_token"))
       access_ = root["access_token"].asString();
     if (root.isMember("expiry")) expiry_ = stoi(root["expiry"].asString());
 
     ReadOverride(root, "user", &user_);
 
-    log_->Write("TokenStore::Read: refresh=%s, access=%s, user=%s",
-                refresh_.c_str(), access_.c_str(), user_.value_or("").c_str());
+    log_->Write("TokenStore::Read: access=%s, user=%s", access_.c_str(),
+                user_.value_or("").c_str());
     return SASL_OK;
 
   } catch (const std::exception &e) {
@@ -230,10 +265,10 @@ int TokenStore::Write() {
 
   try {
     Json::Value root;
-    root["refresh_token"] = refresh_;
     root["access_token"] = access_;
     root["expiry"] = std::to_string(expiry_);
 
+    WriteOverride("refresh_token", refresh_, &root) ;
     WriteOverride("user", user_, &root);
 
     WriteOverride("client_id", override_client_id_, &root);
@@ -245,6 +280,12 @@ int TokenStore::Write() {
 
     if (override_refresh_window_) {
       root["refresh_window"] = std::to_string(*override_refresh_window_);
+    }
+    if (use_client_credentials_) {
+      root["use_client_credentials"] = std::to_string(*use_client_credentials_);
+    }
+    if (manage_token_externally_) {
+      root["manage_token_externally"] = std::to_string(*manage_token_externally_);
     }
 
     std::ofstream file(new_path);
