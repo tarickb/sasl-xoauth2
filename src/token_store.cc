@@ -131,7 +131,7 @@ int TokenStore::Refresh() {
       std::string("client_id=") + client_id +
       "&client_secret=" + client_secret +
        (use_client_credentials
-         ? std::string("&grant_type=client_credentials")
+         ? (std::string("&grant_type=client_credentials&scope=") + override_scope_.value_or(Config::Get()->scope()))
          : ("&grant_type=refresh_token&refresh_token=" + refresh_.value_or("")));
 
   std::string response;
@@ -235,6 +235,7 @@ int TokenStore::Read() {
     ReadOverride(root, "proxy", &override_proxy_);
     ReadOverride(root, "ca_bundle_file", &override_ca_bundle_file_);
     ReadOverride(root, "ca_certs_dir", &override_ca_certs_dir_);
+    ReadOverride(root, "scope", &override_scope_);
 
     if (root.isMember("refresh_window"))
       override_refresh_window_ = stoi(root["refresh_window"].asString());
@@ -270,6 +271,7 @@ int TokenStore::Write() {
 
     WriteOverride("refresh_token", refresh_, &root) ;
     WriteOverride("user", user_, &root);
+    WriteOverride("scope", override_scope_, &root);
 
     WriteOverride("client_id", override_client_id_, &root);
     WriteOverride("client_secret", override_client_secret_, &root);
@@ -282,10 +284,10 @@ int TokenStore::Write() {
       root["refresh_window"] = std::to_string(*override_refresh_window_);
     }
     if (use_client_credentials_) {
-      root["use_client_credentials"] = std::to_string(*use_client_credentials_);
+      root["use_client_credentials"] = use_client_credentials_ ? "true" : "false";
     }
     if (manage_token_externally_) {
-      root["manage_token_externally"] = std::to_string(*manage_token_externally_);
+      root["manage_token_externally"] = manage_token_externally_ ? "true" : "false";
     }
 
     std::ofstream file(new_path);
