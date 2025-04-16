@@ -34,6 +34,10 @@ The top-level JSON object can contain the following keys:
 
 : authenticates this client for OAuth 2 token requests; world-readable by default (but see below to place this in token files instead)
 
+`scope`
+
+: if the client credentials grant is used, we need a scope. Specially for office365.com where the default scope should be: `https://outlook.office365.com/.default` 
+
 `always_log_to_syslog`
 
 : always write plugin log messages to syslog, even for successful runs; may contain tokens/secrets (defaults to "no")
@@ -56,7 +60,7 @@ The top-level JSON object can contain the following keys:
 
 `ca_bundle_file`
 
-: if set, overrides CURL's default certificate-authority bundle file
+: if set, overrides CURL's default certificate-authority bundle file. **Remember curl expect a new line after the last certificate in the bundle**.
 
 `ca_certs_dir`
 

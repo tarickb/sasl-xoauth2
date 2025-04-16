@@ -34,6 +34,7 @@ class Config {
 
   std::string client_id() const { return client_id_; }
   std::string client_secret() const { return client_secret_; }
+  std::string scope() const { return scope_; }
   bool always_log_to_syslog() const { return always_log_to_syslog_; }
   bool log_to_syslog_on_failure() const { return log_to_syslog_on_failure_; }
   bool log_full_trace_on_failure() const { return log_full_trace_on_failure_; }
@@ -52,6 +53,7 @@ class Config {
 
   std::string client_id_;
   std::string client_secret_;
+  std::string scope_;
   bool always_log_to_syslog_ = false;
   bool log_to_syslog_on_failure_ = true;
   bool log_full_trace_on_failure_ = false;
