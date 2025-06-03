@@ -283,11 +283,11 @@ int TokenStore::Write() {
     if (override_refresh_window_) {
       root["refresh_window"] = std::to_string(*override_refresh_window_);
     }
-    if (use_client_credentials_) {
-      root["use_client_credentials"] = use_client_credentials_ ? "true" : "false";
+    if (use_client_credentials_.has_value()) {
+      root["use_client_credentials"] = use_client_credentials_.value_or(false) ? "true" : "false";
     }
-    if (manage_token_externally_) {
-      root["manage_token_externally"] = manage_token_externally_ ? "true" : "false";
+    if (manage_token_externally_.has_value()) {
+      root["manage_token_externally"] = manage_token_externally_.value_or(false) ? "true" : "false";
     }
 
     std::ofstream file(new_path);
