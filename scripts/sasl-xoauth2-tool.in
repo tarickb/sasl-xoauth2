@@ -237,7 +237,7 @@ def subcommand_get_token(args:argparse.Namespace) -> None:
     if args.service == 'outlook':
         if not args.tenant:
             parser.error("'outlook' service requires 'tenant' argument.")
-        if not args.client_secret and not args.use_device_flow:
+        if not (args.client_secret or str(args.client_secret) == '') and not args.use_device_flow:
             args.client_secret = input('Please enter OAuth2 client secret (not always required; Azure docs are unclear): ')
         get_token_outlook(
             args.client_id,

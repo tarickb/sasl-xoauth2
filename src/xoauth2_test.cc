@@ -38,6 +38,9 @@ constexpr char kTokenTemplate[] =
 constexpr char kTokenTemplateWithUser[] =
     R"({"access_token": "%s", "refresh_token": "%s", "expiry": "%s",
         "user": "%s"})";
+constexpr char kTokenTemplateWithOverrides[] =
+    R"({"access_token": "%s", "refresh_token": "%s", "expiry": "%s",
+        "token_endpoint": "%s", "client_secret": "%s"})";
 
 constexpr char kServerPermanentError[] =
     R"({"status":"500","schemes":"Bearer","scope":"https://mail.google.com/"})";
@@ -71,6 +74,15 @@ void SetPasswordToValidTokenWithUserOverride(const std::string &user) {
   fclose(f);
 }
 
+void SetPasswordToExpiredTokenWithOtherOverrides(
+    const std::string &token_endpoint, const std::string &client_secret) {
+  FILE *f = OpenTempTokenFile();
+  std::string expiry_str = "0";
+  fprintf(f, kTokenTemplateWithOverrides, "access", "refresh",
+          expiry_str.c_str(), token_endpoint.c_str(), client_secret.c_str());
+  fclose(f);
+}
+
 void SetPasswordToInvalidToken() {
   FILE *f = OpenTempTokenFile();
   std::string expiry_str = std::to_string(0);
@@ -80,7 +92,7 @@ void SetPasswordToInvalidToken() {
 
 void SetPasswordToExpiredToken() {
   FILE *f = OpenTempTokenFile();
-  std::string expiry_str = std::to_string(0);
+  std::string expiry_str = "0";
   fprintf(f, kTokenTemplate, "access", "refresh", expiry_str.c_str());
   fclose(f);
 }
@@ -379,6 +391,64 @@ bool TestWithCallbacksAndUserOverride(sasl_client_plug_t plug) {
   return true;
 }
 
+bool TestWithCallbacksAndOtherOverrides(sasl_client_plug_t plug) {
+  const std::string kTokenEndpointOverride = "http://foo.com";
+  const std::string kClientSecretOverride = "";
+
+  PrintTestName(__func__);
+  SetPasswordToExpiredTokenWithOtherOverrides(kTokenEndpointOverride,
+                                              kClientSecretOverride);
+  sasl_xoauth2::SetHttpInterceptForTesting(&DefaultHttpIntercept);
+
+  sasl_utils_t utils = {};
+  utils.free = &FakeFree;
+  utils.getcallback = &FakeGetCallbackAll;
+  utils.malloc = &FakeMalloc;
+
+  void *context = nullptr;
+  TEST_ASSERT_OK(plug.mech_new(nullptr, nullptr, &context));
+  PlugCleanup _(&utils, plug, context);
+
+  sasl_client_params_t params = {};
+  params.utils = &utils;
+  params.canon_user = &FakeCanonUser;
+
+  const char *to_server = nullptr;
+  unsigned int to_server_len = 0;
+  sasl_out_params_t out_params = {};
+
+  std::string intercept_token_endpoint, intercept_req_data;
+  sasl_xoauth2::SetHttpInterceptForTesting(
+      [&intercept_token_endpoint,
+       &intercept_req_data](sasl_xoauth2::HttpPostOptions options) {
+        *options.response =
+            R"({"access_token": "refreshed_access", "expires_in": 3600})";
+        *options.response_code = 200;
+        intercept_token_endpoint = options.url;
+        intercept_req_data = options.data;
+        return SASL_OK;
+      });
+
+  TEST_ASSERT_OK(plug.mech_step(context, &params, nullptr, 0, nullptr,
+                                &to_server, &to_server_len, &out_params));
+  fprintf(stderr, "to_server=[%s], len=%d\n", to_server, to_server_len);
+  TEST_ASSERT(strstr(to_server, "Bearer") != nullptr);
+  TEST_ASSERT(strstr(to_server, "refreshed_access") != nullptr);
+  TEST_ASSERT(strstr(to_server, kUserName.c_str()) != nullptr);
+
+  fprintf(stderr, "intercept_token_endpoint=[%s], intercept_req_data=[%s]\n",
+          intercept_token_endpoint.c_str(), intercept_req_data.c_str());
+  TEST_ASSERT(intercept_token_endpoint == kTokenEndpointOverride);
+  TEST_ASSERT(intercept_req_data.find("client_secret=" + kClientSecretOverride +
+                                      "&") != std::string::npos);
+
+  TEST_ASSERT_OK(plug.mech_step(context, &params, "", 0, nullptr, &to_server,
+                                &to_server_len, &out_params));
+  TEST_ASSERT(to_server_len == 0);
+
+  return true;
+}
+
 bool TestWithPermanentError(sasl_client_plug_t plug) {
   PrintTestName(__func__);
   SetPasswordToValidToken();
@@ -587,6 +657,7 @@ int main(int argc, char **argv) {
   TEST_ABORT(TestWithoutPrompts(plug));
   TEST_ABORT(TestWithCallbacks(plug));
   TEST_ABORT(TestWithCallbacksAndUserOverride(plug));
+  TEST_ABORT(TestWithCallbacksAndOtherOverrides(plug));
   TEST_ABORT(TestWithPermanentError(plug));
   TEST_ABORT(TestWithTokenExpiredError(plug));
   TEST_ABORT(TestPreemptiveTokenRefresh(plug));

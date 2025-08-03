@@ -12,12 +12,22 @@ Postfix.
 
 ## Building from Source
 
-Fetch the sources, then:
+Fetch the sources, install the [dependencies](https://github.com/tarickb/sasl-xoauth2/blob/packaging/ubuntu/debian/control), then:
 
 ```
 $ mkdir build && cd build && cmake ..
-# To install with a system-packaged postfix, under /usr, use:
-# cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_SYSCONFDIR=/etc
+$ make
+$ sudo make install
+# Need msal for sasl-xoauth2-tool:
+$ sudo pip3 install msal
+```
+
+On some systems (like Debian), for compatibility with system-packaged Postfix,
+you may need to override the installation paths:
+
+```
+$ mkdir build && cd build
+$ cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_SYSCONFDIR=/etc
 $ make
 $ sudo make install
 # Need msal for sasl-xoauth2-tool:

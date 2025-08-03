@@ -12,8 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-cmake_minimum_required(VERSION 3.0.0)
-cmake_policy(VERSION 3.0)
+cmake_minimum_required(VERSION 3.0.0...3.31.6)
 
 execute_process(
   COMMAND head -n 1 ChangeLog
