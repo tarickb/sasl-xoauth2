@@ -1,4 +1,4 @@
-sasl-xoauth2 (0.27) unstable; urgency=low [NOT YET RELEASED]
+sasl-xoauth2 (0.27) unstable; urgency=low
 
   * Fix bug preventing tokens from specifying empty client secrets.
   * Allow specifying empty client secret on CLI when requesting Outlook token.
