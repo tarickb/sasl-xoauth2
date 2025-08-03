@@ -1,0 +1,5 @@
+sasl-xoauth2 (0.27-1ubuntu1~plucky1~ppa1) plucky; urgency=medium
+
+  * Initial release for Plucky.
+
+ -- Tarick Bedeir (Ubuntu Development) <tarick@bedeir.com>  Sun, 03 Aug 2025 08:58:53 -0700
