@@ -1,3 +1,18 @@
+sasl-xoauth2 (0.27-1ubuntu1~jammy1~ppa1) jammy; urgency=medium
+
+  * Move to C++17.
+  * Update TokenStore to use std::optional. Fixes #101.
+  * Add test for token-file overrides.
+  * Update changelog for client secret issue.
+  * Update README to clarify building for Debian. Fixes #100.
+  * Clarify build-from-source instructions (for #103).
+  * Allow specifying empty client secret on CLI when requesting Outlook token.
+  * test_config.cc: include libgen.h for basename(3)
+  * Set CMake versions.
+  * Prepare for 0.27.
+
+ -- Tarick Bedeir (Ubuntu Development) <tarick@bedeir.com>  Sun, 03 Aug 2025 09:12:21 -0700
+
 sasl-xoauth2 (0.26-1ubuntu1~jammy1~ppa1) jammy; urgency=medium
 
   * Implement custom refresh_window parameter
