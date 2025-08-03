@@ -49,16 +49,17 @@ std::string GetTempSuffix() {
 }
 
 void ReadOverride(const Json::Value &root, const std::string &key,
-                  std::string *output) {
+                  std::optional<std::string> *output) {
   if (root.isMember(key)) {
     *output = root[key].asString();
   }
 }
 
-void WriteOverride(const std::string &key, const std::string &value,
+void WriteOverride(const std::string &key,
+                   const std::optional<std::string> &value,
                    Json::Value *output) {
-  if (!value.empty()) {
-    (*output)[key] = value;
+  if (value) {
+    (*output)[key] = *value;
   }
 }
 
@@ -73,8 +74,7 @@ void WriteOverride(const std::string &key, const std::string &value,
 
 int TokenStore::GetAccessToken(std::string *token) {
   const int refresh_window =
-      (override_refresh_window_ == 0 ? Config::Get()->refresh_window()
-                                   : override_refresh_window_);
+      override_refresh_window_.value_or(Config::Get()->refresh_window());
 
   if ((time(nullptr) + refresh_window) >= expiry_) {
     log_->Write("TokenStore::GetAccessToken: token expired. refreshing.");
@@ -95,25 +95,19 @@ int TokenStore::Refresh() {
   log_->Write("TokenStore::Refresh: attempt %d", refresh_attempts_);
 
   const std::string client_id =
-      (override_client_id_.empty() ? Config::Get()->client_id()
-                                   : override_client_id_);
+      override_client_id_.value_or(Config::Get()->client_id());
   const std::string client_secret =
-      (override_client_secret_.empty() ? Config::Get()->client_secret()
-                                       : override_client_secret_);
+      override_client_secret_.value_or(Config::Get()->client_secret());
   const std::string token_endpoint =
-      (override_token_endpoint_.empty() ? Config::Get()->token_endpoint()
-                                        : override_token_endpoint_);
+      override_token_endpoint_.value_or(Config::Get()->token_endpoint());
 
-  const std::string proxy =
-      (override_proxy_.empty() ? Config::Get()->proxy() : override_proxy_);
+  const std::string proxy = override_proxy_.value_or(Config::Get()->proxy());
 
   const std::string ca_bundle_file =
-      (override_ca_bundle_file_.empty() ? Config::Get()->ca_bundle_file()
-                                        : override_ca_bundle_file_);
+      override_ca_bundle_file_.value_or(Config::Get()->ca_bundle_file());
 
   const std::string ca_certs_dir =
-      (override_ca_certs_dir_.empty() ? Config::Get()->ca_certs_dir()
-                                      : override_ca_certs_dir_);
+      override_ca_certs_dir_.value_or(Config::Get()->ca_certs_dir());
 
   const std::string request =
       std::string("client_id=") + client_id +
@@ -182,11 +176,6 @@ TokenStore::TokenStore(Log *log, const std::string &path, bool enable_updates)
     : log_(log), path_(path), enable_updates_(enable_updates) {}
 
 int TokenStore::Read() {
-  refresh_.clear();
-  access_.clear();
-  expiry_ = 0;
-  user_.clear();
-
   try {
     log_->Write("TokenStore::Read: file=%s", path_.c_str());
 
@@ -218,10 +207,11 @@ int TokenStore::Read() {
     if (root.isMember("access_token"))
       access_ = root["access_token"].asString();
     if (root.isMember("expiry")) expiry_ = stoi(root["expiry"].asString());
-    if (root.isMember("user")) user_ = root["user"].asString();
+
+    ReadOverride(root, "user", &user_);
 
     log_->Write("TokenStore::Read: refresh=%s, access=%s, user=%s",
-                refresh_.c_str(), access_.c_str(), user_.c_str());
+                refresh_.c_str(), access_.c_str(), user_.value_or("").c_str());
     return SASL_OK;
 
   } catch (const std::exception &e) {
@@ -243,7 +233,8 @@ int TokenStore::Write() {
     root["refresh_token"] = refresh_;
     root["access_token"] = access_;
     root["expiry"] = std::to_string(expiry_);
-    if (has_user()) root["user"] = user_;
+
+    WriteOverride("user", user_, &root);
 
     WriteOverride("client_id", override_client_id_, &root);
     WriteOverride("client_secret", override_client_secret_, &root);
@@ -252,8 +243,8 @@ int TokenStore::Write() {
     WriteOverride("ca_bundle_file", override_ca_bundle_file_, &root);
     WriteOverride("ca_certs_dir", override_ca_certs_dir_, &root);
 
-    if (override_refresh_window_ > 0) {
-      root["refresh_window"] = std::to_string(override_refresh_window_);
+    if (override_refresh_window_) {
+      root["refresh_window"] = std::to_string(*override_refresh_window_);
     }
 
     std::ofstream file(new_path);
