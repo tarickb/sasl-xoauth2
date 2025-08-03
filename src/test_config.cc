@@ -1,4 +1,5 @@
 #include <getopt.h>
+#include <libgen.h>
 #include <sasl/sasl.h>
 #include <string.h>
 
