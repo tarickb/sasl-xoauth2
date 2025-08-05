@@ -55,10 +55,13 @@ class TokenStore {
   std::optional<std::string> override_proxy_;
   std::optional<std::string> override_ca_bundle_file_;
   std::optional<std::string> override_ca_certs_dir_;
+  std::optional<std::string> override_scope_;
   std::optional<int> override_refresh_window_ = 0;
+  std::optional<bool> manage_token_externally_ = false;
+  std::optional<bool> use_client_credentials_ = false;
 
   std::string access_;
-  std::string refresh_;
+  std::optional<std::string> refresh_;
   std::optional<std::string> user_;
   time_t expiry_ = 0;
 

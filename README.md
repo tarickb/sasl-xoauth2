@@ -201,6 +201,8 @@ sasl-xoauth2 also provides two configuration variables, `ca_bundle_file` and
 libraries will look for a CA certificate bundle (for `ca_bundle_file`) or a set
 of CA certificates (for `ca_certs_dir`). Specify one or the other, but not both.
 
+**Remember curl expect a new line after the last certificate in the bundle. If it is missed curl aborts with an read error.**
+
 #### A Note on postmulti
 
 [@jamenlang](https://github.com/jamenlang) has provided a [very helpful
@@ -402,6 +404,25 @@ or:
 ```
 $ sudo chown -R postfix:postfix /var/spool/postfix/etc/tokens
 ```
+
+### Outlook/Office 365 Configuration (Client Credentials Flow)
+
+The initial work at azure entra platform for creating an app is the same like the device flow.
+For preventing initial interaction with a browser we add a secret to the app and can use it for the client credential flow.
+
+Store the client ID and secret in `/etc/sasl-xoauth2.conf`:
+
+```json
+{
+  "client_id": "client ID goes here",
+  "client_secret": "client secret goes here",
+  "use_client_credentials": "true",
+  "scope": "https://outlook.office365.com/.default",
+  "token_endpoint": "https://login.microsoftonline.com/<YOUR TENANT ID>/oauth2/v2.0/token"
+}
+```
+
+This flow prevents the need of a refresh token in the token answer.
 
 ### Outlook/Office 365 Configuration (Legacy Client) (Deprecated)
 
