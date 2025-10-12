@@ -81,7 +81,7 @@ relayhost = [smtp.office365.com]:587
 grep -E '^(smtp|.*chroot)' /etc/postfix/master.cf
 ```
 
-Look at the chroot column. If `y`, use `/var/spool/postfix/etc/tokens/`. If `n`, use `/etc/tokens/`.
+Note whether chroot is enabled (y) or disabled (n) - this determines paths in later steps.
 
 ### Step 3: Configure SASL Password Map
 
