@@ -90,11 +90,7 @@ Add to `/etc/postfix/sasl_passwd`:
 For Gmail:
 ```
 [smtp.gmail.com]:587 username@domain.com:/etc/tokens/username@domain.com
-```
-
-For Outlook:
-```
-[smtp.office365.com]:587 username@domain.com:/etc/tokens/username@domain.com
+# smtp.office365.com for outlook
 ```
 
 Generate database:
@@ -112,10 +108,10 @@ Visit [Google Cloud Platform console](https://console.cloud.google.com/).
 Create or select a project.
 
 Configure OAuth Consent Screen:
-- Set Publishing status to "In production" (prevents 7-day token expiration)
-
-Create Credentials → OAuth client ID:
-- Application type: Desktop app
+- Create a client with application type: Desktop app
+- Copy down the client secret and client id
+- Add a scope for https://mail.google.com (under Manually add scopes section -> add to table)
+- Set Publishing status to "In production" (prevents 7-day token expiration) (if you have google workspace this is not necessary if you use internal option)
 
 Save credentials to `/etc/sasl-xoauth2.conf`:
 
