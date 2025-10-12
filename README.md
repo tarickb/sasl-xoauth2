@@ -47,6 +47,21 @@ sudo make install
 sudo pip3 install msal
 ```
 
+## Important: Chroot Configuration
+
+Check if Postfix chroot is enabled:
+
+```bash
+grep -E '^(smtp|.*chroot)' /etc/postfix/master.cf
+```
+
+**If chroot shows `y`:** Add `/var/spool/postfix` prefix to all paths in this guide.
+- Example: `/etc/tokens/` becomes `/var/spool/postfix/etc/tokens/`
+- Example: `/etc/ssl/certs/` becomes `/var/spool/postfix/etc/ssl/certs/`
+- Note: `/etc/postfix/sasl_passwd` always uses `/etc/tokens/` regardless of chroot
+
+**If chroot shows `n`:** Use paths as written in this guide.
+
 ## Setup Guide
 
 ### Step 1: Configure Postfix
@@ -75,19 +90,7 @@ For Outlook, add:
 relayhost = [smtp.office365.com]:587
 ```
 
-### Step 2: Check Chroot Status
-
-```bash
-grep -E '^(smtp|.*chroot)' /etc/postfix/master.cf
-```
-
-If chroot shows `y`:
-- Token path: `/var/spool/postfix/etc/tokens/username@domain.com`
-
-If chroot shows `n`:
-- Token path: `/etc/tokens/username@domain.com`
-
-### Step 3: Configure SASL Password Map
+### Step 2: Configure SASL Password Map
 
 Add to `/etc/postfix/sasl_passwd`:
 
@@ -107,7 +110,7 @@ Generate database:
 sudo postmap /etc/postfix/sasl_passwd
 ```
 
-### Step 4: Setup OAuth Credentials
+### Step 3: Setup OAuth Credentials
 
 #### For Gmail
 
@@ -181,33 +184,25 @@ For organizational accounts, replace `consumers` with `common`, `organizations`,
 
 For organizational directory accounts, add `client_secret`.
 
-### Step 5: Create Token Directory
-
-If chroot enabled:
-
-```bash
-sudo mkdir -p /var/spool/postfix/etc/tokens
-```
-
-If chroot disabled:
+### Step 4: Create Token Directory
 
 ```bash
 sudo mkdir -p /etc/tokens
 ```
 
-### Step 6: Generate Initial Token
+Remember to add `/var/spool/postfix` prefix if chroot is enabled.
+
+### Step 5: Generate Initial Token
 
 #### For Gmail
 
 ```bash
 sasl-xoauth2-tool get-token gmail \
-    /var/spool/postfix/etc/tokens/username@domain.com \
+    /etc/tokens/username@domain.com \
     --client-id=YOUR_CLIENT_ID \
     --client-secret=YOUR_CLIENT_SECRET \
     --scope="https://mail.google.com/"
 ```
-
-(Use `/etc/tokens/username@domain.com` if chroot disabled)
 
 Open the displayed URL in a browser on the same host and authorize.
 
@@ -215,12 +210,10 @@ Open the displayed URL in a browser on the same host and authorize.
 
 ```bash
 sasl-xoauth2-tool get-token outlook \
-    /var/spool/postfix/etc/tokens/username@domain.com \
+    /etc/tokens/username@domain.com \
     --client-id=YOUR_CLIENT_ID \
     --use-device-flow
 ```
-
-(Use `/etc/tokens/username@domain.com` if chroot disabled)
 
 For non-consumer tenants, add `--tenant=common`, `--tenant=organizations`, or `--tenant=TENANT_ID`.
 
@@ -230,31 +223,23 @@ Visit link in browser, enter code, authorize.
 
 ```bash
 sasl-xoauth2-tool get-token outlook \
-    /var/spool/postfix/etc/tokens/username@domain.com \
+    /etc/tokens/username@domain.com \
     --client-id=YOUR_CLIENT_ID
 ```
-
-(Use `/etc/tokens/username@domain.com` if chroot disabled)
 
 For non-consumer tenants, add `--tenant=common`, `--tenant=organizations`, or `--tenant=TENANT_ID`.
 
 Visit link, authorize, copy resulting URL back to terminal.
 
-### Step 7: Set Permissions
-
-If chroot enabled:
-
-```bash
-sudo chown -R postfix:postfix /var/spool/postfix/etc/tokens
-```
-
-If chroot disabled:
+### Step 6: Set Permissions
 
 ```bash
 sudo chown -R postfix:postfix /etc/tokens
 ```
 
-### Step 8: Test Configuration
+Remember to add `/var/spool/postfix` prefix if chroot is enabled.
+
+### Step 7: Test Configuration
 
 ```bash
 sasl-xoauth2-tool test-config --config-file /etc/sasl-xoauth2.conf
@@ -263,12 +248,12 @@ sasl-xoauth2-tool test-config --config-file /etc/sasl-xoauth2.conf
 Test token refresh:
 
 ```bash
-sasl-xoauth2-tool test-token-refresh /var/spool/postfix/etc/tokens/username@domain.com
+sasl-xoauth2-tool test-token-refresh /etc/tokens/username@domain.com
 ```
 
-(Use `/etc/tokens/username@domain.com` if chroot disabled)
+Remember to add `/var/spool/postfix` prefix if chroot is enabled.
 
-### Step 9: Restart Postfix
+### Step 8: Restart Postfix
 
 ```bash
 sudo service postfix restart
@@ -276,7 +261,7 @@ sudo service postfix restart
 
 ## SSL/TLS Certificates (If Needed)
 
-If chroot enabled and seeing certificate errors, copy certificates:
+If seeing certificate errors with chroot enabled, copy certificates:
 
 ```bash
 sudo mkdir -p /var/spool/postfix/etc/ssl/certs
@@ -329,10 +314,12 @@ sasl-xoauth2-tool test-config --config-file /etc/sasl-xoauth2.conf
 ### Test Token Refresh
 
 ```bash
-sasl-xoauth2-tool test-token-refresh PATH_TO_TOKEN_FILE
+sasl-xoauth2-tool test-token-refresh /etc/tokens/username@domain.com
 ```
 
 Add `--config-file /etc/sasl-xoauth2.conf` if config not in default location.
+
+Remember to add `/var/spool/postfix` prefix to token path if chroot is enabled.
 
 ### Logging Options
 
