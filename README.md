@@ -103,15 +103,35 @@ sudo postmap /etc/postfix/sasl_passwd
 
 #### For Gmail
 
-Visit [Google Cloud Platform console](https://console.cloud.google.com/).
+1. Log into the [Google API Console](https://console.cloud.google.com/) with your Google account
+2. Select a project or create a new project
+3. Under "ENABLE APIS AND SERVICES" search for "Drive" and enable the "Google Drive API"
+4. Click "Credentials" in the left-side panel
+5. If not already configured, click "CONFIGURE CONSENT SCREEN":
+   - Click "Get started"
+   - Enter an "Application name" (e.g., "sasl-xoauth2")
+   - Enter "User Support Email" (your email)
+   - Under Audience select "External" (or "Internal" if you're a Google Workspace user - this restricts to your organization only)
+   - Enter your contact information and click "Create"
+6. Add the required scope:
+   - Click "Data Access" in the left panel
+   - Click "add or remove scopes" or use "Manually add scopes"
+   - Add `https://mail.google.com`
+   - Click "add to table" then "update"
+   - Click "save"
+7. Add test users:
+   - Click "Audience", scroll down and click "+ Add users"
+   - Add yourself as a test user and press "save"
+8. Create OAuth client:
+   - Go to "Overview" on the left panel
+   - Click "Create OAuth client"
+   - Choose application type: "Desktop app"
+   - Click "Create"
+   - Copy down the client ID and client secret
+9. Publish the app (if you selected "External" in step 5):
+   - Go to "Audience" and click "PUBLISH APP"
+   - Confirm to prevent 7-day token expiration
 
-Create or select a project.
-
-Configure OAuth Consent Screen:
-- Create a client with application type: Desktop app
-- Copy down the client secret and client id
-- Add a scope for https://mail.google.com (under Manually add scopes section -> add to table)
-- Set Publishing status to "In production" (prevents 7-day token expiration) (if you have google workspace this is not necessary if you use internal option)
 
 Save credentials to `/etc/sasl-xoauth2.conf`:
 
