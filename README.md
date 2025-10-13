@@ -132,7 +132,6 @@ sudo postmap /etc/postfix/sasl_passwd
    - Go to "Audience" and click "PUBLISH APP"
    - Confirm to prevent 7-day token expiration
 
-
 Save credentials to `/etc/sasl-xoauth2.conf`:
 
 ```json
