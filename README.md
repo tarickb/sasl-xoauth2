@@ -137,9 +137,6 @@ Save credentials to `/etc/sasl-xoauth2.conf`:
 }
 ```
 
-Note: 
-
-
 #### For Outlook (Device Flow)
 
 Follow [Microsoft's app registration instructions](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app#register-an-application):
