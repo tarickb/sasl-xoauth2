@@ -71,14 +71,37 @@ def gmail_get_token_from_code(client_id:str, client_secret:str, authorization_co
     return json.loads(response)
 
 
-def gmail_get_RequestHandler(client_id:str, client_secret:str, output_filename:str, input_dict:dict) -> type:
+def gmail_get_RequestHandler(client_id:str, client_secret:str, output_filename:str, forward_url:str, input_dict:dict) -> type:
     class GMailRequestHandler(http.server.BaseHTTPRequestHandler):
         def log_request(self, code:Union[int,str]='-', size:Union[int,str]='-') -> None:
             # Silence request logging.
             return
 
         def do_GET(self) -> None:
-            code = self.ExtractCodeFromResponse()
+            parse = urllib.parse.urlparse(self.path)
+            if parse.path == '/auth':
+              self.handle_initial_auth(parse)
+            elif parse.path == GOOGLE_OAUTH2_RESULT_PATH:
+              self.handle_google_response(parse)
+
+        def handle_initial_auth(self, parse:urllib.parse.ParseResult) -> None:
+            if not forward_url:
+              print("No forwarding URL!", file=sys.stderr)
+              return
+            self.send_response(302)
+            self.send_header('Location', forward_url)
+            self.end_headers()
+
+        def handle_google_response(self, parse:urllib.parse.ParseResult) -> None:
+            qs = urllib.parse.parse_qs(parse.query)
+            if 'code' not in qs:
+                print(f"Invalid query string in response '{qs}'", file=sys.stderr)
+                return
+            if len(qs['code']) != 1:
+                print(f"Invalid query string code in response '{qs}'", file=sys.stderr)
+                return
+            code = qs['code'][0]
+
             response_code = 400
             response_text = '<html><head><title>Error</title></head><body><h1>Invalid request.</h1></body></html>'
 
@@ -99,34 +122,25 @@ def gmail_get_RequestHandler(client_id:str, client_secret:str, output_filename:s
                     self.server.server_address[1],
                 )
                 dump_overwrite(token, output_filename, input_dict)
-                sys.exit(0)
-
-        def ExtractCodeFromResponse(self) -> Optional[str]:
-            parse = urllib.parse.urlparse(self.path)
-            if parse.path != GOOGLE_OAUTH2_RESULT_PATH:
-                return None
-            qs = urllib.parse.parse_qs(parse.query)
-            if 'code' not in qs:
-                return None
-            if len(qs['code']) != 1:
-                return None
-            return qs['code'][0]
+                print(f"Wrote token to {output_filename}.", file=sys.stderr)
+                os._exit(0)
 
     return GMailRequestHandler
 
 
-def get_token_gmail(client_id:str, client_secret:str, scope:str, output_filename:str, input_dict:dict) -> None:
+def get_token_gmail(client_id:str, client_secret:str, scope:str, output_filename:str, local_listen_port:int, input_dict:dict) -> None:
+    forward_url = gmail_get_auth_url(client_id, scope, local_listen_port)
     request_handler_class = gmail_get_RequestHandler(
         client_id,
         client_secret,
         output_filename,
+        forward_url,
         input_dict,
     )
-    server = http.server.HTTPServer(('', 0), request_handler_class)
-    _, port = server.server_address
+    server = http.server.ThreadingHTTPServer(('', local_listen_port), request_handler_class)
 
-    url = gmail_get_auth_url(client_id, scope, port)
-    print(f"Please open this URL in a browser ON THIS HOST:\n\n{url}\n", file=sys.stderr)
+    url = f'http://localhost:{local_listen_port}/auth'
+    print(f"Please open this URL in a browser ON THIS HOST (or that has port {local_listen_port} forwarded to this host):\n\n{url}\n", file=sys.stderr)
 
     server.serve_forever()
 
@@ -259,6 +273,7 @@ def subcommand_get_token(args:argparse.Namespace) -> None:
             args.client_secret,
             args.scope,
             args.output_file,
+            args.local_listen_port,
             input_dict,
         )
 
@@ -296,6 +311,10 @@ sp_get_token.add_argument(
     default=False,
     action='store_true',
     help='overwrite existing token file (preserves extra fields)',
+)
+sp_get_token.add_argument(
+    '--local-listen-port', type=int, default=54332,
+    help='port to launch local http listener on',
 )
 sp_get_token.add_argument(
     'output_file', nargs='?', type=str, default='-',
