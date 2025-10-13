@@ -125,7 +125,7 @@ sudo postmap /etc/postfix/sasl_passwd
    - Click "Create"
    - Copy down the client ID and client secret
 7. Publish the app (if you selected "External" in step 5):
-   - Go to "Audience" and click "PUBLISH APP"
+   - Go to "Audience" and click "Publish App"
    - Confirm to prevent 7-day token expiration
 
 Save credentials to `/etc/sasl-xoauth2.conf`:
