@@ -1,6 +1,9 @@
 #!/bin/sh
 
-# Don't give an error if, for example, postfix is not installed.
-mkdir /var/spool/postfix/etc/ssl || true
-mkdir /var/spool/postfix/etc/ssl/certs || true
-cp /etc/ssl/certs/ca-certificates.crt /var/spool/postfix/etc/ssl/certs/ca-certificates.crt || true
+if [ ! -d /var/spool/postfix ]; then
+    echo "Postfix chroot not found, skipping copying CA certs"
+    exit 0
+fi
+
+mkdir -p /var/spool/postfix/etc/ssl
+cp -r /etc/ssl/certs /var/spool/postfix/etc/ssl/
