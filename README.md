@@ -1,6 +1,6 @@
 ## sasl-xoauth2
 
-OAuth 2.0 SASL plugin for Postfix SMTP relay with Gmail and Office 365.
+XOAUTH2 Simple Authentication and Security Layer (SASL) plugin for Postfix SMTP relay with Gmail and Office 365.
 
 ## Installation
 
