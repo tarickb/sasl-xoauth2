@@ -187,9 +187,9 @@ sudo mkdir -p /var/spool/postfix/etc/tokens  # Use /etc/tokens if chroot disable
 #### For Gmail
 
 ```bash
-# Use /etc/tokens/username@domain.com if chroot disabled
+# Use /etc/tokens/<username@domain.com> if chroot disabled
 sasl-xoauth2-tool get-token gmail \
-    /var/spool/postfix/etc/tokens/username@domain.com \  
+    /var/spool/postfix/etc/tokens/<username@domain.com> \  
     --client-id=YOUR_CLIENT_ID \
     --client-secret=YOUR_CLIENT_SECRET \
     --scope="https://mail.google.com/"
@@ -204,8 +204,9 @@ Note: The Gmail OAuth flow requires a local server on localhost to receive the a
 #### For Outlook (Device Flow)
 
 ```bash
+# Use /etc/tokens/<username@domain.com> if chroot disabled
 sasl-xoauth2-tool get-token outlook \
-    /var/spool/postfix/etc/tokens/username@domain.com \  # Use /etc/tokens/username@domain.com if chroot disabled
+    /var/spool/postfix/etc/tokens/<username@domain.com> \  
     --client-id=YOUR_CLIENT_ID \
     --use-device-flow
 ```
@@ -217,8 +218,9 @@ Visit link in browser, enter code, authorize.
 #### For Outlook (Legacy Client)
 
 ```bash
+# Use /etc/tokens/<username@domain.com> if chroot disabled
 sasl-xoauth2-tool get-token outlook \
-    /var/spool/postfix/etc/tokens/username@domain.com \  # Use /etc/tokens/username@domain.com if chroot disabled
+    /var/spool/postfix/etc/tokens/<username@domain.com> \  
     --client-id=YOUR_CLIENT_ID
 ```
 
@@ -229,7 +231,8 @@ Visit link, authorize, copy resulting URL back to terminal.
 ### Step 7: Set Permissions
 
 ```bash
-sudo chown -R postfix:postfix /var/spool/postfix/etc/tokens  # Use /etc/tokens if chroot disabled
+# Use /etc/tokens if chroot disabled
+sudo chown -R postfix:postfix /var/spool/postfix/etc/tokens  
 ```
 
 ### Step 8: Test Configuration
@@ -241,7 +244,8 @@ sasl-xoauth2-tool test-config --config-file /etc/sasl-xoauth2.conf
 Test token refresh:
 
 ```bash
-sasl-xoauth2-tool test-token-refresh /var/spool/postfix/etc/tokens/<username@domain.com>  # Use /etc/tokens/username@domain.com if chroot disabled
+# Use /etc/tokens/<username@domain.com> if chroot disabled
+sasl-xoauth2-tool test-token-refresh /var/spool/postfix/etc/tokens/<username@domain.com>  
 ```
 
 ### Step 9: Restart Postfix
