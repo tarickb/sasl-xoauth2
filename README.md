@@ -122,6 +122,9 @@ Save credentials to `/etc/sasl-xoauth2.conf`:
 }
 ```
 
+Note: 
+
+
 #### For Outlook (Device Flow)
 
 Follow [Microsoft's app registration instructions](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app#register-an-application):
@@ -184,14 +187,15 @@ sudo mkdir -p /var/spool/postfix/etc/tokens  # Use /etc/tokens if chroot disable
 #### For Gmail
 
 ```bash
+# Use /etc/tokens/username@domain.com if chroot disabled
 sasl-xoauth2-tool get-token gmail \
-    /var/spool/postfix/etc/tokens/username@domain.com \  # Use /etc/tokens/username@domain.com if chroot disabled
+    /var/spool/postfix/etc/tokens/username@domain.com \  
     --client-id=YOUR_CLIENT_ID \
     --client-secret=YOUR_CLIENT_SECRET \
     --scope="https://mail.google.com/"
 ```
 
-Open the displayed URL in a browser on the same host and authorize.
+Open the displayed URL in a browser on the **same host** and authorize. The OAuth flow that is required for GMail spins up a server on localhost to recieve the callback from consent flow in the browser. TL;DR: This makes it tedious to install this on a headless instnace remotely (you are setting this up via SSD on a remote server). However you can run the sasl-xoauth2-tool locally and do the consent flow or you can forward the localhost server over SSH while running the tool. 
 
 #### For Outlook (Device Flow)
 
@@ -233,7 +237,8 @@ sasl-xoauth2-tool test-config --config-file /etc/sasl-xoauth2.conf
 Test token refresh:
 
 ```bash
-sasl-xoauth2-tool test-token-refresh /var/spool/postfix/etc/tokens/username@domain.com  # Use /etc/tokens/username@domain.com if chroot disabled
+
+sasl-xoauth2-tool test-token-refresh /var/spool/postfix/etc/tokens/<username@domain.com>  # Use /etc/tokens/username@domain.com if chroot disabled
 ```
 
 ### Step 9: Restart Postfix
@@ -241,17 +246,6 @@ sasl-xoauth2-tool test-token-refresh /var/spool/postfix/etc/tokens/username@doma
 ```bash
 sudo service postfix restart
 ```
-
-## SSL/TLS Certificates (If Needed)
-
-If seeing certificate errors:
-
-```bash
-sudo mkdir -p /var/spool/postfix/etc/ssl/certs
-sudo cp /etc/ssl/certs/ca-certificates.crt /var/spool/postfix/etc/ssl/certs/ca-certificates.crt
-```
-
-Ubuntu packages automatically handle this via `/etc/ca-certificates/update.d/postfix-sasl-xoauth2-update-ca-certs`.
 
 ## Multiple Providers or Users
 
@@ -287,6 +281,21 @@ Add to `/etc/sasl-xoauth2.conf`:
 See [curl proxy documentation](https://curl.se/libcurl/c/CURLOPT_PROXY.html) for supported schemes.
 
 ## Debugging
+
+### SSL/TLS Errors
+
+If seeing certificate errors, try copying certificates manually:
+
+```bash
+# you may need to change /var/spool/postfix based on your linux distro
+sudo mkdir -p /var/spool/postfix/etc/ssl/certs 
+sudo cp /etc/ssl/certs/ca-certificates.crt /var/spool/postfix/etc/ssl/certs/ca-certificates.crt
+```
+
+SSL/TLS errors can happen when certificates are missing in chroot installations.
+
+/etc/sasl-xoauth2.conf
+/var/
 
 ### Test Configuration
 
