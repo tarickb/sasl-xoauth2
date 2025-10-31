@@ -18,11 +18,17 @@
 #include <sasl/sasl.h>
 #include <string.h>
 
+#include <memory>
 #include <vector>
 
 namespace sasl_xoauth2 {
 
 namespace {
+
+struct CURLDeleter final {
+  void operator()(CURL *curl) const { curl_easy_cleanup(curl); }
+};
+using UniqueCURL = std::unique_ptr<CURL, CURLDeleter>;
 
 constexpr char kUserAgent[] = "sasl xoauth2 token refresher";
 
@@ -93,7 +99,7 @@ int HttpPost(HttpPostOptions options) {
   *options.response_code = 0;
   options.response->clear();
 
-  CURL *curl = curl_easy_init();
+  UniqueCURL curl(curl_easy_init());
   if (!curl) {
     *options.error = "Unable to create CURL handle.";
     return SASL_BADPROT;
@@ -104,46 +110,45 @@ int HttpPost(HttpPostOptions options) {
   char transport_error[CURL_ERROR_SIZE] = {'\0'};
 
   // Behavior.
-  curl_easy_setopt(curl, CURLOPT_VERBOSE, false);
-  curl_easy_setopt(curl, CURLOPT_NOPROGRESS, true);
-  curl_easy_setopt(curl, CURLOPT_NOSIGNAL, true);
+  curl_easy_setopt(curl.get(), CURLOPT_VERBOSE, false);
+  curl_easy_setopt(curl.get(), CURLOPT_NOPROGRESS, true);
+  curl_easy_setopt(curl.get(), CURLOPT_NOSIGNAL, true);
 
   // Errors.
-  curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, transport_error);
+  curl_easy_setopt(curl.get(), CURLOPT_ERRORBUFFER, transport_error);
 
   // Network.
-  curl_easy_setopt(curl, CURLOPT_URL, options.url.c_str());
+  curl_easy_setopt(curl.get(), CURLOPT_URL, options.url.c_str());
 
   // Certs.
   if (options.ca_certs_dir.empty()) {
     if (options.ca_bundle_file.empty()) {
       // Use default CA location.
     } else {
-      curl_easy_setopt(curl, CURLOPT_CAINFO, options.ca_bundle_file.c_str());
+      curl_easy_setopt(curl.get(), CURLOPT_CAINFO, options.ca_bundle_file.c_str());
     }
   } else {
-    curl_easy_setopt(curl, CURLOPT_CAPATH, options.ca_certs_dir.c_str());
+    curl_easy_setopt(curl.get(), CURLOPT_CAPATH, options.ca_certs_dir.c_str());
   }
 
   // HTTP.
-  curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, true);
-  curl_easy_setopt(curl, CURLOPT_USERAGENT, kUserAgent);
+  curl_easy_setopt(curl.get(), CURLOPT_FOLLOWLOCATION, true);
+  curl_easy_setopt(curl.get(), CURLOPT_USERAGENT, kUserAgent);
   if (!options.proxy.empty())
-    curl_easy_setopt(curl, CURLOPT_PROXY, options.proxy.c_str());
-  curl_easy_setopt(curl, CURLOPT_POST, true);
-  curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE_LARGE,
+    curl_easy_setopt(curl.get(), CURLOPT_PROXY, options.proxy.c_str());
+  curl_easy_setopt(curl.get(), CURLOPT_POST, true);
+  curl_easy_setopt(curl.get(), CURLOPT_POSTFIELDSIZE_LARGE,
                    static_cast<curl_off_t>(context.to_server_size()));
 
   // Callbacks.
-  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &RequestContext::Write);
-  curl_easy_setopt(curl, CURLOPT_WRITEDATA, &context);
-  curl_easy_setopt(curl, CURLOPT_READFUNCTION, &RequestContext::Read);
-  curl_easy_setopt(curl, CURLOPT_READDATA, &context);
-  curl_easy_setopt(curl, CURLOPT_SEEKFUNCTION, &RequestContext::Seek);
-  curl_easy_setopt(curl, CURLOPT_SEEKDATA, &context);
+  curl_easy_setopt(curl.get(), CURLOPT_WRITEFUNCTION, &RequestContext::Write);
+  curl_easy_setopt(curl.get(), CURLOPT_WRITEDATA, &context);
+  curl_easy_setopt(curl.get(), CURLOPT_READFUNCTION, &RequestContext::Read);
+  curl_easy_setopt(curl.get(), CURLOPT_READDATA, &context);
+  curl_easy_setopt(curl.get(), CURLOPT_SEEKFUNCTION, &RequestContext::Seek);
+  curl_easy_setopt(curl.get(), CURLOPT_SEEKDATA, &context);
 
-  CURLcode err = curl_easy_perform(curl);
-  curl_easy_cleanup(curl);
+  CURLcode err = curl_easy_perform(curl.get());
 
   if (err != CURLE_OK) {
     *options.error = transport_error;
@@ -154,7 +159,7 @@ int HttpPost(HttpPostOptions options) {
     return SASL_BADPROT;
   }
 
-  curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, options.response_code);
+  curl_easy_getinfo(curl.get(), CURLINFO_RESPONSE_CODE, options.response_code);
   *options.response = context.from_server();
   return SASL_OK;
 }
