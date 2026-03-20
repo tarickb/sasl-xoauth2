@@ -48,7 +48,10 @@ The top-level JSON object can contain the following keys:
 
 `token_endpoint`
 
-: URL to use when requesting tokens; defaults to Google, must be overridden for use with Microsoft/Outlook
+: URL to use when requesting tokens; defaults to Google, must be overridden for use with Microsoft/Outlook.
+  For national clouds, use the appropriate endpoint:
+  US Government: `https://login.microsoftonline.us/{tenant}/oauth2/v2.0/token`;
+  China (21Vianet): `https://login.partner.microsoftonline.cn/{tenant}/oauth2/v2.0/token`
 
 `proxy`
 

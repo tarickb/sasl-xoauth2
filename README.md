@@ -359,6 +359,53 @@ tenant ID. See [Microsoft's OAuth protocol
 documentation](https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-v2-protocols#endpoints)
 for more on this.
 
+#### A Note on National Clouds (US Government, 21Vianet)
+
+Microsoft operates separate cloud environments for government and sovereign
+regions. These use different login endpoints and SMTP scope domains. The
+`sasl-xoauth2-tool` supports the following environments via the `--cloud` flag:
+
+| Cloud | `--cloud` value | Login endpoint | SMTP scope domain |
+|---|---|---|---|
+| Public (default) | `public` | `login.microsoftonline.com` | `outlook.office.com` |
+| US Government GCC High | `usgov` | `login.microsoftonline.us` | `outlook.office365.us` |
+| US Government DoD | `usgov-dod` | `login.microsoftonline.us` | `outlook.office365.us` |
+| China (21Vianet) | `china` | `login.partner.microsoftonline.cn` | `partner.outlook.cn` |
+
+For US Government, the configuration file should use the corresponding token
+endpoint:
+
+```json
+{
+  "client_id": "client ID goes here",
+  "client_secret": "",
+  "token_endpoint": "https://login.microsoftonline.us/TENANT_ID/oauth2/v2.0/token"
+}
+```
+
+For China (21Vianet):
+
+```json
+{
+  "client_id": "client ID goes here",
+  "client_secret": "",
+  "token_endpoint": "https://login.partner.microsoftonline.cn/TENANT_ID/oauth2/v2.0/token"
+}
+```
+
+If your cloud environment is not yet listed, you can override individual
+settings with `--login-base` and `--scope`:
+
+```shell
+$ sasl-xoauth2-tool get-token outlook \
+    PATH_TO_TOKENS_FILE \
+    --client-id=CLIENT_ID \
+    --tenant=TENANT_ID \
+    --login-base=https://login.microsoftonline.us \
+    --scope="openid offline_access https://outlook.office365.us/SMTP.Send" \
+    --use-device-flow
+```
+
 #### Initial Access Token
 
 The sasl-xoauth2 package includes a script that can assist in the generation of
@@ -371,6 +418,9 @@ $ sasl-xoauth2-tool get-token outlook \
     --use-device-flow
 To sign in, use a web browser to open the page https://www.microsoft.com/link and enter the code REDACTED to authenticate.
 ```
+
+For national clouds, add the `--cloud` flag (e.g. `--cloud=usgov` or
+`--cloud=china`).
 
 If using a tenant other than `consumers`, pass `--tenant=common`,
 `--tenant=organizations`, or `--tenant=TENANT_ID`. The client ID will
@@ -448,7 +498,9 @@ for use with consumer Outlook accounts. For other types of accounts it may be
 necessary to replace `consumers` with `common`, `organizations`, or a specific
 tenant ID. See [Microsoft's OAuth protocol
 documentation](https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-v2-protocols#endpoints)
-for more on this.
+for more on this. For national clouds (US Government, 21Vianet), see
+[A Note on National Clouds](#a-note-on-national-clouds-us-government-21vianet)
+in the Device Flow section above.
 
 #### Initial Access Token
 
