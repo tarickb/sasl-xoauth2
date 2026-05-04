@@ -29,11 +29,14 @@ class Config {
 
   static int Init(std::string path = "");
   static int InitForTesting(const Json::Value &root);
+  static int SetClientCredentialsForTesting(std::string grant_type, std::string scope);
 
   static Config *Get();
 
   std::string client_id() const { return client_id_; }
   std::string client_secret() const { return client_secret_; }
+  std::string grant_type() const { return grant_type_; }
+  std::string client_credentials_scope() const { return client_credentials_scope_; }
   bool always_log_to_syslog() const { return always_log_to_syslog_; }
   bool log_to_syslog_on_failure() const { return log_to_syslog_on_failure_; }
   bool log_full_trace_on_failure() const { return log_full_trace_on_failure_; }
@@ -50,6 +53,8 @@ class Config {
 
   std::string client_id_;
   std::string client_secret_;
+  std::string grant_type_ = "refresh";
+  std::string client_credentials_scope_ = "";
   bool always_log_to_syslog_ = false;
   bool log_to_syslog_on_failure_ = true;
   bool log_full_trace_on_failure_ = false;
