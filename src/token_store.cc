@@ -109,10 +109,24 @@ int TokenStore::Refresh() {
   const std::string ca_certs_dir =
       override_ca_certs_dir_.value_or(Config::Get()->ca_certs_dir());
 
-  const std::string request =
+  const std::string grant_type =
+      override_grant_type_.value_or(Config::Get()->grant_type());
+
+  const std::string client_credentials_scope =
+      override_client_credentials_scope_.value_or(Config::Get()->client_credentials_scope());
+
+  std::string request =
       std::string("client_id=") + client_id +
       "&client_secret=" + client_secret +
       "&grant_type=refresh_token&refresh_token=" + refresh_;
+
+  if (grant_type == "client_credentials"){
+    request =
+      std::string("client_id=") + client_id +
+      "&client_secret=" + client_secret +
+      "&grant_type=client_credentials&scope=" + client_credentials_scope;
+  }
+
   std::string response;
   long response_code = 0;
   log_->Write("TokenStore::Refresh: token_endpoint: %s",
@@ -199,11 +213,14 @@ int TokenStore::Read() {
     ReadOverride(root, "proxy", &override_proxy_);
     ReadOverride(root, "ca_bundle_file", &override_ca_bundle_file_);
     ReadOverride(root, "ca_certs_dir", &override_ca_certs_dir_);
+    ReadOverride(root, "grant_type", &override_grant_type_);
+    ReadOverride(root, "client_credentials_scope", &override_client_credentials_scope_);
 
     if (root.isMember("refresh_window"))
       override_refresh_window_ = stoi(root["refresh_window"].asString());
 
     refresh_ = root["refresh_token"].asString();
+
     if (root.isMember("access_token"))
       access_ = root["access_token"].asString();
     if (root.isMember("expiry")) expiry_ = stoi(root["expiry"].asString());
@@ -242,6 +259,8 @@ int TokenStore::Write() {
     WriteOverride("proxy", override_proxy_, &root);
     WriteOverride("ca_bundle_file", override_ca_bundle_file_, &root);
     WriteOverride("ca_certs_dir", override_ca_certs_dir_, &root);
+    WriteOverride("grant_type", override_grant_type_, &root);
+    WriteOverride("client_credentials_scope", override_client_credentials_scope_, &root);
 
     if (override_refresh_window_) {
       root["refresh_window"] = std::to_string(*override_refresh_window_);
