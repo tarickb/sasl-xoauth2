@@ -1,0 +1,5 @@
+sasl-xoauth2 (0.27-1ubuntu1~resolute1~ppa1) resolute; urgency=medium
+
+  * Initial release for Ubuntu 26.04.
+
+ -- Tarick Bedeir (Ubuntu Development) <tarick@bedeir.com>  Sun, 11 Oct 2026 17:30:26 +0000
