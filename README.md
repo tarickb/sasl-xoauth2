@@ -78,6 +78,22 @@ likely because the sasl-xoauth2 plugin, running within the Postfix `smtp`
 process, is unable to read, write, or create a new token file. If in doubt,
 check your SELinux audit logs.
 
+### A Note on Ubuntu 26.04
+
+If you encounter errors from sasl-xoauth2 about a read-only filesystem, relax
+the sandboxing for Postfix (thank you @bernd-it for pointing this out):
+
+```
+systemctl edit postfix.service
+```
+
+And then add:
+
+```
+[Service]
+ProtectSystem=true
+```
+
 ## Configuration
 
 ### Configure Mail Agent
