@@ -1,3 +1,9 @@
+sasl-xoauth2 (0.28-1ubuntu1~resolute1~ppa2) resolute; urgency=medium
+
+  * Fix packaging issue.
+
+ -- Tarick Bedeir (Ubuntu Development) <tarick@bedeir.com>  Mon, 12 Oct 2026 04:07:12 +0000
+
 sasl-xoauth2 (0.28-1ubuntu1~resolute1~ppa1) resolute; urgency=medium
 
   * Update postfix-sasl-xoauth2-update-ca-certs script to check for Postfix chroot existence before copying CA certs
