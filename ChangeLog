@@ -1,3 +1,11 @@
+sasl-xoauth2 (0.28) unstable; urgency=low
+
+  * Fix CURL handle use-after-free (thanks @dechamps).
+  * Simplify Google auth flow for headless environments.
+  * Better error handling in scripts.
+
+ -- Tarick Bedeir <tarick@bedeir.com>  Sun, 11 Oct 2026 20:58:00 -0700
+
 sasl-xoauth2 (0.27) unstable; urgency=low
 
   * Fix bug preventing tokens from specifying empty client secrets.
