@@ -1,3 +1,15 @@
+sasl-xoauth2 (0.28-1ubuntu1~resolute1~ppa1) resolute; urgency=medium
+
+  * Update postfix-sasl-xoauth2-update-ca-certs script to check for Postfix chroot existence before copying CA certs
+  * Fix newline at end of file in postfix-sasl-xoauth2-update-ca-certs script
+  * Add set -e to postfix-sasl-xoauth2-update-ca-certs script for better error handling
+  * Simplify Google auth flow for headless environments.
+  * Fix curl_easy_getinfo() called after cleanup
+  * feat: add national cloud support for M365 sovereign environments
+  * Add note on systemd sandboxing for Ubuntu 26.04.
+
+ -- Tarick Bedeir (Ubuntu Development) <tarick@bedeir.com>  Mon, 12 Oct 2026 04:03:00 +0000
+
 sasl-xoauth2 (0.27-1ubuntu1~resolute1~ppa1) resolute; urgency=medium
 
   * Initial release for Ubuntu 26.04.
