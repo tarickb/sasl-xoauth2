@@ -1,3 +1,9 @@
+sasl-xoauth2 (0.28-1ubuntu1~resolute2~ppa2) resolute; urgency=medium
+
+  * Packaging...
+
+ -- Tarick Bedeir (Ubuntu Development) <tarick@bedeir.com>  Mon, 12 Oct 2026 04:16:05 +0000
+
 sasl-xoauth2 (0.28-1ubuntu1~resolute2~ppa1) resolute; urgency=medium
 
   * Packaging issues, again.
