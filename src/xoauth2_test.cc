@@ -625,6 +625,53 @@ bool TestFailedPreemptiveTokenRefresh(sasl_client_plug_t plug) {
   return true;
 }
 
+bool TestWithClientCredentials(sasl_client_plug_t plug) {
+  PrintTestName(__func__);
+  SetPasswordToExpiredToken();
+  sasl_xoauth2::SetHttpInterceptForTesting(&DefaultHttpIntercept);
+
+  sasl_utils_t utils = {};
+  utils.free = &FakeFree;
+  utils.getcallback = &FakeGetCallbackAll;
+  utils.malloc = &FakeMalloc;
+
+  void *context = nullptr;
+  TEST_ASSERT_OK(plug.mech_new(nullptr, nullptr, &context));
+  PlugCleanup _(&utils, plug, context);
+
+  sasl_client_params_t params = {};
+  params.utils = &utils;
+  params.canon_user = &FakeCanonUser;
+
+  const char *to_server = nullptr;
+  unsigned int to_server_len = 0;
+  sasl_out_params_t out_params = {};
+
+  bool intercept_called = false;
+  sasl_xoauth2::SetHttpInterceptForTesting(
+      [&intercept_called](sasl_xoauth2::HttpPostOptions options) {
+        *options.response =
+            R"({"access_token": "refreshed_access", "expires_in": 3600})";
+        *options.response_code = 200;
+        intercept_called = true;
+        return SASL_OK;
+      });
+
+  TEST_ASSERT_OK(plug.mech_step(context, &params, nullptr, 0, nullptr,
+                                &to_server, &to_server_len, &out_params));
+  fprintf(stderr, "to_server=[%s], len=%d\n", to_server, to_server_len);
+  TEST_ASSERT(strstr(to_server, "Bearer") != nullptr);
+  TEST_ASSERT(strstr(to_server, "refreshed_access") != nullptr);
+  TEST_ASSERT(strstr(to_server, kUserName.c_str()) != nullptr);
+  TEST_ASSERT(intercept_called);
+
+  TEST_ASSERT_OK(plug.mech_step(context, &params, "", 0, nullptr, &to_server,
+                                &to_server_len, &out_params));
+  TEST_ASSERT(to_server_len == 0);
+
+  return true;
+}
+
 int main(int argc, char **argv) {
   sasl_xoauth2::EnableLoggingForTesting();
 
@@ -662,6 +709,8 @@ int main(int argc, char **argv) {
   TEST_ABORT(TestWithTokenExpiredError(plug));
   TEST_ABORT(TestPreemptiveTokenRefresh(plug));
   TEST_ABORT(TestFailedPreemptiveTokenRefresh(plug));
+  TEST_ASSERT_OK(sasl_xoauth2::Config::SetClientCredentialsForTesting("client_credentials","https://outlook.office365.com/.default"));
+  TEST_ABORT(TestWithClientCredentials(plug));
 
   Cleanup();
   fprintf(stderr, "\nALL TESTS PASS.\n");

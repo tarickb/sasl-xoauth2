@@ -133,6 +133,14 @@ int Config::InitForTesting(const Json::Value &root) {
   return s_config->Init(root);
 }
 
+int Config::SetClientCredentialsForTesting(std::string grant_type, std::string scope){
+  if (s_config){
+    s_config->grant_type_ = grant_type;
+    s_config->client_credentials_scope_ = scope;
+  }
+  return 0;
+}
+
 Config *Config::Get() {
   if (!s_config) {
     Log("sasl-xoauth2: Attempt to fetch before calling Init()!\n");
@@ -149,6 +157,12 @@ int Config::Init(const Json::Value &root) {
     if (err != SASL_OK) return err;
 
     err = Fetch(root, "client_secret", false, &client_secret_);
+    if (err != SASL_OK) return err;
+
+    err = Fetch(root, "grant_type", true, &grant_type_);
+    if (err != SASL_OK) return err;
+
+    err = Fetch(root, "client_credentials_scope", true, &client_credentials_scope_);
     if (err != SASL_OK) return err;
 
     err = Fetch(root, "always_log_to_syslog", true,
