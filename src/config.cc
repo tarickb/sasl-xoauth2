@@ -151,6 +151,9 @@ int Config::Init(const Json::Value &root) {
     err = Fetch(root, "client_secret", false, &client_secret_);
     if (err != SASL_OK) return err;
 
+    err = Fetch(root, "scope", true, &scope_);
+    if (err != SASL_OK) return err;
+
     err = Fetch(root, "always_log_to_syslog", true,
                 &always_log_to_syslog_);
     if (err != SASL_OK) return err;
@@ -176,6 +179,14 @@ int Config::Init(const Json::Value &root) {
     if (err != SASL_OK) return err;
 
     err = Fetch(root, "ca_certs_dir", true, &ca_certs_dir_);
+    if (err != SASL_OK) return err;
+
+    err = Fetch(root, "manage_token_externally", true,
+                &manage_token_externally_);
+    if (err != SASL_OK) return err;
+
+    err = Fetch(root, "use_client_credentials", true,
+            &use_client_credentials_);
     if (err != SASL_OK) return err;
 
     return 0;
