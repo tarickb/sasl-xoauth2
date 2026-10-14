@@ -66,6 +66,13 @@ void SetPasswordToValidToken() {
   fclose(f);
 }
 
+void SetPasswordToValidTokenAfter2038() {
+  FILE *f = OpenTempTokenFile();
+  // 2100-01-01T00:00:00Z: past the 32-bit time_t limit (2038-01-19).
+  fprintf(f, kTokenTemplate, "access", "refresh", "4102444800");
+  fclose(f);
+}
+
 void SetPasswordToValidTokenWithUserOverride(const std::string &user) {
   FILE *f = OpenTempTokenFile();
   std::string expiry_str = std::to_string(time(nullptr) + 3600);
@@ -349,6 +356,42 @@ bool TestWithCallbacks(sasl_client_plug_t plug) {
   TEST_ASSERT_OK(plug.mech_step(context, &params, "", 0, nullptr, &to_server,
                                 &to_server_len, &out_params));
   TEST_ASSERT(to_server_len == 0);
+
+  return true;
+}
+
+bool TestWithExpiryAfter2038(sasl_client_plug_t plug) {
+  PrintTestName(__func__);
+  SetPasswordToValidTokenAfter2038();
+  bool intercept_called = false;
+  sasl_xoauth2::SetHttpInterceptForTesting(
+      [&intercept_called](sasl_xoauth2::HttpPostOptions options) {
+        intercept_called = true;
+        return SASL_FAIL;
+      });
+
+  sasl_utils_t utils = {};
+  utils.free = &FakeFree;
+  utils.getcallback = &FakeGetCallbackAll;
+  utils.malloc = &FakeMalloc;
+
+  void *context = nullptr;
+  TEST_ASSERT_OK(plug.mech_new(nullptr, nullptr, &context));
+  PlugCleanup _(&utils, plug, context);
+
+  sasl_client_params_t params = {};
+  params.utils = &utils;
+  params.canon_user = &FakeCanonUser;
+
+  const char *to_server = nullptr;
+  unsigned int to_server_len = 0;
+  sasl_out_params_t out_params = {};
+
+  // The token is valid until 2100, so it is sent as-is with no refresh.
+  TEST_ASSERT_OK(plug.mech_step(context, &params, nullptr, 0, nullptr,
+                                &to_server, &to_server_len, &out_params));
+  TEST_ASSERT(strstr(to_server, "Bearer access") != nullptr);
+  TEST_ASSERT(!intercept_called);
 
   return true;
 }
@@ -656,6 +699,7 @@ int main(int argc, char **argv) {
   TEST_ABORT(TestWithPrompts(plug));
   TEST_ABORT(TestWithoutPrompts(plug));
   TEST_ABORT(TestWithCallbacks(plug));
+  TEST_ABORT(TestWithExpiryAfter2038(plug));
   TEST_ABORT(TestWithCallbacksAndUserOverride(plug));
   TEST_ABORT(TestWithCallbacksAndOtherOverrides(plug));
   TEST_ABORT(TestWithPermanentError(plug));

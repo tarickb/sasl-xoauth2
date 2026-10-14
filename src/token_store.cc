@@ -206,7 +206,9 @@ int TokenStore::Read() {
     refresh_ = root["refresh_token"].asString();
     if (root.isMember("access_token"))
       access_ = root["access_token"].asString();
-    if (root.isMember("expiry")) expiry_ = stoi(root["expiry"].asString());
+    // stoll, not stoi: Unix times from 2038-01-19 on do not fit in an int.
+    if (root.isMember("expiry"))
+      expiry_ = static_cast<time_t>(stoll(root["expiry"].asString()));
 
     ReadOverride(root, "user", &user_);
 
