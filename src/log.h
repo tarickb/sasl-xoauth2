@@ -25,6 +25,10 @@ namespace sasl_xoauth2 {
 
 void EnableLoggingForTesting();
 
+// Stand-in for a secret (token, client secret) in log lines: its length only,
+// so a trace still shows whether a value was present without revealing it.
+std::string RedactSecret(const std::string &secret);
+
 // Log implementation interface, not for direct use.
 class LogImpl {
  public:

@@ -625,8 +625,18 @@ bool TestFailedPreemptiveTokenRefresh(sasl_client_plug_t plug) {
   return true;
 }
 
+bool TestRedactSecret() {
+  PrintTestName(__func__);
+  TEST_ASSERT(sasl_xoauth2::RedactSecret("") == "<empty>");
+  const std::string redacted = sasl_xoauth2::RedactSecret("ya29.secret");
+  TEST_ASSERT(redacted == "<redacted, 11 bytes>");
+  TEST_ASSERT(redacted.find("secret") == std::string::npos);
+  return true;
+}
+
 int main(int argc, char **argv) {
   sasl_xoauth2::EnableLoggingForTesting();
+  TEST_ABORT(TestRedactSecret());
 
   Json::Value config;
   config["client_id"] = "dummy client id";
