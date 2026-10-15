@@ -117,7 +117,11 @@ int TokenStore::Refresh() {
   long response_code = 0;
   log_->Write("TokenStore::Refresh: token_endpoint: %s",
               token_endpoint.c_str());
-  log_->Write("TokenStore::Refresh: request: %s", request.c_str());
+  log_->Write(
+      "TokenStore::Refresh: request: client_id=%s, client_secret=%s, "
+      "grant_type=refresh_token, refresh_token=%s",
+      client_id.c_str(), RedactSecret(client_secret).c_str(),
+      RedactSecret(refresh_).c_str());
 
   std::string http_error;
   int err = HttpPost({.url = token_endpoint,
@@ -133,13 +137,16 @@ int TokenStore::Refresh() {
     return err;
   }
 
-  log_->Write("TokenStore::Refresh: code=%d, response=%s", response_code,
-              response.c_str());
-
   if (response_code != 200) {
+    // An error response carries the provider's reason and no tokens.
+    log_->Write("TokenStore::Refresh: code=%d, response=%s", response_code,
+                response.c_str());
     log_->Write("TokenStore::Refresh: request failed");
     return SASL_BADPROT;
   }
+  // A successful response carries the new access (and maybe refresh) token.
+  log_->Write("TokenStore::Refresh: code=%d, response=%s", response_code,
+              RedactSecret(response).c_str());
 
   try {
     std::stringstream ss(response);
@@ -213,7 +220,8 @@ int TokenStore::Read() {
     ReadOverride(root, "user", &user_);
 
     log_->Write("TokenStore::Read: refresh=%s, access=%s, user=%s",
-                refresh_.c_str(), access_.c_str(), user_.value_or("").c_str());
+                RedactSecret(refresh_).c_str(), RedactSecret(access_).c_str(),
+                user_.value_or("").c_str());
     return SASL_OK;
 
   } catch (const std::exception &e) {

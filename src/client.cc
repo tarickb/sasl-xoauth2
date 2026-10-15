@@ -284,7 +284,8 @@ int Client::SendToken(const char **to_server, unsigned int *to_server_len) {
   if (err != SASL_OK) return err;
 
   response_ = "user=" + user_ + "\1auth=Bearer " + token + "\1\1";
-  log_->Write("Client::SendToken: response: %s", response_.c_str());
+  log_->Write("Client::SendToken: user=%s, token=%s", user_.c_str(),
+              RedactSecret(token).c_str());
 
   *to_server = response_.data();
   *to_server_len = response_.size();

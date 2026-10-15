@@ -82,6 +82,11 @@ std::unique_ptr<LogImpl> CreateLogImpl(Log::Target target) {
 
 }  // namespace
 
+std::string RedactSecret(const std::string &secret) {
+  if (secret.empty()) return "<empty>";
+  return "<redacted, " + std::to_string(secret.size()) + " bytes>";
+}
+
 void EnableLoggingForTesting() {
   s_default_options = Log::OPTIONS_IMMEDIATE;
   s_default_target = Log::TARGET_STDERR;
