@@ -54,7 +54,8 @@ int Transform(std::string in, T *out) {
 
 template <>
 int Transform(std::string in, bool *out) {
-  std::for_each(in.begin(), in.end(), [](char c) { return std::tolower(c); });
+  std::transform(in.begin(), in.end(), in.begin(),
+                 [](unsigned char c) { return std::tolower(c); });
   if (in == "yes" || in == "true") {
     *out = true;
     return SASL_OK;
