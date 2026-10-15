@@ -243,7 +243,10 @@ int Client::TokenSentStep(sasl_client_params_t *params,
   *to_server = nullptr;
   *to_server_len = 0;
 
-  log_->Write("Client::TokenSentStep: from server: %s", from_server);
+  // from_server is from_server_len bytes and need not be NUL-terminated.
+  log_->Write("Client::TokenSentStep: from server: %.*s",
+              static_cast<int>(from_server_len),
+              from_server ? from_server : "");
 
   if (from_server_len == 0) return SASL_OK;
 
